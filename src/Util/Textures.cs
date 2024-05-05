@@ -1,17 +1,16 @@
-namespace Chess.Util;
-
 using System.Collections.Generic;
 using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-static class Textures
+namespace Chess.Util;
+internal class Textures
 {
-    private static readonly Dictionary<string, Texture2D> textures = new();
-    public static void Load(Game game)
+    private readonly Dictionary<string, Texture2D> textures = new();
+    internal void Load(Game game)
     {
         var contentManager = game.Content;
-        var textureFiles = Directory.EnumerateFiles(contentManager.RootDirectory + "/Textures", "*.xnb");
+        var textureFiles = Directory.EnumerateFiles(contentManager.RootDirectory, "*.xnb");
     
         foreach (var textureFile in textureFiles)
         {
@@ -20,7 +19,7 @@ static class Textures
             textures.Add(textureName, texture);
         }
     }
-    public static Texture2D Get(string name)
+    internal Texture2D Get(string name)
     {
         return textures[name];
     }

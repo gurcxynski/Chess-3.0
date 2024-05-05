@@ -1,1 +1,7 @@
 Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds
+"C:/Users/wojci/Desktop/cplotek/Chess/Content/Bishop.png","C:/Users/wojci/Desktop/cplotek/Chess/Content/bin/Windows/Content/Bishop.xnb","TextureProcessor","Texture2DContent",2960,105485,0.0926699
+"C:/Users/wojci/Desktop/cplotek/Chess/Content/King.png","C:/Users/wojci/Desktop/cplotek/Chess/Content/bin/Windows/Content/King.xnb","TextureProcessor","Texture2DContent",2237,105485,0.0066717
+"C:/Users/wojci/Desktop/cplotek/Chess/Content/Knight.png","C:/Users/wojci/Desktop/cplotek/Chess/Content/bin/Windows/Content/Knight.xnb","TextureProcessor","Texture2DContent",2570,105485,0.0057762
+"C:/Users/wojci/Desktop/cplotek/Chess/Content/Pawn.png","C:/Users/wojci/Desktop/cplotek/Chess/Content/bin/Windows/Content/Pawn.xnb","TextureProcessor","Texture2DContent",2223,105485,0.0044836
+"C:/Users/wojci/Desktop/cplotek/Chess/Content/Queen.png","C:/Users/wojci/Desktop/cplotek/Chess/Content/bin/Windows/Content/Queen.xnb","TextureProcessor","Texture2DContent",2347,105485,0.0040791
+"C:/Users/wojci/Desktop/cplotek/Chess/Content/Rook.png","C:/Users/wojci/Desktop/cplotek/Chess/Content/bin/Windows/Content/Rook.xnb","TextureProcessor","Texture2DContent",2137,105485,0.0050984
