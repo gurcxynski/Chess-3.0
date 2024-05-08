@@ -1,7 +1,6 @@
-
-using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended;
 using MonoGame.Extended.Input.InputListeners;
 
 namespace Chess.Core;
@@ -14,14 +13,15 @@ internal class Scene {
     internal Scene() {
         mouseListener.MouseClicked += (sender, args) => {
             Vector2 pos = new(args.Position.X / Game1.Size, args.Position.Y / Game1.Size);
-            if (SelectedPiece is null) {
-                Piece p = board.GetPieceAt(pos);
-                if (p is not null && p.IsWhite == board.WhiteToMove) SelectedPiece = p;
+            Piece clicked = board.GetPieceAt(pos);
+            if (SelectedPiece is null && clicked is null) return;
+            if (SelectedPiece is not null && (clicked is null || clicked.IsWhite != board.WhiteToMove)) {
+                board.ExecuteMove(new Move(SelectedPiece.GridPosition, pos, board));
+                SelectedPiece = null;
                 return;
             }
-            Move move = new(SelectedPiece.GridPosition, pos, board);
-            board.ExecuteMove(move);
-            SelectedPiece = null;
+            if (clicked.IsWhite == board.WhiteToMove) SelectedPiece = clicked;
+
         };
         keyboardListener.KeyTyped += (sender, args) => {
             board.UndoMove();
@@ -31,5 +31,8 @@ internal class Scene {
         mouseListener.Update(gameTime);
         keyboardListener.Update(gameTime);
     }
-    internal void Draw(SpriteBatch spriteBatch) => board.Draw(spriteBatch);
+    internal void Draw(SpriteBatch spriteBatch) {
+        if (SelectedPiece is not null) spriteBatch.FillRectangle(new RectangleF(SelectedPiece.DrawPosition, new Size2(Game1.Size, Game1.Size)), Color.Yellow);
+        board.Draw(spriteBatch);
+    }
 }
