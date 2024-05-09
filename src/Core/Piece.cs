@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -24,15 +25,11 @@ namespace Chess.Core
             spriteBatch.Draw(texture, destinationRectangle, texture.Bounds, Color.White);
         }
 
-        internal void Update(GameTime gameTime)
-        {
-
-        }
-
         internal void Move(Vector2 pos)
         {
             GridPosition = pos;
         }
+        
     }
 
     internal enum PieceType

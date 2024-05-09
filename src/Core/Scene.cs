@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
@@ -11,13 +12,13 @@ internal class Scene {
 
     private Piece SelectedPiece;
     internal Scene() {
-        mouseListener.MouseClicked += (sender, args) => {
+        mouseListener.MouseUp += (sender, args) => {
+            Console.WriteLine(args.Position);
             Vector2 pos = new(args.Position.X / Game1.Size, args.Position.Y / Game1.Size);
             Piece clicked = board.GetPieceAt(pos);
             if (SelectedPiece is null && clicked is null) return;
             if (SelectedPiece is not null && (clicked is null || clicked.IsWhite != board.WhiteToMove)) {
-                board.ExecuteMove(new Move(SelectedPiece.GridPosition, pos, board));
-                SelectedPiece = null;
+                if (board.ExecuteMove(new Move(SelectedPiece.GridPosition, pos, board))) SelectedPiece = null;
                 return;
             }
             if (clicked.IsWhite == board.WhiteToMove) SelectedPiece = clicked;
@@ -30,9 +31,12 @@ internal class Scene {
     internal void Update(GameTime gameTime) {
         mouseListener.Update(gameTime);
         keyboardListener.Update(gameTime);
+        
     }
     internal void Draw(SpriteBatch spriteBatch) {
-        if (SelectedPiece is not null) spriteBatch.FillRectangle(new RectangleF(SelectedPiece.DrawPosition, new Size2(Game1.Size, Game1.Size)), Color.Yellow);
-        board.Draw(spriteBatch);
+        Board.DrawBoard(spriteBatch);
+        if (SelectedPiece is not null) 
+            spriteBatch.FillRectangle(new RectangleF(SelectedPiece.DrawPosition, new Size2(Game1.Size, Game1.Size)), new Color(0.6f, 0.6f, 0, 0.1f));
+        board.DrawPieces(spriteBatch);
     }
 }

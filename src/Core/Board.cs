@@ -1,4 +1,7 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using Chess.Util;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -6,7 +9,7 @@ namespace Chess.Core;
 internal class Board {
     private readonly List<Piece> pieces = new();
     private readonly Stack<Move> moveList = new();
-    internal bool WhiteToMove { get; private set; }
+    internal bool? WhiteToMove { get; private set; }
     internal int MoveCount => moveList.Count;
     internal Board() {
         FillBoard();
@@ -38,13 +41,17 @@ internal class Board {
     internal Piece GetPieceAt(Vector2 pos) {
         return pieces.Find(piece => piece.GridPosition == pos);
     }
-    public void Draw(SpriteBatch spriteBatch)
+    public static void DrawBoard(SpriteBatch spriteBatch)
     {
-        pieces.ForEach(piece => piece.Draw(spriteBatch));
+        Texture2D texture = Game1.self.textures.Get("brown");
+        Rectangle destinationRectangle = new(0, 0, 8 * Game1.Size, 8 * Game1.Size);
+        spriteBatch.Draw(texture, destinationRectangle, texture.Bounds, Color.White);
     }
+    public void DrawPieces(SpriteBatch spriteBatch) => pieces.ForEach(piece => piece.Draw(spriteBatch));
 
-    internal void ExecuteMove(Move move) {
-        if (move.OfWhite != WhiteToMove) throw new System.Exception("Not your turn");
+    internal bool ExecuteMove(Move move) {
+        if (move.OfWhite != WhiteToMove) return false;
+        if (!Validator.CheckTheory(move)) return false;
         if (move.IsCapture) {
             Piece captured = GetPieceAt(move.End);
             pieces.Remove(captured);
@@ -53,7 +60,10 @@ internal class Board {
         piece.Move(move.End);
         WhiteToMove = !WhiteToMove;
         moveList.Push(move);
+        return true;
     }
+
+
     internal void UndoMove() {
         if (MoveCount == 0) return;
         Move move = moveList.Pop();
