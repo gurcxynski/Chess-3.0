@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 namespace Chess.Core;
 public class MyBot
 {

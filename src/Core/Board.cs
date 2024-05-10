@@ -1,13 +1,12 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Chess.Util;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Chess.Core;
 internal class Board {
-    private readonly List<Piece> pieces = new();
+    internal List<Piece> pieces { get; private init; } = new();
+    internal List<Piece> capturedPieces { get; private init; } = new();
     private readonly Stack<Move> moveList = new();
     internal bool WhiteToMove { get; private set; }
     internal int MoveCount => moveList.Count;
@@ -39,15 +38,8 @@ internal class Board {
         pieces.Add(new Piece(PieceType.King, new Vector2(4, 7), false));
     }
     internal Piece GetPieceAt(Vector2 pos) {
-        return pieces.Find(piece => piece.GridPosition == pos);
+        return pieces.Find(piece => piece.Position == pos);
     }
-    public static void DrawBoard(SpriteBatch spriteBatch)
-    {
-        Texture2D texture = Game1.self.textures.Get("brown");
-        Rectangle destinationRectangle = new(0, 0, 8 * Game1.Size, 8 * Game1.Size);
-        spriteBatch.Draw(texture, destinationRectangle, texture.Bounds, Color.White);
-    }
-    public void DrawPieces(SpriteBatch spriteBatch) => pieces.ForEach(piece => piece.Draw(spriteBatch));
 
     internal bool ExecuteMove(Move move) {
         if (move.OfWhite != WhiteToMove) return false;
@@ -55,6 +47,7 @@ internal class Board {
         if (!MoveValidator.CheckPath(move, this)) return false;
         if (move.IsCapture) {
             Piece captured = GetPieceAt(move.End);
+            capturedPieces.Add(captured);
             pieces.Remove(captured);
         }
         Piece piece = GetPieceAt(move.Start);
@@ -69,10 +62,12 @@ internal class Board {
         Move move = moveList.Pop();
         Piece piece = GetPieceAt(move.End);
         piece.Move(move.Start);
-        if (move.IsCapture) {
-            pieces.Add(new Piece(move.CapturePieceType, move.End, !move.OfWhite));
-        }
         WhiteToMove = !WhiteToMove;
+        if (move.IsCapture) {
+            Piece captured = capturedPieces.Last();
+            capturedPieces.Remove(captured);
+            pieces.Add(captured);
+        }
     }
     internal List<Move> GetValidMoves() {
         List<Move> validMoves = new();
@@ -80,8 +75,8 @@ internal class Board {
             for (int x = 0; x < 8; x++) {
                 for (int y = 0; y < 8; y++) {
                     Vector2 pos = new(x, y);
-                    if (pos == piece.GridPosition) continue;
-                    Move move = new(piece.GridPosition, pos, this);
+                    if (pos == piece.Position) continue;
+                    Move move = new(piece.Position, pos, this);
                     if (MoveValidator.CheckTheory(move) && MoveValidator.CheckPath(move, this)) {
                         validMoves.Add(move);
                     }

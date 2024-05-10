@@ -2,7 +2,6 @@
 using Chess.Util;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 namespace Chess;
 
@@ -10,7 +9,7 @@ public class Game1 : Game
 {
     private GraphicsDeviceManager graphics;
     private SpriteBatch spriteBatch;
-    private readonly Scene scene = new();
+    private GameScreen activeScreen;
     internal readonly Textures textures = new();
     internal static Game1 self;
     public static readonly int Size = 100;
@@ -26,7 +25,6 @@ public class Game1 : Game
 
     protected override void Initialize()
     {
-
         base.Initialize();
     }
 
@@ -35,11 +33,13 @@ public class Game1 : Game
         spriteBatch = new SpriteBatch(GraphicsDevice);
 
         textures.Load(this);
+        
+        activeScreen = new ChessGame();
     }
 
     protected override void Update(GameTime gameTime)
     {
-        scene.Update(gameTime);
+        activeScreen.Update(gameTime);
 
         base.Update(gameTime);
     }
@@ -49,7 +49,7 @@ public class Game1 : Game
         GraphicsDevice.Clear(Color.CornflowerBlue);
 
         spriteBatch.Begin();
-        scene.Draw(spriteBatch);
+        activeScreen.Draw(spriteBatch);
         spriteBatch.End();
 
         base.Draw(gameTime);
