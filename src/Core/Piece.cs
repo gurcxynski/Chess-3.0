@@ -9,9 +9,10 @@ namespace Chess.Core
         private static int Size => Game1.Size;
         internal PieceType Type { get; }
         internal Vector2 GridPosition { get; private set; }
-        internal Vector2 DrawPosition => Size * GridPosition; //new Vector2(GridPosition.X, 7 - GridPosition.Y);
+        internal Vector2 DrawPosition => Size * new Vector2(GridPosition.X, 7 - GridPosition.Y);
         internal Vector2 DrawPositionCentered => DrawPosition + Size / 2 * Vector2.One;
         internal bool IsWhite { get; }
+        internal bool HasMoved { get; private set; } = false;
         internal Piece(PieceType type, Vector2 position, bool isWhite = true)
         {
             Type = type;
@@ -28,6 +29,7 @@ namespace Chess.Core
         internal void Move(Vector2 pos)
         {
             GridPosition = pos;
+            HasMoved = true;
         }
         
     }

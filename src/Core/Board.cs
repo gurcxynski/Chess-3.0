@@ -9,7 +9,7 @@ namespace Chess.Core;
 internal class Board {
     private readonly List<Piece> pieces = new();
     private readonly Stack<Move> moveList = new();
-    internal bool? WhiteToMove { get; private set; }
+    internal bool WhiteToMove { get; private set; }
     internal int MoveCount => moveList.Count;
     internal Board() {
         FillBoard();
@@ -51,7 +51,8 @@ internal class Board {
 
     internal bool ExecuteMove(Move move) {
         if (move.OfWhite != WhiteToMove) return false;
-        if (!Validator.CheckTheory(move)) return false;
+        if (!MoveValidator.CheckTheory(move)) return false;
+        if (!MoveValidator.CheckPath(move, this)) return false;
         if (move.IsCapture) {
             Piece captured = GetPieceAt(move.End);
             pieces.Remove(captured);
@@ -63,7 +64,6 @@ internal class Board {
         return true;
     }
 
-
     internal void UndoMove() {
         if (MoveCount == 0) return;
         Move move = moveList.Pop();
@@ -73,5 +73,36 @@ internal class Board {
             pieces.Add(new Piece(move.CapturePieceType, move.End, !move.OfWhite));
         }
         WhiteToMove = !WhiteToMove;
+    }
+    internal List<Move> GetValidMoves() {
+        List<Move> validMoves = new();
+        foreach (Piece piece in pieces.Where(piece => piece.IsWhite == WhiteToMove)) {
+            for (int x = 0; x < 8; x++) {
+                for (int y = 0; y < 8; y++) {
+                    Vector2 pos = new(x, y);
+                    if (pos == piece.GridPosition) continue;
+                    Move move = new(piece.GridPosition, pos, this);
+                    if (MoveValidator.CheckTheory(move) && MoveValidator.CheckPath(move, this)) {
+                        validMoves.Add(move);
+                    }
+                }
+            }
+        }
+        return validMoves;
+    }
+
+    internal bool HasKingsideCastleRight(bool playingWhite)
+    {
+        return false;
+    }
+
+    internal bool HasQueensideCastleRight(bool playingWhite)
+    {
+        return false;
+    }
+
+    internal bool IsInCheck()
+    {
+        return false;
     }
 }

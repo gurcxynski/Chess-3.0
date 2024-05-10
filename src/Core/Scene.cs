@@ -9,12 +9,13 @@ internal class Scene {
     private readonly Board board = new();
     private readonly MouseListener mouseListener = new();
     private readonly KeyboardListener keyboardListener = new();
+    private readonly MyBot bot = new();
 
     private Piece SelectedPiece;
     internal Scene() {
         mouseListener.MouseUp += (sender, args) => {
-            Console.WriteLine(args.Position);
-            Vector2 pos = new(args.Position.X / Game1.Size, args.Position.Y / Game1.Size);
+            if (!board.WhiteToMove) return;
+            Vector2 pos = new(args.Position.X / Game1.Size, 7 - args.Position.Y / Game1.Size);
             Piece clicked = board.GetPieceAt(pos);
             if (SelectedPiece is null && clicked is null) return;
             if (SelectedPiece is not null && (clicked is null || clicked.IsWhite != board.WhiteToMove)) {
@@ -31,6 +32,10 @@ internal class Scene {
     internal void Update(GameTime gameTime) {
         mouseListener.Update(gameTime);
         keyboardListener.Update(gameTime);
+        if (!board.WhiteToMove) {
+            Move botMove = bot.Think(board);
+            board.ExecuteMove(botMove);
+        }
         
     }
     internal void Draw(SpriteBatch spriteBatch) {
