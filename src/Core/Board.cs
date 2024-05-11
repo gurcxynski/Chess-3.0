@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Chess.Pieces;
@@ -40,8 +41,10 @@ internal class Board {
     internal Piece GetPieceAt(Vector2 pos) {
         return Pieces.Find(piece => piece.Position == pos);
     }
+    internal List<Piece> GetAll(Type type) =>  Pieces.Where(piece => piece.GetType() == type).ToList();
+    internal Piece GetKing(bool isWhite) => Pieces.Find(piece => piece.GetType() == typeof(King) && piece.IsWhite == isWhite);
 
-    internal bool ExecuteMove(Move move) {
+    internal void ExecuteMove(Move move) {
         Piece piece = GetPieceAt(move.Start);
         if (move.IsCapture) {
             Piece captured = GetPieceAt(move.End);
@@ -61,7 +64,7 @@ internal class Board {
                 rook.Move(new(5, move.Start.Y));
             }
         }
-        return true;
+        return;
     }
 
     internal void UndoMove() {
@@ -111,9 +114,6 @@ internal class Board {
         return false;
     }
 
-    internal bool IsInCheck()
-    {
-        return false;
-        //return MoveValidator.IsAttacked(pieces.Find(piece => piece.Type == PieceType.King && piece.IsWhite == WhiteToMove).Position, this, !WhiteToMove);
-    }
+    internal bool IsInCheck() => MoveHelper.IsAttackedBy(GetKing(WhiteToMove).Position, this, !WhiteToMove);
+    internal bool IsChecking() => MoveHelper.IsAttackedBy(GetKing(!WhiteToMove).Position, this, WhiteToMove);
 }

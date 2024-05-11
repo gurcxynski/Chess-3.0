@@ -31,6 +31,9 @@ internal class ChessGame : GameScreen {
                     board.ExecuteMove(move);
                     dPieces.ForEach(piece => piece.UpdatePosition());
                     SelectedPiece = null;
+                    if (board.IsChecking()) {
+                        Console.WriteLine("Check");
+                    }
                 }
                 return;
             }
@@ -56,15 +59,24 @@ internal class ChessGame : GameScreen {
     }
     internal override void Draw(SpriteBatch spriteBatch) {
         base.Draw(spriteBatch);
+
+        //if (board.IsInCheck()) 
+        //    spriteBatch.FillRectangle(
+        //        new RectangleF(Converter.GridToDraw(board.GetKing(board.WhiteToMove).Position), new Size2(Game1.Size, Game1.Size)), Color.Red * 0.8f);
+        //if (board.IsChecking()) 
+        //    spriteBatch.FillRectangle(
+        //        new RectangleF(Converter.GridToDraw(board.GetKing(!board.WhiteToMove).Position), new Size2(Game1.Size, Game1.Size)), Color.Red * 0.8f);            
+        
         if (SelectedPiece is not null) {
             spriteBatch.FillRectangle(
-                new RectangleF(Converter.GridToDraw(SelectedPiece.Position), new Size2(Game1.Size, Game1.Size)), new Color(0.6f, 0.6f, 0, 0.1f));
+                new RectangleF(Converter.GridToDraw(SelectedPiece.Position), new Size2(Game1.Size, Game1.Size)), Color.Yellow * 0.8f);
+        
             for (int i = 0; i < 8; i++) {
                 for (int j = 0; j < 8; j++) {
                     Vector2 pos = new(i, j);
-                    if (SelectedPiece.CreateMove(pos, board) is not null) {
+                    if (SelectedPiece.Position != pos && SelectedPiece.CreateMove(pos, board) is not null) {
                         spriteBatch.FillRectangle(
-                            new RectangleF(Converter.GridToDraw(pos), new Size2(Game1.Size, Game1.Size)), new Color(0, 0.8f, 0.8f, 0.1f));
+                            new RectangleF(Converter.GridToDraw(pos), new Size2(Game1.Size, Game1.Size)), Color.Cyan * 0.8f);
                     }
                 }
             }

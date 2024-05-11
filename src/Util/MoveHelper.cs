@@ -17,13 +17,20 @@ internal static class MoveHelper
         if (board.GetPieceAt(end) is not null && board.GetPieceAt(end).IsWhite == board.GetPieceAt(start).IsWhite) return false;
         return true;
     }
-    internal static bool IsAttacked(Vector2 pos, Board board, bool white)
+    internal static bool IsAttackedBy(Vector2 pos, Board board, bool white)
     {
         foreach (var piece in board.Pieces)
         {
-            if (piece.IsWhite == white) continue;
+            if (piece.IsWhite != white) continue;
             if (piece.CreateMove(pos, board) is not null) return true;
         }
         return false;
+    }
+    internal static bool WillBeChecked(Move move, Board board)
+    {
+        board.ExecuteMove(move);
+        var ret = board.IsChecking();
+        board.UndoMove();
+        return ret;
     }
 }

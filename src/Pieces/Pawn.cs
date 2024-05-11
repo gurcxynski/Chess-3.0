@@ -15,6 +15,8 @@ namespace Chess.Pieces
             if (!IsCapture && !(direction.X == 0 && (direction.Y == 1 || (!HasMoved && direction.Y == 2)))) return null;
             if (IsCapture && !(System.Math.Abs(direction.X) == 1 && direction.Y == 1)) return null;
             if (!MoveHelper.CheckPath(Position, target, board)) return null;
+            var move = new Move(Position, target, board);
+            if (MoveHelper.WillBeChecked(move, board)) return null;
             return new Move(Position, target, board);          
         }
     }

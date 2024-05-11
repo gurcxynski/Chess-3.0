@@ -11,6 +11,8 @@ namespace Chess.Pieces
             var direction = target - Position;
             if (!(direction.X == 0 || direction.Y == 0)) return null;
             if (!MoveHelper.CheckPath(Position, target, board)) return null;
+            var move = new Move(Position, target, board);
+            if (MoveHelper.WillBeChecked(move, board)) return null;
             return new Move(Position, target, board);          
         }
     }

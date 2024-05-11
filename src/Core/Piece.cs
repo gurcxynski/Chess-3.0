@@ -1,3 +1,5 @@
+using System;
+using Chess.Util;
 using Microsoft.Xna.Framework;
 
 namespace Chess.Core
@@ -19,6 +21,5 @@ namespace Chess.Core
             HasMoved = true;
         }
         internal abstract Move CreateMove(Vector2 target, Board board);
-
     }
 }
