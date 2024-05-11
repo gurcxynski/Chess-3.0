@@ -1,3 +1,4 @@
+using Chess.Util;
 using Microsoft.Xna.Framework;
 
 namespace Chess.Core;
@@ -6,20 +7,24 @@ internal class Move
     internal Vector2 Start { get; private init; }
     internal Vector2 End { get; private init; }
     internal bool OfWhite { get; private init; }
-	internal PieceType MovePieceType { get; private init; }
-	internal PieceType CapturePieceType { get; private init; }
-	internal PieceType PromotionPieceType { get; private init; }
-	internal bool IsCapture { get; private init; }
+	internal System.Type MovePieceType { get; private init; }
+	internal System.Type CapturePieceType { get; private init; }
+	internal System.Type PromotionPieceType { get; private init; }
+	internal bool IsCapture => CapturePieceType is not null;
 	internal bool IsEnPassant { get; private init; }
 	internal bool IsPromotion { get; private init; }
 	internal bool IsCastles { get; private init; }
-    internal Move(Vector2 start, Vector2 end, Board board)
+    internal Move(Vector2 start, Vector2 end, Board board, bool castles = false, bool enPassant = false, bool promotion = false)
     {
         Start = start;
         End = end;
-        OfWhite = board.GetPieceAt(start).IsWhite;
-        MovePieceType = board.GetPieceAt(start).Type;
-        IsCapture = board.GetPieceAt(end) != null;
-        if (IsCapture) CapturePieceType = board.GetPieceAt(end).Type;
+        OfWhite = board.WhiteToMove;
+        IsCastles = castles;
+        IsEnPassant = enPassant;
+        IsPromotion = promotion;
+        Piece piece = board.GetPieceAt(start);
+        MovePieceType = piece.GetType();
+        Piece captured = board.GetPieceAt(end);
+        if (captured is not null) CapturePieceType = captured.GetType();
     }
 }

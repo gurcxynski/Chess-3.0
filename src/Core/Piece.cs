@@ -1,17 +1,14 @@
-using System;
 using Microsoft.Xna.Framework;
 
 namespace Chess.Core
 {
-    internal class Piece
+    internal abstract class Piece
     {
-        internal PieceType Type { get; }
         internal Vector2 Position { get; private set; }
         internal bool IsWhite { get; }
         internal bool HasMoved { get; private set; } = false;
-        internal Piece(PieceType type, Vector2 position, bool isWhite = true)
+        internal Piece(Vector2 position, bool isWhite = true)
         {
-            Type = type;
             Position = position;
             IsWhite = isWhite;
         }
@@ -21,20 +18,7 @@ namespace Chess.Core
             Position = pos;
             HasMoved = true;
         }
+        internal abstract Move CreateMove(Vector2 target, Board board);
 
-        internal void Capture()
-        {
-            Position = new Vector2(-1, -1);
-        }
-    }
-
-    internal enum PieceType
-    {
-        Pawn,
-        Rook,
-        Knight,
-        Bishop,
-        Queen,
-        King
     }
 }

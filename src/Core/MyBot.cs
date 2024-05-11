@@ -1,16 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
 namespace Chess.Core;
 public class MyBot
 {
     bool playingWhite;
-    readonly Dictionary<PieceType, int> pieceValues = new Dictionary<PieceType, int> {
-    { PieceType.Pawn, 100 },
-    { PieceType.Knight, 300 },
-    { PieceType.Bishop, 350 },
-    { PieceType.Rook, 500 },
-    { PieceType.Queen, 900 },
-    { PieceType.King, int.MaxValue } };
 
     readonly int[][] centerValues = new int[][] {
         new int[] { 000, 000, 000, 000, 000, 000, 000, 000 },
@@ -25,8 +17,8 @@ public class MyBot
 
     int Eval(Board board, Move move, int depth = 2) {
         int val = 0;
-        if (move.IsCapture) val += pieceValues[move.CapturePieceType];
-        if (move.MovePieceType != PieceType.King && move.MovePieceType != PieceType.Rook) 
+        //if (move.IsCapture) val += pieceValues[move.CapturePieceType];
+        //if (move.MovePieceType != PieceType.King && move.MovePieceType != PieceType.Rook) 
         val += centerValues[(int)move.End.Y][(int)move.End.X] - 
             centerValues[(int)move.Start.Y][(int)move.Start.X];
         board.ExecuteMove(move);
