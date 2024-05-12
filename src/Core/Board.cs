@@ -12,6 +12,8 @@ internal class Board {
     private readonly Stack<Move> moveList = new();
     internal bool WhiteToMove { get; private set; }
     internal int MoveCount => moveList.Count;
+    private King white;
+    private King black;
     internal Board() {
         FillBoard();
         WhiteToMove = true;
@@ -35,14 +37,16 @@ internal class Board {
         Pieces.Add(new Bishop(new(5, 7), false));
         Pieces.Add(new Queen(new(3, 0)));
         Pieces.Add(new Queen(new(3, 7), false));
-        Pieces.Add(new King(new(4, 0)));
-        Pieces.Add(new King(new(4, 7), false));
+        white = new King(new(4, 0));
+        black = new King(new(4, 7), false);
+        Pieces.Add(white);
+        Pieces.Add(black);
     }
     internal Piece GetPieceAt(Vector2 pos) {
         return Pieces.Find(piece => piece.Position == pos);
     }
     internal List<Piece> GetAll(Type type) =>  Pieces.Where(piece => piece.GetType() == type).ToList();
-    internal Piece GetKing(bool isWhite) => Pieces.Find(piece => piece.GetType() == typeof(King) && piece.IsWhite == isWhite);
+    internal Piece GetKing(bool isWhite) => isWhite ? white : black;
 
     internal void ExecuteMove(Move move) {
         Piece piece = GetPieceAt(move.Start);
@@ -92,7 +96,8 @@ internal class Board {
     }
     internal List<Move> GetValidMoves() {
         List<Move> validMoves = new();
-        foreach (Piece piece in Pieces.Where(piece => piece.IsWhite == WhiteToMove)) {
+        var piecesCopy = new List<Piece>(Pieces);
+        foreach (Piece piece in piecesCopy.Where(piece => piece.IsWhite == WhiteToMove)) {
             for (int x = 0; x < 8; x++) {
                 for (int y = 0; y < 8; y++) {
                     Vector2 pos = new(x, y);
@@ -116,5 +121,10 @@ internal class Board {
     }
 
     internal bool IsInCheck() => MoveHelper.IsAttackedBy(GetKing(WhiteToMove).Position, this, !WhiteToMove);
-    internal bool IsChecking() => MoveHelper.IsAttackedBy(GetKing(!WhiteToMove).Position, this, WhiteToMove);
+    internal bool IsChecking() {
+        Piece king = GetKing(!WhiteToMove);
+        var ret = MoveHelper.IsAttackedBy(king.Position, this, WhiteToMove);
+        return ret;
+    }
+    internal bool IsMate() => IsInCheck() && GetValidMoves().Count == 0;
 }

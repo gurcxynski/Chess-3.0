@@ -52,6 +52,10 @@ internal class ChessGame : GameScreen {
         };
     }
     internal override void Update(GameTime gameTime) {
+        if (board.IsMate()) {
+            Console.WriteLine("Checkmate");
+            return;
+        }
         mouseListener.Update(gameTime);
         keyboardListener.Update(gameTime);
         //if (!board.WhiteToMove) {
@@ -64,12 +68,12 @@ internal class ChessGame : GameScreen {
     internal override void Draw(SpriteBatch spriteBatch) {
         base.Draw(spriteBatch);
 
-        //if (board.IsInCheck()) 
-        //    spriteBatch.FillRectangle(
-        //        new RectangleF(Converter.GridToDraw(board.GetKing(board.WhiteToMove).Position), new Size2(Game1.Size, Game1.Size)), Color.Red * 0.8f);
-        //if (board.IsChecking()) 
-        //    spriteBatch.FillRectangle(
-        //        new RectangleF(Converter.GridToDraw(board.GetKing(!board.WhiteToMove).Position), new Size2(Game1.Size, Game1.Size)), Color.Red * 0.8f);            
+        if (board.IsInCheck()) 
+            spriteBatch.FillRectangle(
+                new RectangleF(Converter.GridToDraw(board.GetKing(board.WhiteToMove).Position), new Size2(Game1.Size, Game1.Size)), Color.Red * 0.8f);
+        if (board.IsChecking()) 
+            spriteBatch.FillRectangle(
+                new RectangleF(Converter.GridToDraw(board.GetKing(!board.WhiteToMove).Position), new Size2(Game1.Size, Game1.Size)), Color.Red * 0.8f);            
         
         if (SelectedPiece is not null) {
             spriteBatch.FillRectangle(

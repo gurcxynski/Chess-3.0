@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Chess.Core;
 using Microsoft.Xna.Framework;
 
@@ -19,7 +20,8 @@ internal static class MoveHelper
     }
     internal static bool IsAttackedBy(Vector2 pos, Board board, bool white)
     {
-        foreach (var piece in board.Pieces)
+        var piecesCopy = new List<Piece>(board.Pieces);
+        foreach (var piece in piecesCopy)
         {
             if (piece.IsWhite != white) continue;
             if (piece.CreateMove(pos, board) is not null) return true;
