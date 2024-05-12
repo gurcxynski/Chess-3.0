@@ -14,7 +14,8 @@ internal class Move
 	internal bool IsEnPassant { get; private init; }
 	internal bool IsPromotion { get; private init; }
 	internal bool IsCastles { get; private init; }
-    internal Move(Vector2 start, Vector2 end, Board board, bool castles = false, bool enPassant = false, bool promotion = false)
+    internal bool IsFirstMoveOfPiece { get; private init; } = false;
+    internal Move(Vector2 start, Vector2 end, Board board, bool castles = false, bool enPassant = false, bool promotion = false, bool firstMove = false)
     {
         Start = start;
         End = end;
@@ -22,6 +23,7 @@ internal class Move
         IsCastles = castles;
         IsEnPassant = enPassant;
         IsPromotion = promotion;
+        IsFirstMoveOfPiece = firstMove;
         Piece piece = board.GetPieceAt(start);
         MovePieceType = piece.GetType();
         Piece captured = board.GetPieceAt(end);

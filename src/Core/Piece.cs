@@ -8,7 +8,7 @@ namespace Chess.Core
     {
         internal Vector2 Position { get; private set; }
         internal bool IsWhite { get; }
-        internal bool HasMoved { get; private set; } = false;
+        internal bool HasMoved { get; set; } = false;
         internal Piece(Vector2 position, bool isWhite = true)
         {
             Position = position;

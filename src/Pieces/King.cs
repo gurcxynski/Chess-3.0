@@ -20,9 +20,9 @@ namespace Chess.Pieces
             if (!castles && !(System.Math.Abs(direction.X) <= 1 && System.Math.Abs(direction.Y) <= 1)) return null; 
             if (MoveHelper.IsAttackedBy(target, board, !IsWhite)) return null;
             if (!MoveHelper.CheckPath(Position, target, board)) return null;
-            var move = new Move(Position, target, board);
+            var move = new Move(Position, target, board, castles: castles, firstMove: !HasMoved);
             if (MoveHelper.WillBeChecked(move, board)) return null;
-            return new Move(Position, target, board, castles);          
+            return move;     
         }
     }
 }

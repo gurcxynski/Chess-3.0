@@ -78,6 +78,7 @@ internal class Board {
             CapturedPieces.Remove(captured);
             Pieces.Add(captured);
         }
+        if (move.IsFirstMoveOfPiece) piece.HasMoved = false;
         if (move.IsCastles) {
             if (move.End.X == 2) {
                 Piece rook = GetPieceAt(new(3, move.Start.Y));

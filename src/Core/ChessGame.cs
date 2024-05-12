@@ -25,6 +25,10 @@ internal class ChessGame : GameScreen {
             Vector2 pos = new(args.Position.X / Game1.Size, 7 - args.Position.Y / Game1.Size);
             Piece clicked = board.GetPieceAt(pos);
             if (SelectedPiece is null && clicked is null) return;
+            if (clicked == SelectedPiece) {
+                SelectedPiece = null;
+                return;
+            }
             if (SelectedPiece is not null && (clicked is null || clicked.IsWhite != board.WhiteToMove)) {
                 Move move = SelectedPiece.CreateMove(pos, board);
                 if (move is not null) {
