@@ -78,9 +78,8 @@ internal class Board {
         piece.Move(move.Start);
         WhiteToMove = !WhiteToMove;
         if (move.IsCapture) {
-            Piece captured = CapturedPieces.Last();
-            CapturedPieces.Remove(captured);
-            Pieces.Add(captured);
+            CapturedPieces.Remove(move.Captured);
+            Pieces.Add(move.Captured);
         }
         if (move.IsFirstMoveOfPiece) piece.HasMoved = false;
         if (move.IsCastles) {
