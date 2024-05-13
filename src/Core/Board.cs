@@ -47,13 +47,13 @@ internal class Board {
     }
     internal List<Piece> GetAll(Type type) =>  Pieces.Where(piece => piece.GetType() == type).ToList();
     internal Piece GetKing(bool isWhite) => isWhite ? white : black;
+    internal Move LastMove => moveList.Count > 0 ? moveList.Peek() : null;
 
     internal void ExecuteMove(Move move) {
         Piece piece = GetPieceAt(move.Start);
         if (move.IsCapture) {
-            Piece captured = GetPieceAt(move.End);
-            CapturedPieces.Add(captured);
-            Pieces.Remove(captured);
+            CapturedPieces.Add(move.Captured);
+            Pieces.Remove(move.Captured);
         }
         piece.Move(move.End);
         WhiteToMove = !WhiteToMove;

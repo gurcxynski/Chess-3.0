@@ -11,6 +11,7 @@ internal class Move
 	internal System.Type CapturePieceType { get; private init; }
 	internal System.Type PromotionPieceType { get; private init; }
 	internal bool IsCapture => CapturePieceType is not null;
+    internal Piece Captured { get; private init; }
 	internal bool IsEnPassant { get; private init; }
 	internal bool IsPromotion { get; private init; }
 	internal bool IsCastles { get; private init; }
@@ -26,7 +27,7 @@ internal class Move
         IsFirstMoveOfPiece = firstMove;
         Piece piece = board.GetPieceAt(start);
         MovePieceType = piece.GetType();
-        Piece captured = board.GetPieceAt(end);
-        if (captured is not null) CapturePieceType = captured.GetType();
+        Captured = IsEnPassant ? board.GetPieceAt(end + new Vector2(0, OfWhite ? -1 : 1)) : board.GetPieceAt(end);
+        if (Captured is not null) CapturePieceType = Captured.GetType();
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Chess.Pieces;
 namespace Chess.Core;
 public class MyBot
 {
@@ -15,10 +16,21 @@ public class MyBot
         new int[] { 000, 000, 000, 000, 000, 000, 000, 000 }
     };
 
+    static int GetValue(System.Type type) {
+        return type switch {
+            System.Type t when t == typeof(Pawn) => 100,
+            System.Type t when t == typeof(Knight) => 300,
+            System.Type t when t == typeof(Bishop) => 350,
+            System.Type t when t == typeof(Rook) => 500,
+            System.Type t when t == typeof(Queen) => 900,
+            System.Type t when t == typeof(King) => int.MaxValue,
+            _ => 0
+        };
+    }
     int Eval(Board board, Move move, int depth = 2) {
         int val = 0;
-        //if (move.IsCapture) val += pieceValues[move.CapturePieceType];
-        //if (move.MovePieceType != PieceType.King && move.MovePieceType != PieceType.Rook) 
+        if (move.IsCapture) val += GetValue(move.CapturePieceType);
+        if (move.MovePieceType != typeof(King) && move.MovePieceType != typeof(Rook)) 
         val += centerValues[(int)move.End.Y][(int)move.End.X] - 
             centerValues[(int)move.Start.Y][(int)move.Start.X];
         board.ExecuteMove(move);
