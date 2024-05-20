@@ -12,6 +12,6 @@ internal class StateMachine {
 
     internal void Init()
     {
-        ActiveScreen = new NewGameMenu();
+        NewGame();
     }
 }
