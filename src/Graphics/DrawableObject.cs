@@ -13,4 +13,5 @@ internal abstract class DrawableObject
         Texture = texture;
     }
     internal virtual void Draw(SpriteBatch spriteBatch) => spriteBatch.Draw(Texture, Bounds, Color.White);
+    internal virtual void DrawAt(SpriteBatch spriteBatch, Vector2 pos) => spriteBatch.Draw(Texture, pos, Color.White);
 }

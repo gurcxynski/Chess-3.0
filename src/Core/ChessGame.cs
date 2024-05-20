@@ -4,6 +4,7 @@ using Chess.Graphics;
 using Chess.Util;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
 using MonoGame.Extended.Input.InputListeners;
 
@@ -14,6 +15,7 @@ internal class ChessGame : GameScreen {
     private readonly MouseListener mouseListener = new();
     private readonly KeyboardListener keyboardListener = new();
     private readonly MyBot bot = new();
+    private Vector2 heldRelative;
 
     private Piece SelectedPiece;
     internal ChessGame() {
@@ -21,28 +23,26 @@ internal class ChessGame : GameScreen {
         Background = Game1.self.textures.Get("brown");
         board.Pieces.ForEach(piece => dPieces.Add(new PieceDrawable(Bounds.Location.ToVector2(), piece)));
         mouseListener.MouseUp += (sender, args) => {
-            //if (!board.WhiteToMove) return;
             Vector2 pos = new(args.Position.X / Game1.Size, 7 - args.Position.Y / Game1.Size);
             Piece clicked = board.GetPieceAt(pos);
-            if (SelectedPiece is null && clicked is null) return;
-            if (clicked == SelectedPiece) {
-                SelectedPiece = null;
-                return;
-            }
             if (SelectedPiece is not null && (clicked is null || clicked.IsWhite != board.WhiteToMove)) {
                 Move move = SelectedPiece.CreateMove(pos, board);
                 if (move is not null) {
                     board.ExecuteMove(move);
                     dPieces.ForEach(piece => piece.UpdatePosition());
-                    SelectedPiece = null;
-                    if (board.IsChecking()) {
-                        Console.WriteLine("Check");
-                    }
                 }
-                return;
             }
-            if (clicked.IsWhite == board.WhiteToMove) SelectedPiece = clicked;
+            SelectedPiece = null;
 
+        };
+        mouseListener.MouseDown += (sender, args) => {
+            Vector2 pos = new(args.Position.X / Game1.Size, 7 - args.Position.Y / Game1.Size);
+            Piece clicked = board.GetPieceAt(pos);
+            if (clicked is null) return;
+            if (clicked.IsWhite == board.WhiteToMove) {
+                SelectedPiece = clicked;
+                heldRelative = Converter.GridToDraw(pos) - args.Position.ToVector2();
+            }
         };
         keyboardListener.KeyTyped += (sender, args) => {
             SelectedPiece = null;
@@ -90,6 +90,10 @@ internal class ChessGame : GameScreen {
             }
         }
             
-        dPieces.ForEach(piece => {if (!board.CapturedPieces.Contains(piece.Piece)) piece.Draw(spriteBatch);});
+        dPieces.ForEach(piece => {
+            if (piece.Piece != SelectedPiece) {
+                if (!board.CapturedPieces.Contains(piece.Piece)) piece.Draw(spriteBatch); }
+                else piece.DrawAt(spriteBatch, heldRelative + Mouse.GetState().Position.ToVector2());
+    });
     }
 }
