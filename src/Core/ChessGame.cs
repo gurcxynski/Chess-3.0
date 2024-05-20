@@ -58,11 +58,11 @@ internal class ChessGame : GameScreen {
         }
         mouseListener.Update(gameTime);
         keyboardListener.Update(gameTime);
-        //if (!board.WhiteToMove) {
-        //    Move botMove = bot.Think(board);
-        //    board.ExecuteMove(botMove);
-        //    dPieces.ForEach(piece => piece.UpdatePosition());
-        //}
+        if (!board.WhiteToMove) {
+            Move botMove = bot.Think(board);
+            board.ExecuteMove(botMove);
+            dPieces.ForEach(piece => piece.UpdatePosition());
+        }
         
     }
     internal override void Draw(SpriteBatch spriteBatch) {
@@ -90,10 +90,10 @@ internal class ChessGame : GameScreen {
             }
         }
             
-        dPieces.ForEach(piece => {
-            if (piece.Piece != SelectedPiece) {
-                if (!board.CapturedPieces.Contains(piece.Piece)) piece.Draw(spriteBatch); }
-                else piece.DrawAt(spriteBatch, heldRelative + Mouse.GetState().Position.ToVector2());
-    });
+        dPieces.ForEach(piece => 
+        { if (piece.Piece != SelectedPiece && !board.CapturedPieces.Contains(piece.Piece)) piece.Draw(spriteBatch); });
+        
+        dPieces.ForEach(piece => 
+        { if (piece.Piece == SelectedPiece) piece.DrawAt(spriteBatch, heldRelative + Mouse.GetState().Position.ToVector2()); });
     }
 }
