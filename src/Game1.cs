@@ -9,7 +9,7 @@ public class Game1 : Game
 {
     private GraphicsDeviceManager graphics;
     private SpriteBatch spriteBatch;
-    private GameScreen activeScreen;
+    internal readonly StateMachine machine = new();
     internal readonly Textures textures = new();
     internal static Game1 self;
     public static readonly int Size = 100;
@@ -34,12 +34,12 @@ public class Game1 : Game
 
         textures.Load(this);
         
-        activeScreen = new ChessGame();
+        machine.Init();
     }
 
     protected override void Update(GameTime gameTime)
     {
-        activeScreen.Update(gameTime);
+        machine.ActiveScreen.Update(gameTime);
 
         base.Update(gameTime);
     }
@@ -49,7 +49,7 @@ public class Game1 : Game
         GraphicsDevice.Clear(Color.CornflowerBlue);
 
         spriteBatch.Begin();
-        activeScreen.Draw(spriteBatch);
+        machine.ActiveScreen.Draw(spriteBatch);
         spriteBatch.End();
 
         base.Draw(gameTime);
