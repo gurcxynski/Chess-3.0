@@ -50,6 +50,13 @@ internal class Board {
     internal List<Piece> GetAll(Type type) =>  Pieces.Where(piece => piece.GetType() == type).ToList();
     internal Piece GetKing(bool isWhite) => isWhite ? white : black;
     internal Move LastMove => moveList.Count > 0 ? moveList.Peek() : null;
+    internal Move PreLastMove() {
+        if (moveList.Count < 2) return null;
+        var move = moveList.Pop();
+        var preLastMove = moveList.Peek();
+        moveList.Push(move);
+        return preLastMove;
+    }
 
     internal void ExecuteMove(Move move) {
         Piece piece = GetPieceAt(move.Start);

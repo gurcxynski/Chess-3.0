@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Chess.Graphics;
 using Chess.Util;
 using Microsoft.Xna.Framework;
@@ -18,56 +19,64 @@ internal class ChessGame : GameScreen {
     private readonly Animator animator;
     private Vector2 heldRelative;
     private class Animator {
-        internal bool animating = false;
+        internal struct AnimationData {
+            internal Move move;
+            internal Piece piece;
+            internal bool reverse;
+        }
+        readonly List<AnimationData> data;
+        readonly Board board;
+        internal bool Animating => data.Count > 0;
+        const double length = 100;
         TimeSpan start;
-        const int time = 150;
-        internal Move move;
-        internal Piece piece;
-        internal Vector2 Position => Vector2.Lerp(Converter.GridToDraw(move.Start), Converter.GridToDraw(move.End), progress);
-        float progress;
-        internal void Start(TimeSpan time, Move move, Piece piece) {
+        double progress;
+        internal IEnumerable<Piece> Pieces => data.Select(d => d.piece);
+        internal Animator(Board board) {
+            this.board = board;
+            data = new();
+        }
+        internal Vector2 Position(Piece p){
+            var d = data.Find(d => d.piece == p);
+            Console.WriteLine(p.GetType().Name);
+            return Vector2.Lerp(
+                Converter.GridToDraw(d.reverse ? d.move.End : d.move.Start), 
+                Converter.GridToDraw(d.reverse ? d.move.Start : d.move.End), (float)progress);
+        } 
+        internal void Start(TimeSpan time, Move move, bool reverse = false) {
+            Console.WriteLine("added" + board.GetPieceAt(reverse ? move.End : move.Start));
             start = time;
-            this.move = move;
-            this.piece = piece;
-            animating = true;
+            data.Add(new() { move = move, piece = board.GetPieceAt(reverse ? move.End : move.Start), reverse = reverse });
         }
-        void Stop() {
-            animating = false;
-            progress = 0;
-            move = null;
-            piece = null;
-            start = TimeSpan.Zero;
-        }
-        #nullable enable
-        internal Move? Update(GameTime gameTime)
+        internal List<AnimationData> Update(GameTime gameTime)
         {
-            if (!animating) return null;
-            progress = (float)((gameTime.TotalGameTime - start).TotalMilliseconds / time);
+            var ret = new List<AnimationData>();
+            if (!Animating) return ret;
+            progress = (gameTime.TotalGameTime - start).TotalMilliseconds / length;
             if (progress >= 1) {
-                var m = move;
-                Stop();
-                return m;
+                ret.AddRange(data);
+                data.Clear();
+                start = default;
+                progress = 0;
             }
-            return null;
+            return ret;
         }
-        #nullable disable
     }
 
-    
 
     private Piece SelectedPiece;
     internal ChessGame() {
         Bounds = new Rectangle(0, 0, 8 * Game1.Size, 8 * Game1.Size);
         Background = Game1.self.textures.Get("brown");
-        animator = new Animator();
+        animator = new Animator(board);
         board.Pieces.ForEach(piece => dPieces.Add(new PieceDrawable(Bounds.Location.ToVector2(), piece)));
         mouseListener.MouseUp += (sender, args) => {
             Vector2 pos = new(args.Position.X / Game1.Size, 7 - args.Position.Y / Game1.Size);
             Piece clicked = board.GetPieceAt(pos);
             if (SelectedPiece is not null && (clicked is null || clicked.IsWhite != board.WhiteToMove)) {
                 Move move = SelectedPiece.CreateMove(pos, board);
-                if (move is not null) {
-                    animator.Start(args.Time, move, SelectedPiece);
+                if (move is not null) {       
+                    board.ExecuteMove(move);
+                    dPieces.ForEach(piece => piece.UpdatePosition());
                 }
             }
             SelectedPiece = null;
@@ -82,30 +91,35 @@ internal class ChessGame : GameScreen {
                 heldRelative = Converter.GridToDraw(pos) - args.Position.ToVector2();
             }
         };
-        keyboardListener.KeyTyped += (sender, args) => {
+        mouseListener.MouseWheelMoved += (sender, args) => {
+            if (board.MoveCount <= 1) return;
             SelectedPiece = null;
-            board.UndoMove();
-            board.UndoMove();
-            dPieces.ForEach(piece => piece.UpdatePosition());
+            animator.Start(args.Time, board.LastMove, true);
+            animator.Start(args.Time, board.PreLastMove(), true);
         };
     }
     internal override void Update(GameTime gameTime) {
-        var move = animator.Update(gameTime);
-        if (move is not null) {
-            board.ExecuteMove(move);
+        var animations = animator.Update(gameTime);
+        if (animations.Count > 0) {
+            animations.ForEach((animation) => {
+                if (animation.reverse) {
+                    board.UndoMove();
+                } else {
+                    board.ExecuteMove(animation.move);
+                }
+            });
             dPieces.ForEach(piece => piece.UpdatePosition());
-            return;
         }
-        if (animator.animating) return;
+        if (animator.Animating) return;
         if (board.IsMate) {
             return;
         }
+        //if (!board.WhiteToMove) {
+        //    Move botMove = bot.Think(board);
+        //    animator.Start(gameTime.TotalGameTime, botMove);
+        //}
         mouseListener.Update(gameTime);
         keyboardListener.Update(gameTime);
-        if (!board.WhiteToMove) {
-            Move botMove = bot.Think(board);
-            animator.Start(gameTime.TotalGameTime, botMove, board.GetPieceAt(botMove.Start));
-        }
         
     }
     internal override void Draw(SpriteBatch spriteBatch) {
@@ -134,10 +148,11 @@ internal class ChessGame : GameScreen {
         }
             
         dPieces.ForEach(piece => 
-        { if (piece.Piece != SelectedPiece && piece.Piece != animator.piece && !board.CapturedPieces.Contains(piece.Piece)) piece.Draw(spriteBatch); });
+        { if (piece.Piece != SelectedPiece && !animator.Pieces.Contains(piece.Piece) && !board.CapturedPieces.Contains(piece.Piece)) piece.Draw(spriteBatch); });
 
         dPieces.Find(piece => piece.Piece == SelectedPiece)?.DrawAt(spriteBatch, heldRelative + Mouse.GetState().Position.ToVector2());
 
-        dPieces.Find(piece => piece.Piece == animator.piece)?.DrawAt(spriteBatch, animator.Position);
+        dPieces.ForEach(piece => 
+        { if (animator.Pieces.Contains(piece.Piece)) piece.DrawAt(spriteBatch, animator.Position(piece.Piece)); });
     }
 }

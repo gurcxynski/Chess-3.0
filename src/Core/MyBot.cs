@@ -32,7 +32,7 @@ public class MyBot
     int Eval(Board board, Move move, int depth = 2) {
         int val = 0;
         var myPieces = playingWhite ? board.WhitePieces : board.BlackPieces;
-        var pieceValueSum = myPieces.Sum(piece => GetValue(piece.GetType()));
+        var pieceValueSum = myPieces.Sum((piece) => { if (piece.GetType() != typeof (King)) return GetValue(piece.GetType()); return 0;});
         if (move.IsCapture) val += GetValue(move.CapturePieceType) * (40 / pieceValueSum);
         if (move.MovePieceType != typeof(King) && move.MovePieceType != typeof(Rook)) 
         val += centerValues[(int)move.End.Y][(int)move.End.X] - 
