@@ -97,7 +97,7 @@ internal class ChessGame : GameScreen {
             return;
         }
         if (animator.animating) return;
-        if (board.IsMate()) {
+        if (board.IsMate) {
             return;
         }
         mouseListener.Update(gameTime);
@@ -111,10 +111,10 @@ internal class ChessGame : GameScreen {
     internal override void Draw(SpriteBatch spriteBatch) {
         base.Draw(spriteBatch);
 
-        if (board.IsInCheck()) 
+        if (board.IsInCheck) 
             spriteBatch.FillRectangle(
                 new RectangleF(Converter.GridToDraw(board.GetKing(board.WhiteToMove).Position), new Size2(Game1.Size, Game1.Size)), Color.Red * 0.8f);
-        if (board.IsChecking()) 
+        if (board.IsChecking) 
             spriteBatch.FillRectangle(
                 new RectangleF(Converter.GridToDraw(board.GetKing(!board.WhiteToMove).Position), new Size2(Game1.Size, Game1.Size)), Color.Red * 0.8f);            
         

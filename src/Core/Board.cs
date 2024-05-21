@@ -8,6 +8,8 @@ using Microsoft.Xna.Framework;
 namespace Chess.Core;
 internal class Board {
     internal List<Piece> Pieces { get; private init; } = new();
+    internal IEnumerable<Piece> WhitePieces => Pieces.Where(piece => piece.IsWhite);
+    internal IEnumerable<Piece> BlackPieces => Pieces.Where(piece => !piece.IsWhite);
     internal List<Piece> CapturedPieces { get; private init; } = new();
     private readonly Stack<Move> moveList = new();
     internal bool WhiteToMove { get; private set; }
@@ -111,19 +113,17 @@ internal class Board {
 
     internal bool HasKingsideCastleRight(bool playingWhite)
     {
-        return false;
+        var move = GetKing(playingWhite).CreateMove(new(6, playingWhite ? 0 : 7), this);
+        return move is not null;
     }
 
     internal bool HasQueensideCastleRight(bool playingWhite)
     {
-        return false;
+        var move = GetKing(playingWhite).CreateMove(new(2, playingWhite ? 0 : 7), this);
+        return move is not null;
     }
 
-    internal bool IsInCheck() => MoveHelper.IsAttackedBy(GetKing(WhiteToMove).Position, this, !WhiteToMove);
-    internal bool IsChecking() {
-        Piece king = GetKing(!WhiteToMove);
-        var ret = MoveHelper.IsAttackedBy(king.Position, this, WhiteToMove);
-        return ret;
-    }
-    internal bool IsMate() => IsInCheck() && GetValidMoves().Count == 0;
+    internal bool IsInCheck => MoveHelper.IsAttackedBy(GetKing(WhiteToMove).Position, this, !WhiteToMove);
+    internal bool IsChecking => MoveHelper.IsAttackedBy(GetKing(!WhiteToMove).Position, this, WhiteToMove);
+    internal bool IsMate => IsInCheck && GetValidMoves().Count == 0;
 }

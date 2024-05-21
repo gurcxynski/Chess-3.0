@@ -31,7 +31,7 @@ internal static class MoveHelper
     internal static bool WillBeChecked(Move move, Board board)
     {
         board.ExecuteMove(move);
-        var ret = board.IsChecking();
+        var ret = board.IsChecking;
         board.UndoMove();
         return ret;
     }

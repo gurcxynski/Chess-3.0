@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using Chess.Pieces;
+using System;
+using System.Linq;
 namespace Chess.Core;
 public class MyBot
 {
@@ -16,29 +18,34 @@ public class MyBot
         new int[] { 000, 000, 000, 000, 000, 000, 000, 000 }
     };
 
-    static int GetValue(System.Type type) {
+    static int GetValue(Type type) {
         return type switch {
-            System.Type t when t == typeof(Pawn) => 100,
-            System.Type t when t == typeof(Knight) => 300,
-            System.Type t when t == typeof(Bishop) => 350,
-            System.Type t when t == typeof(Rook) => 500,
-            System.Type t when t == typeof(Queen) => 900,
-            System.Type t when t == typeof(King) => int.MaxValue,
+            Type t when t == typeof(Pawn) => 100,
+            Type t when t == typeof(Knight) => 300,
+            Type t when t == typeof(Bishop) => 350,
+            Type t when t == typeof(Rook) => 500,
+            Type t when t == typeof(Queen) => 900,
+            Type t when t == typeof(King) => int.MaxValue,
             _ => 0
         };
     }
     int Eval(Board board, Move move, int depth = 2) {
         int val = 0;
-        if (move.IsCapture) val += GetValue(move.CapturePieceType);
+        var myPieces = playingWhite ? board.WhitePieces : board.BlackPieces;
+        var pieceValueSum = myPieces.Sum(piece => GetValue(piece.GetType()));
+        if (move.IsCapture) val += GetValue(move.CapturePieceType) * (40 / pieceValueSum);
         if (move.MovePieceType != typeof(King) && move.MovePieceType != typeof(Rook)) 
         val += centerValues[(int)move.End.Y][(int)move.End.X] - 
             centerValues[(int)move.Start.Y][(int)move.Start.X];
         board.ExecuteMove(move);
-        if (board.IsInCheck()) val += 50;
+        if (board.IsInCheck) val += 50;
         if (board.MoveCount < 30) {
             if (move.IsCastles) val += 90;
-            else { if (board.HasKingsideCastleRight(playingWhite)) val += 50;
-            if ( board.HasQueensideCastleRight(playingWhite)) val += 30; }
+            else { 
+                if (move.IsFirstMoveOfPiece && move.MovePieceType == typeof(King)) val -= 80;
+                if (board.HasKingsideCastleRight(playingWhite)) val += 50;
+                if (board.HasQueensideCastleRight(playingWhite)) val += 30; 
+            }
         }
         if (depth == 0) { board.UndoMove(); return val; }
         List<Move> moves = board.GetValidMoves();
