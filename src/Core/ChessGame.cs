@@ -71,6 +71,7 @@ internal class ChessGame : GameScreen {
         board.Pieces.ForEach(piece => dPieces.Add(new PieceDrawable(Bounds.Location.ToVector2(), piece)));
         mouseListener.MouseUp += (sender, args) => {
             Vector2 pos = new(args.Position.X / Game1.Size, 7 - args.Position.Y / Game1.Size);
+            if (pos.X < 0 || pos.X > 7 || pos.Y < 0 || pos.Y > 7) return;
             Piece clicked = board.GetPieceAt(pos);
             if (SelectedPiece is not null && (clicked is null || clicked.IsWhite != board.WhiteToMove)) {
                 Move move = SelectedPiece.CreateMove(pos, board);

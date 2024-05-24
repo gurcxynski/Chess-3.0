@@ -1,4 +1,5 @@
-﻿using Chess.Core;
+﻿using System;
+using Chess.Core;
 using Chess.Util;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -12,7 +13,7 @@ public class Game1 : Game
     internal readonly StateMachine machine = new();
     internal readonly Textures textures = new();
     internal static Game1 self;
-    public static readonly int Size = 100;
+    public const int Size = 100;
     public Game1()
     {
         graphics = new GraphicsDeviceManager(this);
@@ -21,6 +22,7 @@ public class Game1 : Game
         self = this;
         graphics.PreferredBackBufferWidth = 8 * Size;
         graphics.PreferredBackBufferHeight = 8 * Size;
+        Window.AllowUserResizing = true;
     }
 
     protected override void Initialize()
