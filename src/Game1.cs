@@ -1,6 +1,7 @@
 ﻿using System;
 using Chess.Core;
 using Chess.Util;
+using GeonBit.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -22,18 +23,18 @@ public class Game1 : Game
         self = this;
         graphics.PreferredBackBufferWidth = 8 * Size;
         graphics.PreferredBackBufferHeight = 8 * Size;
-        Window.AllowUserResizing = true;
     }
 
     protected override void Initialize()
     {
+        UserInterface.Initialize(Content, BuiltinThemes.hd);
         base.Initialize();
     }
 
     protected override void LoadContent()
     {
         spriteBatch = new SpriteBatch(GraphicsDevice);
-
+        GeonBit.UI.DataTypes.ThemeSettings a = new();
         textures.Load(this);
         
         machine.Init();
@@ -41,6 +42,8 @@ public class Game1 : Game
 
     protected override void Update(GameTime gameTime)
     {
+        UserInterface.Active.Update(gameTime);
+
         machine.ActiveScreen.Update(gameTime);
 
         base.Update(gameTime);
@@ -50,6 +53,7 @@ public class Game1 : Game
     {
         GraphicsDevice.Clear(Color.CornflowerBlue);
 
+        UserInterface.Active.Draw(spriteBatch);
         spriteBatch.Begin();
         machine.ActiveScreen.Draw(spriteBatch);
         spriteBatch.End();
