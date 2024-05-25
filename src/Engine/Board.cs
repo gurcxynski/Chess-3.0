@@ -10,7 +10,7 @@ internal class Board {
     internal List<Piece> Pieces { get; private init; } = new();
     internal IEnumerable<Piece> WhitePieces => Pieces.Where(piece => piece.IsWhite);
     internal IEnumerable<Piece> BlackPieces => Pieces.Where(piece => !piece.IsWhite);
-    internal List<Piece> CapturedPieces { get; private init; } = new();
+    internal IEnumerable<Piece> CapturedPieces => Pieces.Where(piece => piece.IsCaptured);
     private readonly Stack<Move> moveList = new();
     internal bool WhiteToMove { get; private set; }
     internal int MoveCount => moveList.Count;
@@ -21,28 +21,33 @@ internal class Board {
         WhiteToMove = true;
     }
     private void FillBoard() {
+        Pieces.Add(new Rook(new(0, 0)));
+        Pieces.Add(new Knight(new(1, 0)));
+        Pieces.Add(new Bishop(new(2, 0)));
+        Pieces.Add(new Queen(new(3, 0)));
+        white = new King(new(4, 0));
+        Pieces.Add(white);
+        Pieces.Add(new Bishop(new(5, 0)));
+        Pieces.Add(new Knight(new(6, 0)));
+        Pieces.Add(new Rook(new(7, 0)));
+        
         for (int x = 0; x < 8; x++) {
             Pieces.Add(new Pawn(new(x, 1)));
+        }
+
+        
+        for (int x = 0; x < 8; x++) {
             Pieces.Add(new Pawn(new(x, 6), false));
         }
-        Pieces.Add(new Rook(new(0, 0)));
-        Pieces.Add(new Rook(new(7, 0)));
         Pieces.Add(new Rook(new(0, 7), false));
-        Pieces.Add(new Rook(new(7, 7), false));
-        Pieces.Add(new Knight(new(1, 0)));
-        Pieces.Add(new Knight(new(6, 0)));
         Pieces.Add(new Knight(new(1, 7), false));
-        Pieces.Add(new Knight(new(6, 7), false));
-        Pieces.Add(new Bishop(new(2, 0)));
-        Pieces.Add(new Bishop(new(5, 0)));
         Pieces.Add(new Bishop(new(2, 7), false));
-        Pieces.Add(new Bishop(new(5, 7), false));
-        Pieces.Add(new Queen(new(3, 0)));
         Pieces.Add(new Queen(new(3, 7), false));
-        white = new King(new(4, 0));
         black = new King(new(4, 7), false);
-        Pieces.Add(white);
         Pieces.Add(black);
+        Pieces.Add(new Bishop(new(5, 7), false));
+        Pieces.Add(new Knight(new(6, 7), false));
+        Pieces.Add(new Rook(new(7, 7), false));
     }
     internal Piece GetPieceAt(Vector2 pos) {
         return Pieces.Find(piece => piece.Position == pos);
@@ -61,8 +66,7 @@ internal class Board {
     internal void ExecuteMove(Move move) {
         Piece piece = GetPieceAt(move.Start);
         if (move.IsCapture) {
-            CapturedPieces.Add(move.Captured);
-            Pieces.Remove(move.Captured);
+            move.CapturedPiece.IsCaptured = true;
         }
         piece.Move(move.End);
         WhiteToMove = !WhiteToMove;
@@ -87,8 +91,7 @@ internal class Board {
         piece.Move(move.Start);
         WhiteToMove = !WhiteToMove;
         if (move.IsCapture) {
-            CapturedPieces.Remove(move.Captured);
-            Pieces.Add(move.Captured);
+            move.CapturedPiece.IsCaptured = false;
         }
         if (move.IsFirstMoveOfPiece) piece.HasMoved = false;
         if (move.IsCastles) {

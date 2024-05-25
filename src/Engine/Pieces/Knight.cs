@@ -1,4 +1,3 @@
-using ;
 using Chess.Util;
 using Microsoft.Xna.Framework;
 
