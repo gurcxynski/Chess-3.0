@@ -1,0 +1,17 @@
+using Chess.Engine;
+using Chess.Util;
+using Microsoft.Xna.Framework;
+
+namespace Chess.Engine.Pieces;
+internal class Bishop : Piece
+{
+    internal Bishop(Vector2 position, bool isWhite = true) : base(position, isWhite) { }
+    internal override Move CreateMove(Vector2 target, Board board) {
+        var direction = target - Position;
+        if(!(System.Math.Abs(direction.X) == System.Math.Abs(direction.Y))) return null;
+        if (!MoveHelper.CheckPath(Position, target, board)) return null;
+        var move = new Move(Position, target, board, firstMove: !HasMoved);
+        if (MoveHelper.WillBeChecked(move, board)) return null;
+        return move;   
+    }
+}

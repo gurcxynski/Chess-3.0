@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
-using Chess.Pieces;
+using Chess.Engine;
+using Chess.Engine.Pieces;
 using System;
 using System.Linq;
 namespace Chess.Core;

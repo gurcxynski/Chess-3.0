@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Chess.Core;
+using Chess.Engine;
 using Microsoft.Xna.Framework;
 
 namespace Chess.Util;
