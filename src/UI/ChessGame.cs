@@ -1,10 +1,9 @@
-using Chess.UI;
 using Chess.Util;
 using Chess.Engine;
 using GeonBit.UI.Entities;
 using Microsoft.Xna.Framework;
 
-namespace Chess.Core;
+namespace Chess.UI;
 internal class ChessGame : Panel {
     private readonly Board board = new();
 

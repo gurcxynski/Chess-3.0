@@ -3,7 +3,7 @@ using Chess.Engine;
 using Chess.Engine.Pieces;
 using System;
 using System.Linq;
-namespace Chess.Core;
+namespace Chess;
 public class MyBot
 {
     bool playingWhite;
