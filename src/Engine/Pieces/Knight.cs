@@ -12,6 +12,6 @@ internal class Knight : Piece
         if (board.GetPieceAt(target)?.IsWhite == IsWhite) return null;
         var move = new Move(Position, target, board, firstMove: !HasMoved);
         if (MoveHelper.WillBeChecked(move, board)) return null;
-        return move;        
+        return move;
     }
 }
