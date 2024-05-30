@@ -55,9 +55,14 @@ internal class PlayableArea : Panel {
         var clicked = PositionConverter.ToGrid(MouseInput.MousePosition, this, drawWhiteDown);
         if (clicked.X < 0 || clicked.X > 7 || clicked.Y < 0 || clicked.Y > 7 || clicked == piece.Position) return;
         Move move = piece.CreateMove(clicked, board);
-        Console.WriteLine("Executing move: " + move);
         if (move is not null) {
             board.ExecuteMove(move);
+
+        }
+        if (board.IsInCheck) {
+            AddChild(new ColorField(Color.Red, board.GetKing(WhiteTurn).Position, this, drawWhiteDown, ColorField.HighlightType.Check));
+        } else {
+            RemoveAllChildren((Entity child) => child is ColorField && (child as ColorField).Type == ColorField.HighlightType.Check);
         }
     }
     void OnPickup(PieceIcon piece)

@@ -20,7 +20,13 @@ namespace Chess.UI
             Size = new Vector2(1 / 8f, 1 / 8f);
             Anchor = Anchor.TopLeft;
             Offset = PositionConverter.ToOffset(square, parent, drawWhiteDown);
-            Opacity = 10;
+            Opacity = type switch {
+                HighlightType.Move => 25,
+                HighlightType.Capture => 50,
+                HighlightType.Check => 50,
+                HighlightType.Checkmate => 0,
+                _ => 0
+            };
             PriorityBonus = -50;
         }
     }
