@@ -19,5 +19,5 @@ internal abstract class Piece
         Position = pos;
         HasMoved = true;
     }
-    internal abstract Move CreateMove(Vector2 target, Board board);
+    internal abstract Move CreateMove(Vector2 target, Board board, bool verifyCheck = true);
 }

@@ -1,11 +1,29 @@
+using System;
+using Chess.UI;
+using GeonBit.UI;
+
 namespace Chess;
 
 internal class StateMachine {
-    internal void NewGame() {
+    private static readonly StartMenu newGame = new();
+
+    internal static void Init()
+    {
+        UserInterface.Active = newGame;
     }
 
-    internal void Init()
+    internal static void StartGame()
     {
+        UserInterface.Active = new ChessGame();
+    }
 
+    internal static void QuitGame()
+    {
+        Chess.Instance.Exit();
+    }
+
+    internal static void ToMenu<T>() where T : Menu, new()
+    {
+        UserInterface.Active = new T();
     }
 }

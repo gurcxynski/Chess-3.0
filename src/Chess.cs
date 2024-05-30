@@ -6,6 +6,8 @@ using GeonBit.UI;
 using Chess.UI;
 using Chess.Util;
 using System;
+using Microsoft.Xna.Framework.Input;
+using MonoGame.Extended.Input.InputListeners;
 
 namespace Chess;
     /// This is the main class for your game.
@@ -15,14 +17,17 @@ namespace Chess;
         GraphicsDeviceManager graphics;
         internal readonly StateMachine machine = new();
         SpriteBatch spriteBatch;
+        internal static KeyboardListener keyboardListener = new();
 
+        internal static Chess Instance;
 		/// Game constructor.
         public Chess()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            graphics.PreferredBackBufferWidth = 1000;
-            graphics.PreferredBackBufferHeight = 1000;
+            graphics.PreferredBackBufferWidth = 800;
+            graphics.PreferredBackBufferHeight = 800;
+            Instance = this;
         }
 
         /// Allows the game to perform any initialization it needs to before starting to run.
@@ -32,9 +37,9 @@ namespace Chess;
             // GeonBit.UI: Init the UI manager using the "hd" built-in theme
             UserInterface.Initialize(Content, "chess");
 
-            // GeonBit.UI: tbd create your GUI layouts here..
-            
-            UserInterface.Active.AddEntity(new NewGameMenu());
+        // GeonBit.UI: tbd create your GUI layouts here..
+
+        StateMachine.Init();
             
             // call base initialize func
             base.Initialize();
@@ -57,6 +62,7 @@ namespace Chess;
             UserInterface.Active.Update(gameTime);
 
             // tbd add your own update() stuff here..
+            keyboardListener.Update(gameTime);
 
             // call base update
             base.Update(gameTime);

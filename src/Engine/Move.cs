@@ -30,4 +30,5 @@ internal class Move
         CapturedPiece = IsEnPassant ? board.GetPieceAt(end + new Vector2(0, OfWhite ? -1 : 1)) : board.GetPieceAt(end);
         if (CapturedPiece is not null) CapturePieceType = CapturedPiece.GetType();
     }
+    public override string ToString() => $"{(OfWhite ? "white" : "black")} {MovePieceType.Name} from {Start} to {End} {(IsCapture ? $"capturing {CapturePieceType.Name}" : "")} {(IsPromotion ? $"promoting to {PromotionPieceType.Name}" : "")} {(IsEnPassant ? "en passant" : "")} {(IsCastles ? "castles" : "")}";
 }

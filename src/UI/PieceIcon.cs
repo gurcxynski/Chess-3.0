@@ -12,16 +12,13 @@ internal class PieceIcon : Icon
         Piece = piece;
         Texture = Textures.Get(piece);
         Size = new Vector2(1/8f, 1/8f);
+        LimitDraggingToParentBoundaries = false;
     }
 
     internal void Update(bool drawWhiteDown)
     {
-        Offset = ToOffset(Piece.Position, drawWhiteDown);
+        Offset = PositionConverter.ToOffset(Piece.Position, Parent, drawWhiteDown);
         Visible = !Piece.IsCaptured;
-        Draggable = Piece.IsWhite == ChessGame.Instance.WhiteTurn;
-    }
-    private Vector2 ToOffset(Vector2 vec, bool drawWhiteDown) {
-        if (drawWhiteDown) vec = new Vector2(vec.X, 7 - vec.Y);
-        return vec * ((Parent.Size - 2 * Parent.Padding) / 8);
+        Draggable = Visible && Piece.IsWhite == PlayableArea.Instance.WhiteTurn;
     }
 }

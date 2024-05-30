@@ -5,7 +5,8 @@ namespace Chess.Engine.Pieces;
 internal class Pawn : Piece
 {
     internal Pawn(Vector2 position, bool isWhite = true) : base(position, isWhite) { }
-    internal override Move CreateMove(Vector2 target, Board board) {
+    internal override Move CreateMove(Vector2 target, Board board, bool verifyCheck = true) {
+        if (IsCaptured) return null;
         var direction = target - Position;
         var IsCapture = board.GetPieceAt(target) != null;
         if (!IsWhite) direction.Y *= -1;
@@ -24,7 +25,7 @@ internal class Pawn : Piece
         if (IsCapture && !(System.Math.Abs(direction.X) == 1 && direction.Y == 1)) return null;
         if (!MoveHelper.CheckPath(Position, target, board)) return null;
         var move = new Move(Position, target, board, firstMove: !HasMoved, enPassant: IsEnPassant);
-        if (MoveHelper.WillBeChecked(move, board)) return null;
+        //if (verifyCheck && MoveHelper.WillBeChecked(move, board)) return null;
         return move;      
     }
 }
