@@ -11,7 +11,7 @@ internal class Rook : Piece
         if (!(direction.X == 0 || direction.Y == 0)) return null;
         if (!MoveHelper.CheckPath(Position, target, board)) return null;
         var move = new Move(Position, target, board, firstMove: !HasMoved);
-        //if (verifyCheck && MoveHelper.WillBeChecked(move, board)) return null;
+        if (verifyCheck && MoveHelper.WillBeChecked(move, board)) return null;
         return move;    
     }
 }

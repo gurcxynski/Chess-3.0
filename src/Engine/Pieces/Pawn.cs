@@ -25,7 +25,7 @@ internal class Pawn : Piece
         if (IsCapture && !(System.Math.Abs(direction.X) == 1 && direction.Y == 1)) return null;
         if (!MoveHelper.CheckPath(Position, target, board)) return null;
         var move = new Move(Position, target, board, firstMove: !HasMoved, enPassant: IsEnPassant);
-        //if (verifyCheck && MoveHelper.WillBeChecked(move, board)) return null;
+        if (verifyCheck && MoveHelper.WillBeChecked(move, board)) return null;
         return move;      
     }
 }

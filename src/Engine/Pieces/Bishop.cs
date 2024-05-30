@@ -12,7 +12,7 @@ internal class Bishop : Piece
         if(!(System.Math.Abs(direction.X) == System.Math.Abs(direction.Y))) return null;
         if (!MoveHelper.CheckPath(Position, target, board)) return null;
         var move = new Move(Position, target, board, firstMove: !HasMoved);
-        //if (verifyCheck && MoveHelper.WillBeChecked(move, board)) return null;
+        if (verifyCheck && MoveHelper.WillBeChecked(move, board)) return null;
         return move;   
     }
 }

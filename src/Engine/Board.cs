@@ -50,7 +50,7 @@ internal class Board {
         Pieces.Add(new Rook(new(7, 7), false));
     }
     internal Piece GetPieceAt(Vector2 pos) {
-        return Pieces.Find(piece => piece.Position == pos);
+        return Pieces.Find(piece => piece.Position == pos && !piece.IsCaptured);
     }
     internal List<Piece> GetAll(Type type) =>  Pieces.Where(piece => piece.GetType() == type).ToList();
     internal Piece GetKing(bool isWhite) => isWhite ? white : black;

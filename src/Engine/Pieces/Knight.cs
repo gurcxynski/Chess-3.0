@@ -12,7 +12,7 @@ internal class Knight : Piece
         || (System.Math.Abs(direction.X) == 2 && System.Math.Abs(direction.Y) == 1))) return null;
         if (board.GetPieceAt(target)?.IsWhite == IsWhite) return null;
         var move = new Move(Position, target, board, firstMove: !HasMoved);
-        //if (verifyCheck && MoveHelper.WillBeChecked(move, board)) return null;
+        if (verifyCheck && MoveHelper.WillBeChecked(move, board)) return null;
         return move;
     }
 }
