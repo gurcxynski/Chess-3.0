@@ -6,6 +6,9 @@ using System.Linq;
 namespace Chess;
 public class MyBot
 {
+    public MyBot(bool white) {
+        playingWhite = white;
+    }
     bool playingWhite;
 
     readonly int[][] centerValues = new int[][] {

@@ -12,6 +12,10 @@ internal class StateMachine {
         UserInterface.Active = newGame;
     }
 
+    internal static void StartGame(bool white)
+    {
+        UserInterface.Active = new ChessGame(white);
+    }
     internal static void StartGame()
     {
         UserInterface.Active = new ChessGame();
