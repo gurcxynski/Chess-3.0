@@ -9,7 +9,7 @@ public class MyBot
     public MyBot(bool white) {
         playingWhite = white;
     }
-    bool playingWhite;
+    public bool playingWhite;
 
     readonly int[][] centerValues = new int[][] {
         new int[] { 000, 000, 000, 000, 000, 000, 000, 000 },
@@ -33,7 +33,7 @@ public class MyBot
             _ => 0
         };
     }
-    int Eval(Board board, Move move, int depth = 2) {
+    int Eval(Board board, Move move, int depth = 0) {
         int val = 0;
         var myPieces = playingWhite ? board.WhitePieces : board.BlackPieces;
         var pieceValueSum = myPieces.Sum((piece) => { if (piece.GetType() != typeof (King)) return GetValue(piece.GetType()); return 0;});
@@ -46,9 +46,9 @@ public class MyBot
         if (board.MoveCount < 30) {
             if (move.IsCastles) val += 90;
             else { 
-                if (move.IsFirstMoveOfPiece && move.MovePieceType == typeof(King)) val -= 80;
-                if (board.HasKingsideCastleRight(playingWhite)) val += 50;
-                if (board.HasQueensideCastleRight(playingWhite)) val += 30; 
+                //if (move.IsFirstMoveOfPiece && move.MovePieceType == typeof(King)) val -= 80;
+                //if (board.HasKingsideCastleRight(playingWhite)) val += 50;
+                //if (board.HasQueensideCastleRight(playingWhite)) val += 30; 
             }
         }
         if (depth == 0) { board.UndoMove(); return val; }

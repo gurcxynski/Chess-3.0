@@ -121,18 +121,6 @@ internal class Board {
         return validMoves;
     }
 
-    internal bool HasKingsideCastleRight(bool playingWhite)
-    {
-        var move = GetKing(playingWhite).CreateMove(new(6, playingWhite ? 0 : 7), this);
-        return move is not null;
-    }
-
-    internal bool HasQueensideCastleRight(bool playingWhite)
-    {
-        var move = GetKing(playingWhite).CreateMove(new(2, playingWhite ? 0 : 7), this);
-        return move is not null;
-    }
-
     internal bool IsInCheck => MoveHelper.IsAttackedBy(GetKing(WhiteToMove).Position, this, !WhiteToMove);
     internal bool IsChecking => MoveHelper.IsAttackedBy(GetKing(!WhiteToMove).Position, this, WhiteToMove);
     internal bool IsMate => IsInCheck && GetValidMoves().Count == 0;

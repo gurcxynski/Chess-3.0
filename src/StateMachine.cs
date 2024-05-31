@@ -1,4 +1,3 @@
-using System;
 using Chess.UI;
 using GeonBit.UI;
 
@@ -12,13 +11,13 @@ internal class StateMachine {
         UserInterface.Active = newGame;
     }
 
-    internal static void StartGame(bool white)
+    internal static void StartGame(ChessGame.GameType type, bool white)
     {
-        UserInterface.Active = new ChessGame(white);
+        UserInterface.Active = new PlayArea(type, white);
     }
-    internal static void StartGame()
+    internal static void StartGame(ChessGame.GameType type)
     {
-        UserInterface.Active = new ChessGame();
+        UserInterface.Active = new PlayArea(type);
     }
 
     internal static void QuitGame()

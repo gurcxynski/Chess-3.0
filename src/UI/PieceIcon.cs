@@ -15,10 +15,10 @@ internal class PieceIcon : Icon
         LimitDraggingToParentBoundaries = false;
     }
 
-    internal void Update(bool drawWhiteDown)
+    internal void Update(bool drawBlackDown, bool draggable)
     {
-        Offset = PositionConverter.ToOffset(Piece.Position, Parent, drawWhiteDown);
+        Offset = PositionConverter.ToOffset(Piece.Position, Parent, drawBlackDown);
         Visible = !Piece.IsCaptured;
-        Draggable = Visible && Piece.IsWhite == PlayableArea.Instance.WhiteTurn;
+        Draggable = Visible && draggable;
     }
 }
