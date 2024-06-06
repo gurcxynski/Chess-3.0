@@ -1,5 +1,7 @@
+using System.Numerics;
 using Chess.UI;
 using GeonBit.UI;
+using Microsoft.VisualBasic.ApplicationServices;
 
 namespace Chess;
 
@@ -13,11 +15,13 @@ internal class StateMachine {
 
     internal static void StartGame(ChessGame.GameType type, bool white)
     {
-        UserInterface.Active = new PlayArea(type, white);
+        Vector2 size = new(UserInterface.Active.ScreenWidth, UserInterface.Active.ScreenHeight);
+        UserInterface.Active = new PlayArea(size, type, white);
     }
     internal static void StartGame(ChessGame.GameType type)
     {
-        UserInterface.Active = new PlayArea(type);
+        Vector2 size = new(UserInterface.Active.ScreenWidth, UserInterface.Active.ScreenHeight);
+        UserInterface.Active = new PlayArea(size, type);
     }
 
     internal static void QuitGame()

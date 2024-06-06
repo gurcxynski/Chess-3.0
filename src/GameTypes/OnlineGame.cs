@@ -1,11 +1,12 @@
 using Chess.UI;
 using GeonBit.UI.Entities;
+using Microsoft.Xna.Framework;
 
 namespace Chess;
 
 internal class OnlineGame : ChessGame {
     bool playingWhite;
-    internal OnlineGame(bool white) : base(GameType.Online) {
+    internal OnlineGame(Vector2 size, bool white) : base(size, GameType.Online) {
         playingWhite = white;
         drawBlackDown = !white;
         AfterUpdate += (Entity entity) => {

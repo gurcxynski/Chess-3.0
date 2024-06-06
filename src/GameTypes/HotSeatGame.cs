@@ -1,11 +1,11 @@
-using System;
 using Chess.UI;
+using Microsoft.Xna.Framework;
 
 namespace Chess;
 
 internal class HotSeatGame : ChessGame
 {
-    internal HotSeatGame() : base(GameType.Hotseat)
+    internal HotSeatGame(Vector2 size) : base(size, GameType.Hotseat)
     {
     }
 

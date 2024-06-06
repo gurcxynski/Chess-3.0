@@ -1,11 +1,12 @@
 using Chess.UI;
 using GeonBit.UI.Entities;
+using Microsoft.Xna.Framework;
 
 namespace Chess;
 
 internal class BotGame : ChessGame {
     readonly MyBot bot;
-    internal BotGame(bool white) : base(GameType.Bot) {
+    internal BotGame(Vector2 size, bool white) : base(size, GameType.Bot) {
         bot = new MyBot(!white);
         drawBlackDown = !white;
         AfterUpdate += (Entity entity) => {

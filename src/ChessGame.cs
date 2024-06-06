@@ -17,11 +17,15 @@ internal abstract class ChessGame : Panel {
     internal static ChessGame Instance { get; private set; }
     protected readonly Board board = new();
     protected bool drawBlackDown;
+    private Vector2 baseSize;
+    internal float SizeFactor;
+    internal float PaddingFactor;
 
-    internal ChessGame(GameType type) : base(new Vector2(600, 600)) {
+    internal ChessGame(Vector2 bSize, GameType type) : base() {
+        baseSize = bSize;
+        Anchor = Anchor.CenterLeft;
         Instance = this;
         Type = type;
-        Padding = new Vector2(20, 20);
 
         var background = new Image(Textures.Get("brown"), anchor: Anchor.Center) { PriorityBonus = -100 };
         AddChild(background);
@@ -39,6 +43,11 @@ internal abstract class ChessGame : Panel {
             AddChild(icon); 
         });
 
+    }
+    internal void Init() {
+        Size = baseSize * SizeFactor;
+        Padding = Size * PaddingFactor;
+        UpdateIcons();
     }
     protected virtual void PieceMovedByMouse (PieceIcon icon) {
         var piece = icon.Piece;
