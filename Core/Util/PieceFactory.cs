@@ -2,11 +2,10 @@
 using Microsoft.Xna.Framework;
 using System;
 using System.Reflection;
-using static Chess.Core.PositionLoader;
 
 namespace Chess.Core.Util
 {
-    internal class PieceFactory
+    internal static class PieceFactory
     {
         internal static Piece CreatePiece(PieceData data)
         {

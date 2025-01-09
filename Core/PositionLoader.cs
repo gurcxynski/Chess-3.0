@@ -1,22 +1,22 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
-using static Chess.Core.PositionLoader;
 
 namespace Chess.Core;
-internal class BoardSetup
+internal struct BoardSetup
 {
     public List<PieceData> Pieces { get; set; }
 }
-
-internal class PositionLoader
+internal struct PieceData
 {
-    internal class PieceData
-    {
-        public string Type { get; set; }
-        public int[] Position { get; set; }
-        public string Color { get; set; }
-    }
+    public string Type { get; set; }
+    public int[] Position { get; set; }
+    public string Color { get; set; }
+}
+
+internal static class PositionLoader
+{
+
 
     internal static BoardSetup LoadBoardSetup(string file)
     {
