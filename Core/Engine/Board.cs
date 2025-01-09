@@ -14,6 +14,7 @@ internal class Board
     internal IEnumerable<Piece> BlackPieces => Pieces.Where(piece => !piece.IsWhite);
     internal IEnumerable<Piece> CapturedPieces => Pieces.Where(piece => piece.IsCaptured);
     internal IEnumerable<Piece> ActivePieces => Pieces.Where(piece => !piece.IsCaptured);
+    internal List<Move> ValidMoves => GetValidMoves();
 
     private readonly Stack<Move> moveHistory = new();
     internal bool WhiteToMove { get; private set; }
@@ -42,75 +43,51 @@ internal class Board
         }
     }
 
-    internal Piece GetPieceAt(Vector2 pos)
-    {
-        return Pieces.Find(piece => piece.Position == pos && !piece.IsCaptured);
-    }
+    internal Piece GetPieceAt(Vector2 pos) => Pieces.Find(piece => piece.Position == pos && !piece.IsCaptured);
     internal List<Piece> GetAll(Type type) => Pieces.Where(piece => piece.GetType() == type).ToList();
     internal Piece GetKing(bool isWhite) => isWhite ? whiteKing : blackKing;
     internal Move LastMove => moveHistory.Count > 0 ? moveHistory.Peek() : null;
-    internal Move PreLastMove()
-    {
-        if (moveHistory.Count < 2) return null;
-        var move = moveHistory.Pop();
-        var preLastMove = moveHistory.Peek();
-        moveHistory.Push(move);
-        return preLastMove;
-    }
 
     internal void ExecuteMove(Move move)
     {
-        Piece piece = GetPieceAt(move.Start);
-        if (move.IsCapture)
-        {
-            move.CapturedPiece.IsCaptured = true;
-        }
-        piece.Move(move.End);
+        if (move.IsCapture) move.CapturedPiece.IsCaptured = true;
+        move.MovedPiece.Move(move.End);
         WhiteToMove = !WhiteToMove;
         moveHistory.Push(move);
-        if (move.IsCastles)
+        if (!move.IsCastles) return;
+        if (move.End.X == 2)
         {
-            if (move.End.X == 2)
-            {
-                Piece rook = GetPieceAt(new(0, move.Start.Y));
-                rook.Move(new(3, move.Start.Y));
-            }
-            if (move.End.X == 6)
-            {
-                Piece rook = GetPieceAt(new(7, move.Start.Y));
-                rook.Move(new(5, move.Start.Y));
-            }
+            Piece rook = GetPieceAt(new(0, move.Start.Y));
+            rook.Move(new(3, move.Start.Y));
         }
-        return;
+        else if (move.End.X == 6)
+        {
+            Piece rook = GetPieceAt(new(7, move.Start.Y));
+            rook.Move(new(5, move.Start.Y));
+        }
     }
 
     internal void UndoMove()
     {
         if (MoveCount == 0) return;
         Move move = moveHistory.Pop();
-        Piece piece = GetPieceAt(move.End);
-        piece.Move(move.Start);
+        move.MovedPiece.Move(move.Start);
         WhiteToMove = !WhiteToMove;
-        if (move.IsCapture)
+        if (move.IsCapture) move.CapturedPiece.IsCaptured = false;
+        if (move.IsFirstMoveOfPiece) move.MovedPiece.HasMoved = false;
+        if (!move.IsCastles) return;
+        if (move.End.X == 2)
         {
-            move.CapturedPiece.IsCaptured = false;
+            Piece rook = GetPieceAt(new(3, move.Start.Y));
+            rook.Move(new(0, move.Start.Y));
         }
-        if (move.IsFirstMoveOfPiece) piece.HasMoved = false;
-        if (move.IsCastles)
+        if (move.End.X == 6)
         {
-            if (move.End.X == 2)
-            {
-                Piece rook = GetPieceAt(new(3, move.Start.Y));
-                rook.Move(new(0, move.Start.Y));
-            }
-            if (move.End.X == 6)
-            {
-                Piece rook = GetPieceAt(new(5, move.Start.Y));
-                rook.Move(new(7, move.Start.Y));
-            }
+            Piece rook = GetPieceAt(new(5, move.Start.Y));
+            rook.Move(new(7, move.Start.Y));
         }
     }
-    internal List<Move> GetValidMoves()
+    private List<Move> GetValidMoves()
     {
         List<Move> validMoves = [];
         var piecesCopy = new List<Piece>(Pieces);

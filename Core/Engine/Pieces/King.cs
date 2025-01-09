@@ -21,7 +21,7 @@ internal class King(Vector2 position, bool isWhite = true) : Piece(position, isW
         if (!castles && !(System.Math.Abs(direction.X) <= 1 && System.Math.Abs(direction.Y) <= 1)) return null;
         if (MoveHelper.IsAttackedBy(target, board, !IsWhite)) return null;
         if (!MoveHelper.CheckPath(Position, target, board)) return null;
-        var move = new Move(Position, target, board, castles: castles, firstMove: !HasMoved);
+        var move = new Move(Position, target, this, board.GetPieceAt(target), castles: castles, firstMove: !HasMoved);
         if (verifyCheck && MoveHelper.WillBeChecked(move, board)) return null;
         return move;
     }

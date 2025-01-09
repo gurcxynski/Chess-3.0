@@ -55,7 +55,7 @@ public class MyBot(bool white)
             }
         }
         if (depth == 0) { board.UndoMove(); return val; }
-        List<Move> moves = board.GetValidMoves();
+        List<Move> moves = board.ValidMoves;
         int max = int.MinValue;
         foreach (var m in moves)
         {
@@ -70,7 +70,7 @@ public class MyBot(bool white)
     {
         playingWhite = board.WhiteToMove;
         int max = int.MinValue;
-        List<Move> moves = board.GetValidMoves();
+        List<Move> moves = board.ValidMoves;
         Move bestMove = moves[0];
         foreach (var move in moves)
         {

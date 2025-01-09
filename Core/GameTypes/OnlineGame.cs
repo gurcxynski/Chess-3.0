@@ -14,7 +14,7 @@ internal class OnlineGame : ChessGame
         {
             if (board.WhiteToMove == playingWhite)
             {
-                ProcessMove(board.GetValidMoves()[0]);
+                ProcessMove(board.ValidMoves[0]);
             }
         };
     }

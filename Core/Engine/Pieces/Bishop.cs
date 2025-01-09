@@ -10,7 +10,7 @@ internal class Bishop(Vector2 position, bool isWhite = true) : Piece(position, i
         var direction = target - Position;
         if (!(System.Math.Abs(direction.X) == System.Math.Abs(direction.Y))) return null;
         if (!MoveHelper.CheckPath(Position, target, board)) return null;
-        var move = new Move(Position, target, board, firstMove: !HasMoved);
+        var move = new Move(Position, target, this, board.GetPieceAt(target), firstMove: !HasMoved);
         if (verifyCheck && MoveHelper.WillBeChecked(move, board)) return null;
         return move;
     }

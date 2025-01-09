@@ -27,7 +27,7 @@ internal class Pawn(Vector2 position, bool isWhite = true) : Piece(position, isW
         if (!IsCapture && !(direction.X == 0 && (direction.Y == 1 || (!HasMoved && direction.Y == 2)))) return null;
         if (IsCapture && !(System.Math.Abs(direction.X) == 1 && direction.Y == 1)) return null;
         if (!MoveHelper.CheckPath(Position, target, board)) return null;
-        var move = new Move(Position, target, board, firstMove: !HasMoved, enPassant: IsEnPassant);
+        var move = new Move(Position, target, this, board.GetPieceAt(target), firstMove: !HasMoved, enPassant: IsEnPassant);
         if (verifyCheck && MoveHelper.WillBeChecked(move, board)) return null;
         return move;
     }
