@@ -1,6 +1,3 @@
-using GeonBit.UI;
-using Windows.Devices.Usb;
-
 namespace Chess.Core.UI.Menus;
 internal partial class StartMenu : Menu
 {

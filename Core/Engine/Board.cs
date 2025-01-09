@@ -6,67 +6,55 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace Chess.Core.Engine;
+
 internal class Board
 {
     internal List<Piece> Pieces { get; private init; } = [];
     internal IEnumerable<Piece> WhitePieces => Pieces.Where(piece => piece.IsWhite);
     internal IEnumerable<Piece> BlackPieces => Pieces.Where(piece => !piece.IsWhite);
     internal IEnumerable<Piece> CapturedPieces => Pieces.Where(piece => piece.IsCaptured);
-    private readonly Stack<Move> moveList = new();
+    internal IEnumerable<Piece> ActivePieces => Pieces.Where(piece => !piece.IsCaptured);
+
+    private readonly Stack<Move> moveHistory = new();
     internal bool WhiteToMove { get; private set; }
-    internal int MoveCount => moveList.Count;
-    private King white;
-    private King black;
-    internal Board()
+    internal int MoveCount => moveHistory.Count;
+    private King whiteKing;
+    private King blackKing;
+    internal Board(BoardSetup setup)
     {
-        FillBoard();
+        FillBoard(setup);
         WhiteToMove = true;
     }
-    private void FillBoard()
+    private void FillBoard(BoardSetup setup)
     {
-        Pieces.Add(new Rook(new(0, 0)));
-        Pieces.Add(new Knight(new(1, 0)));
-        Pieces.Add(new Bishop(new(2, 0)));
-        Pieces.Add(new Queen(new(3, 0)));
-        white = new King(new(4, 0));
-        Pieces.Add(white);
-        Pieces.Add(new Bishop(new(5, 0)));
-        Pieces.Add(new Knight(new(6, 0)));
-        Pieces.Add(new Rook(new(7, 0)));
-
-        for (int x = 0; x < 8; x++)
+        foreach (var pieceData in setup.Pieces)
         {
-            Pieces.Add(new Pawn(new(x, 1)));
-        }
+            var piece = PieceFactory.CreatePiece(pieceData);
+            Pieces.Add(piece);
 
-
-        for (int x = 0; x < 8; x++)
-        {
-            Pieces.Add(new Pawn(new(x, 6), false));
+            if (piece is King king)
+            {
+                if (king.IsWhite)
+                    whiteKing = king;
+                else
+                    blackKing = king;
+            }
         }
-        Pieces.Add(new Rook(new(0, 7), false));
-        Pieces.Add(new Knight(new(1, 7), false));
-        Pieces.Add(new Bishop(new(2, 7), false));
-        Pieces.Add(new Queen(new(3, 7), false));
-        black = new King(new(4, 7), false);
-        Pieces.Add(black);
-        Pieces.Add(new Bishop(new(5, 7), false));
-        Pieces.Add(new Knight(new(6, 7), false));
-        Pieces.Add(new Rook(new(7, 7), false));
     }
+
     internal Piece GetPieceAt(Vector2 pos)
     {
         return Pieces.Find(piece => piece.Position == pos && !piece.IsCaptured);
     }
     internal List<Piece> GetAll(Type type) => Pieces.Where(piece => piece.GetType() == type).ToList();
-    internal Piece GetKing(bool isWhite) => isWhite ? white : black;
-    internal Move LastMove => moveList.Count > 0 ? moveList.Peek() : null;
+    internal Piece GetKing(bool isWhite) => isWhite ? whiteKing : blackKing;
+    internal Move LastMove => moveHistory.Count > 0 ? moveHistory.Peek() : null;
     internal Move PreLastMove()
     {
-        if (moveList.Count < 2) return null;
-        var move = moveList.Pop();
-        var preLastMove = moveList.Peek();
-        moveList.Push(move);
+        if (moveHistory.Count < 2) return null;
+        var move = moveHistory.Pop();
+        var preLastMove = moveHistory.Peek();
+        moveHistory.Push(move);
         return preLastMove;
     }
 
@@ -79,7 +67,7 @@ internal class Board
         }
         piece.Move(move.End);
         WhiteToMove = !WhiteToMove;
-        moveList.Push(move);
+        moveHistory.Push(move);
         if (move.IsCastles)
         {
             if (move.End.X == 2)
@@ -99,7 +87,7 @@ internal class Board
     internal void UndoMove()
     {
         if (MoveCount == 0) return;
-        Move move = moveList.Pop();
+        Move move = moveHistory.Pop();
         Piece piece = GetPieceAt(move.End);
         piece.Move(move.Start);
         WhiteToMove = !WhiteToMove;

@@ -17,7 +17,7 @@ internal abstract class ChessGame : Panel
     }
     internal GameType Type { get; private init; }
     internal static ChessGame Instance { get; private set; }
-    protected readonly Board board = new();
+    protected readonly Board board = new(PositionLoader.LoadBoardSetup("boardSetup.json"));
     protected bool drawBlackDown;
     private Vector2 baseSize;
     internal float SizeFactor;

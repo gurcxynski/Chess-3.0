@@ -8,19 +8,11 @@ namespace Chess.Core;
 
 internal static class StateMachine
 {
-    private static readonly StartMenu newGame = new();
-
-    internal static void Init() => UserInterface.Active = newGame;
-
-    internal static void StartGame(ChessGame.GameType type, bool white)
+    internal static void Init() => UserInterface.Active = new NewGameMenu();
+    internal static void StartGame(ChessGame.GameType type, bool white = true)
     {
         Vector2 size = new(UserInterface.Active.ScreenWidth, UserInterface.Active.ScreenHeight);
         UserInterface.Active = new PlayArea(size, type, white);
-    }
-    internal static void StartGame(ChessGame.GameType type)
-    {
-        Vector2 size = new(UserInterface.Active.ScreenWidth, UserInterface.Active.ScreenHeight);
-        UserInterface.Active = new PlayArea(size, type);
     }
 
     internal static void QuitGame() => Environment.Exit(0);

@@ -2,9 +2,8 @@ using Chess.Core.Util;
 using Microsoft.Xna.Framework;
 
 namespace Chess.Core.Engine.Pieces;
-internal class Queen : Piece
+internal class Queen(Vector2 position, bool isWhite = true) : Piece(position, isWhite)
 {
-    internal Queen(Vector2 position, bool isWhite = true) : base(position, isWhite) { }
     internal override Move CreateMove(Vector2 target, Board board, bool verifyCheck = true)
     {
         if (IsCaptured) return null;
