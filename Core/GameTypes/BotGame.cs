@@ -1,4 +1,5 @@
 using Chess.Core.UI;
+using Chess.Core.ChessBot;
 using Microsoft.Xna.Framework;
 
 namespace Chess.Core.GameTypes;

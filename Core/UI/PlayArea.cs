@@ -9,6 +9,7 @@ internal partial class PlayArea : UserInterface
     readonly ChessGame game;
     internal PlayArea(Vector2 size, ChessGame.GameType type, bool white = true) : base()
     {
+        ShowCursor = false;
         switch (type)
         {
             case ChessGame.GameType.Online:
@@ -21,27 +22,12 @@ internal partial class PlayArea : UserInterface
                 game = new HotSeatGame(size);
                 break;
         }
-        game.Anchor = Anchor.CenterLeft;
-        game.SizeFactor = 0.7f;
+        game.Anchor = Anchor.Center;
+        game.SizeFactor = 0.9f;
         game.PaddingFactor = 0.025f;
         game.Init();
 
-        Panel upper = new(new(game.SizeFactor, (1 - game.SizeFactor) / 2), anchor: Anchor.TopLeft);
-        Panel lower = new(new(game.SizeFactor, (1 - game.SizeFactor) / 2), anchor: Anchor.BottomLeft);
 
-        PanelTabs tabs = new()
-        {
-            Size = new Vector2(1 - game.SizeFactor, 0.99f)
-        };
-
-        tabs.AddTab("Chat");
-        tabs.AddTab("Time");
-
-        tabs.Anchor = Anchor.TopRight;
-
-        AddEntity(tabs);
-        AddEntity(upper);
         AddEntity(game);
-        AddEntity(lower);
     }
 }
