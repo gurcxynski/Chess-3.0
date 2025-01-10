@@ -99,7 +99,7 @@ internal class Board
                 {
                     Vector2 pos = new(x, y);
                     if (pos == piece.Position) continue;
-                    Move move = piece.CreateMove(pos, this);
+                    Move move = piece.TryCreatingMove(pos, this);
                     if (move is not null) validMoves.Add(move);
                 }
             }

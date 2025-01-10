@@ -63,7 +63,7 @@ internal abstract class ChessGame : Panel
         var clicked = PositionConverter.ToGrid(MouseInput.MousePosition, this, drawBlackDown);
         if (clicked.X < 0 || clicked.X > 7 || clicked.Y < 0 || clicked.Y > 7 || clicked == piece.Position) return;
 
-        Move move = piece.CreateMove(clicked, board);
+        Move move = piece.TryCreatingMove(clicked, board);
         if (move is not null) board.ExecuteMove(move);
 
     }
@@ -76,7 +76,7 @@ internal abstract class ChessGame : Panel
             for (int j = 0; j < 8; j++)
             {
                 var pos = new Vector2(i, j);
-                if (selected.Position != pos && selected.CreateMove(pos, board) is not null)
+                if (selected.Position != pos && selected.TryCreatingMove(pos, board) is not null)
                 {
                     AddChild(new ColorField(Color.Blue, pos, this, drawBlackDown, ColorField.HighlightType.Move));
                 }

@@ -1,34 +1,25 @@
 using Chess.Core.Util;
 using Microsoft.Xna.Framework;
+using System;
 
 namespace Chess.Core.Engine.Pieces;
 internal class Pawn(Vector2 position, bool isWhite = true) : Piece(position, isWhite)
 {
-    internal override Move CreateMove(Vector2 target, Board board, bool verifyCheck = true)
+    protected override bool CheckBasicMovement(Vector2 direction, Board board)
     {
-        if (IsCaptured) return null;
-        var direction = target - Position;
-        var IsCapture = board.GetPieceAt(target) != null;
+        bool isCapture = board.GetPieceAt(Position + direction) is not null;
         if (!IsWhite) direction.Y *= -1;
-        var IsEnPassant = false;
-        var lastMove = board.LastMove;
-        if (lastMove != null)
-        {
-            var lastMovePiece = board.GetPieceAt(lastMove.End);
-            if (lastMovePiece is Pawn && (lastMove.End - lastMove.Start).Length() == 2)
-            {
-                IsEnPassant = target == new Vector2(lastMove.End.X, lastMove.End.Y + (IsWhite ? 1 : -1));
-                if (IsEnPassant)
-                {
-                    IsCapture = true;
-                }
-            }
-        }
-        if (!IsCapture && !(direction.X == 0 && (direction.Y == 1 || (!HasMoved && direction.Y == 2)))) return null;
-        if (IsCapture && !(System.Math.Abs(direction.X) == 1 && direction.Y == 1)) return null;
-        if (!MoveHelper.CheckPath(Position, target, board)) return null;
-        var move = new Move(Position, target, this, board.GetPieceAt(target), firstMove: !HasMoved, enPassant: IsEnPassant);
-        if (verifyCheck && MoveHelper.WillBeChecked(move, board)) return null;
-        return move;
+        if (direction == Vector2.UnitY && !isCapture) return true;
+        if (direction == Vector2.UnitY * 2 && !HasMoved && !isCapture) return true;
+        if (isCapture && direction.Y == 1 && Math.Abs(direction.X) == 1) return true;
+        if (IsEnPassant(direction, board)) return true;
+        return false;
+    }
+    private bool IsEnPassant(Vector2 direction, Board board)
+    {
+        if (!(direction.Y == 1 && Math.Abs(direction.X) == 1)) return false;
+        Move lastMove = board.LastMove;
+        return lastMove is not null && lastMove.MovedPiece is Pawn && lastMove.IsFirstMoveOfPiece && 
+            (lastMove.End.X == (Position + direction).X) && lastMove.End.Y == Position.Y;
     }
 }

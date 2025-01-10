@@ -15,16 +15,21 @@ internal static class MoveHelper
         {
             if (board.GetPieceAt(current) is not null) return false;
         }
-        if (board.GetPieceAt(end) is not null && board.GetPieceAt(end).IsWhite == board.GetPieceAt(start).IsWhite) return false;
         return true;
     }
+
+    internal static bool CheckDestination(Vector2 start, Vector2 dest, Board board)
+    {
+        return !(board.GetPieceAt(dest) is not null && board.GetPieceAt(dest).IsWhite == board.GetPieceAt(start).IsWhite);
+    }
+     
     internal static bool IsAttackedBy(Vector2 pos, Board board, bool white, bool verifyCheck = true)
     {
         var piecesCopy = new List<Piece>(board.Pieces);
         foreach (var piece in piecesCopy)
         {
             if (piece.IsWhite != white) continue;
-            if (piece.CreateMove(pos, board, verifyCheck) is not null) return true;
+            if (piece.TryCreatingMove(pos, board, verifyCheck) is not null) return true;
         }
         return false;
     }
