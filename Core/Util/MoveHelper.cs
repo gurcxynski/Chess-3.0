@@ -1,4 +1,5 @@
 using Chess.Core.Engine;
+using Chess.Core.Engine.Pieces;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
@@ -39,5 +40,17 @@ internal static class MoveHelper
         bool ret = IsAttackedBy(board.GetKing(!board.WhiteToMove).Position, board, board.WhiteToMove, false);
         board.UndoMove();
         return ret;
+    }
+    internal static bool IsEnPassant(Vector2 origin, Vector2 target, Board board)
+    {
+        if (!((target - origin).Y == 1 && Math.Abs((target - origin).X) == 1)) return false;
+        Move lastMove = board.LastMove;
+        return lastMove is not null && lastMove.MovedPiece is Pawn && lastMove.IsFirstMoveOfPiece &&
+            (lastMove.End.X == target.X) && lastMove.End.Y == origin.Y;
+    }
+    internal static Piece GetPieceCapturedByEnPassant(Vector2 target, Board board)
+    {
+        if (board.WhiteToMove) return board.GetPieceAt(target - Vector2.UnitY);
+        return board.GetPieceAt(target + Vector2.UnitY);
     }
 }

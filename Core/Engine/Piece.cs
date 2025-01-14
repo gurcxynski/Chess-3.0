@@ -1,3 +1,4 @@
+using Chess.Core.Engine.Pieces;
 using Chess.Core.Util;
 using Microsoft.Xna.Framework;
 
@@ -20,9 +21,10 @@ internal abstract class Piece(Vector2 position, bool isWhite = true)
         if (!CheckBasicMovement(target - Position, board)) return null;
         if (!CanJumpOver && !MoveHelper.CheckPath(Position, target, board)) return null;
         if (!MoveHelper.CheckDestination(Position, target, board)) return null;
-        Move move = new(Position, target, this, board.GetPieceAt(target), firstMove: !HasMoved);
+        Piece capturedPiece = MoveHelper.IsEnPassant(Position, target, board) ? MoveHelper.GetPieceCapturedByEnPassant(target, board) : board.GetPieceAt(target);
+        Move move = new(Position, target, this, capturedPiece, firstMove: !HasMoved);
         if (verifyCheck && MoveHelper.WillBeChecked(move, board)) return null;
         return move;
     }
     protected abstract bool CheckBasicMovement(Vector2 direction, Board board);
-}
+} 

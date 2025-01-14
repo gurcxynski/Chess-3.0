@@ -17,7 +17,5 @@ namespace Chess.Core.Engine
         internal bool IsPromotion { get; private init; } = promotion;
         internal bool IsCastles { get; private init; } = castles;
         internal bool IsFirstMoveOfPiece { get; private init; } = firstMove;
-
-        public override string ToString() => $"{(OfWhite ? "white" : "black")} {MovePieceType.Name} from {Start} to {End} {(IsCapture ? $"capturing {CapturePieceType.Name}" : "")} {(IsPromotion ? $"promoting to {PromotionPieceType.Name}" : "")} {(IsCastles ? "castles" : "")}";
     }
 }
