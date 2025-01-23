@@ -1,4 +1,5 @@
 using Chess.Core.Engine.Pieces;
+using Chess.Core.UI.Menus;
 using Chess.Core.Util;
 using Microsoft.Xna.Framework;
 using System;
@@ -17,6 +18,7 @@ internal class Board
     internal List<Move> ValidMoves => GetValidMoves();
 
     private readonly Stack<Move> moveHistory = new();
+    internal Queue<Move> LastFifty { get; private init; } = new();
     internal bool WhiteToMove { get; private set; }
     internal int MoveCount => moveHistory.Count;
     private King whiteKing;
@@ -48,12 +50,15 @@ internal class Board
     internal Piece GetKing(bool isWhite) => isWhite ? whiteKing : blackKing;
     internal Move LastMove => moveHistory.Count > 0 ? moveHistory.Peek() : null;
 
-    internal void ExecuteMove(Move move)
+    internal void ExecuteMove(Move move, bool isReal = true)
     {
         if (move.IsCapture) move.CapturedPiece.IsCaptured = true;
         move.MovedPiece.Move(move.End);
         WhiteToMove = !WhiteToMove;
         moveHistory.Push(move);
+        LastFifty.Enqueue(move);
+        if (LastFifty.Count > 50) LastFifty.Dequeue();
+        if (isReal && IsMate) StateMachine.ToMenu<StartMenu>();
         if (!move.IsCastles) return;
         if (move.End.X == 2)
         {
@@ -110,4 +115,5 @@ internal class Board
     internal bool IsInCheck => MoveHelper.IsAttackedBy(GetKing(WhiteToMove).Position, this, !WhiteToMove);
     internal bool IsChecking => MoveHelper.IsAttackedBy(GetKing(!WhiteToMove).Position, this, WhiteToMove);
     internal bool IsMate => IsInCheck && GetValidMoves().Count == 0;
+    internal bool IsDraw => MoveHelper.CalculateDraw(this);
 }

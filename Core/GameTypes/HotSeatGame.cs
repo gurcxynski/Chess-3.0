@@ -5,7 +5,7 @@ namespace Chess.Core.GameTypes;
 
 internal class HotSeatGame : ChessGame
 {
-    internal HotSeatGame(Vector2 size) : base(size, GameType.Hotseat) { }
+    internal HotSeatGame(Vector2 size) : base(size) { }
 
     protected override bool IsDraggable(PieceIcon icon) => board.WhiteToMove == icon.Piece.IsWhite;
 

@@ -1,6 +1,7 @@
 using Chess.Core.Engine.Pieces;
 using Chess.Core.Util;
 using Microsoft.Xna.Framework;
+using System.IO.Pipelines;
 
 namespace Chess.Core.Engine;
 internal abstract class Piece(Vector2 position, bool isWhite = true)
@@ -27,4 +28,8 @@ internal abstract class Piece(Vector2 position, bool isWhite = true)
         return move;
     }
     protected abstract bool CheckBasicMovement(Vector2 direction, Board board);
+    public override string ToString()
+    {
+        return (IsWhite ? "w" : "b") + GetType().ToString().Split('.')[^1];
+    }
 } 

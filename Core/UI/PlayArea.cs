@@ -7,24 +7,13 @@ namespace Chess.Core.UI;
 internal partial class PlayArea : UserInterface
 {
     readonly ChessGame game;
-    internal PlayArea(Vector2 size, ChessGame.GameType type, bool white = true) : base()
+    internal PlayArea(Vector2 size) : base()
     {
         ShowCursor = false;
-        switch (type)
+        game = new HotSeatGame(size)
         {
-            case ChessGame.GameType.Online:
-                game = new OnlineGame(size, white);
-                break;
-            case ChessGame.GameType.Bot:
-                game = new BotGame(size, white);
-                break;
-            case ChessGame.GameType.Hotseat:
-                game = new HotSeatGame(size);
-                break;
-        }
-        game.Anchor = Anchor.Center;
-        game.SizeFactor = 0.9f;
-        game.PaddingFactor = 0.025f;
+            Anchor = Anchor.Center
+        };
         game.Init();
 
 

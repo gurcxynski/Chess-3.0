@@ -3,6 +3,7 @@ using Chess.Core.Engine.Pieces;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Chess.Core.Util;
 internal static class MoveHelper
@@ -36,7 +37,7 @@ internal static class MoveHelper
     }
     internal static bool WillBeChecked(Move move, Board board)
     {
-        board.ExecuteMove(move);
+        board.ExecuteMove(move, false);
         bool ret = IsAttackedBy(board.GetKing(!board.WhiteToMove).Position, board, board.WhiteToMove, false);
         board.UndoMove();
         return ret;
@@ -52,5 +53,12 @@ internal static class MoveHelper
     {
         if (board.WhiteToMove) return board.GetPieceAt(target - Vector2.UnitY);
         return board.GetPieceAt(target + Vector2.UnitY);
+    }
+
+    internal static bool CalculateDraw(Board board)
+    {
+        if (!board.IsMate && board.ValidMoves.Count == 0) return true;
+        if (board.LastFifty.Count > 50 && board.LastFifty.All(move => !move.IsCapture || move.MovePieceType == typeof(Pawn))) return true;
+        return false;
     }
 }

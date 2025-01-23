@@ -4,9 +4,9 @@ using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 
 namespace Chess.Core.UI;
-internal partial class Menu : UserInterface
+internal class Menu : UserInterface
 {
-    readonly Panel holder = new(new Vector2(0.6f, 0.6f), PanelSkin.Default, Anchor.Center);
+    private readonly Panel holder = new(Vector2.One * 0.7f, PanelSkin.Default, Anchor.Center);
     internal Menu(IEnumerable<Entity> items) : base()
     {
         ShowCursor = false;

@@ -1,38 +1,35 @@
 using Chess.Core.Engine;
 using Chess.Core.UI;
+using Chess.Core.UI.Menus;
 using Chess.Core.Util;
 using GeonBit.UI.Entities;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Chess.Core;
 internal abstract class ChessGame : Panel
 {
-    internal enum GameType
-    {
-        Hotseat,
-        Bot,
-        Online
-    }
-    internal GameType Type { get; private init; }
     internal static ChessGame Instance { get; private set; }
     protected readonly Board board = new(PositionLoader.LoadBoardSetup("boardSetup.json"));
-    protected bool drawBlackDown;
-    private Vector2 baseSize;
-    internal float SizeFactor;
-    internal float PaddingFactor;
 
-    internal ChessGame(Vector2 bSize, GameType type) : base()
+    internal ChessGame(Vector2 size) : base()
     {
-        baseSize = bSize;
+        Size = size;
         Anchor = Anchor.CenterLeft;
         Instance = this;
-        Type = type;
-
-        var background = new Image(Textures.Get("brown"), anchor: Anchor.Center) { PriorityBonus = -100 };
-        AddChild(background);
-
+    }
+    internal void Init()
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                var pos = new Vector2(i, j);
+                AddChild(new BoardSquare(pos));
+            }
+        }
         board.Pieces.ForEach((piece) =>
         {
             var icon = new PieceIcon(piece)
@@ -47,12 +44,6 @@ internal abstract class ChessGame : Panel
             };
             AddChild(icon);
         });
-
-    }
-    internal void Init()
-    {
-        Size = baseSize * SizeFactor;
-        Padding = Size * PaddingFactor;
         UpdateIcons();
     }
     protected virtual void PieceMovedByMouse(PieceIcon icon)
@@ -60,7 +51,7 @@ internal abstract class ChessGame : Panel
         var piece = icon.Piece;
         if (piece.IsWhite != board.WhiteToMove) return;
 
-        var clicked = PositionConverter.ToGrid(MouseInput.MousePosition, this, drawBlackDown);
+        var clicked = PositionConverter.ToGrid(MouseInput.MousePosition);
         if (clicked.X < 0 || clicked.X > 7 || clicked.Y < 0 || clicked.Y > 7 || clicked == piece.Position) return;
 
         Move move = piece.TryCreatingMove(clicked, board);
@@ -76,9 +67,10 @@ internal abstract class ChessGame : Panel
             for (int j = 0; j < 8; j++)
             {
                 var pos = new Vector2(i, j);
-                if (selected.Position != pos && selected.TryCreatingMove(pos, board) is not null)
+                var move = selected.TryCreatingMove(pos, board);
+                if (selected.Position != pos && move is not null)
                 {
-                    AddChild(new ColorField(Color.Blue, pos, this, drawBlackDown, ColorField.HighlightType.Move));
+                    AddChild(new ColorField(pos, move.IsCapture ? ColorField.HighlightType.Capture : ColorField.HighlightType.Move));
                 }
             }
         }
@@ -100,20 +92,20 @@ internal abstract class ChessGame : Panel
     {
         foreach (var child in Children)
         {
-            if (child is PieceIcon icon) icon.Update(drawBlackDown, IsDraggable(icon));
+            if (child is PieceIcon icon) icon.Update(IsDraggable(icon));
         }
     }
     protected void UpdateSquares()
     {
         if (board.IsInCheck)
         {
-            AddChild(new ColorField(Color.Red, board.GetKing(board.WhiteToMove).Position, this, drawBlackDown, ColorField.HighlightType.Check));
+            AddChild(new ColorField(board.GetKing(board.WhiteToMove).Position, ColorField.HighlightType.Check));
         }
         else
         {
             RemoveAllChildren((child) => child is ColorField && (child as ColorField).Type == ColorField.HighlightType.Check);
         }
-        RemoveAllChildren((child) => child is ColorField && (child as ColorField).Type == ColorField.HighlightType.Move);
+        RemoveAllChildren((child) => child is ColorField && (child as ColorField).Type != ColorField.HighlightType.Check);
     }
 
     protected abstract bool IsDraggable(PieceIcon icon);

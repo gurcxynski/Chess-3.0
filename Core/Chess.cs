@@ -15,12 +15,12 @@ public partial class Chess : Game
         Content.RootDirectory = "Content";
         graphics.PreferredBackBufferWidth = 800;
         graphics.PreferredBackBufferHeight = 800;
+        IsMouseVisible = true;
     }
 
     protected override void Initialize()
     {
         UserInterface.Initialize(Content, "chess");
-        IsMouseVisible = true;
 
         StateMachine.Init();
 
@@ -30,7 +30,6 @@ public partial class Chess : Game
     protected override void LoadContent()
     {
         spriteBatch = new SpriteBatch(GraphicsDevice);
-        Textures.Load(this);
     }
 
     protected override void Update(GameTime gameTime)
