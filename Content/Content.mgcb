@@ -13,6 +13,12 @@
 
 #---------------------------------- Content ---------------------------------#
 
+#begin capture.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:capture.wav
+
 #begin GeonBit.UI/Themes/chess/circle.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -1578,4 +1584,10 @@
 
 #begin GeonBit.UI/Themes/chess/ThemeData.xml
 /copy:GeonBit.UI/Themes/chess/ThemeData.xml
+
+#begin move.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:move.wav
 

@@ -5,12 +5,17 @@ using Microsoft.Xna.Framework.Graphics;
 using System.Linq;
 using MonoGame.Extended.Input.InputListeners;
 using System;
+using Microsoft.Xna.Framework.Audio;
 namespace Chess.Core;
 public class Chess : Game
 {
     internal static DisplayMode displaySettings;
     readonly internal GraphicsDeviceManager graphics;
     internal static KeyboardListener keyboardListener;
+
+
+    internal SoundEffect moveSound;
+    internal SoundEffect captureSound;
 
     SpriteBatch spriteBatch;
     static internal Chess Instance { get; private set; }
@@ -65,7 +70,10 @@ public class Chess : Game
 
     protected override void LoadContent()
     {
-        spriteBatch = new SpriteBatch(GraphicsDevice);
+        spriteBatch = new SpriteBatch(GraphicsDevice); 
+        moveSound = Content.Load<SoundEffect>("move");
+        captureSound = Content.Load<SoundEffect>("capture");
+
     }
 
     protected override void Update(GameTime gameTime)

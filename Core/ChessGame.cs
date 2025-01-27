@@ -46,7 +46,13 @@ internal class ChessGame : Panel
         if (clicked.X < 0 || clicked.X > 7 || clicked.Y < 0 || clicked.Y > 7 || clicked == piece.Position) return;
 
         Move move = piece.TryCreatingMove(clicked, board);
-        if (move is not null) board.ExecuteMove(move);
+        if (move is not null)
+        {
+            board.ExecuteMove(move);
+            if (move.IsCapture) Chess.Instance.captureSound.Play();
+            else Chess.Instance.moveSound.Play();
+        }
+
 
     }
     protected virtual void PiecePickedUp(Piece piece)
