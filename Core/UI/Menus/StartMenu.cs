@@ -1,10 +1,10 @@
 namespace Chess.Core.UI.Menus;
-internal partial class StartMenu : Menu
+internal class StartMenu : Menu
 {
     public StartMenu() : base([
-        new MyButton("Start Game", StateMachine.ToMenu<NewGameMenu>),
+        new MyButton("Start Game", StateMachine.StartGame),
         new MyButton("Options", StateMachine.ToMenu<OptionsMenu>),
-        new MyButton("Quit Game", StateMachine.QuitGame),
+        new MyButton("Quit", StateMachine.QuitGame)
     ])
     { }
 }

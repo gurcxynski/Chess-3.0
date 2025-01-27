@@ -4,7 +4,7 @@ using GeonBit.UI;
 using GeonBit.UI.Entities;
 using Microsoft.Xna.Framework;
 
-namespace Chess.Core.UI;
+namespace Chess.Core.UI.Graphics;
 
 internal class ColorField : Image
 {

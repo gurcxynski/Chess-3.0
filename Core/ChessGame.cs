@@ -1,54 +1,45 @@
 using Chess.Core.Engine;
 using Chess.Core.UI;
-using Chess.Core.UI.Menus;
+using Chess.Core.UI.Graphics;
 using Chess.Core.Util;
 using GeonBit.UI.Entities;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Chess.Core;
-internal abstract class ChessGame : Panel
+internal class ChessGame : Panel
 {
     internal static ChessGame Instance { get; private set; }
     protected readonly Board board = new(PositionLoader.LoadBoardSetup("boardSetup.json"));
-
-    internal ChessGame(Vector2 size) : base()
+    internal Vector2 BoardSize => Size - 2 * Padding;
+    internal ChessGame()
     {
-        Size = size;
-        Anchor = Anchor.CenterLeft;
         Instance = this;
+        Padding = Vector2.One * 10;
     }
     internal void Init()
     {
-        for (int i = 0; i < 8; i++)
-        {
-            for (int j = 0; j < 8; j++)
-            {
-                var pos = new Vector2(i, j);
-                AddChild(new BoardSquare(pos));
-            }
-        }
+        for (int i = 0; i < 8; i++) for (int j = 0; j < 8; j++) AddChild(new BoardSquare((i + j) % 2 == 0));
         board.Pieces.ForEach((piece) =>
         {
             var icon = new PieceIcon(piece)
             {
                 OnMouseReleased = (entity) =>
                 {
-                    PieceMovedByMouse(entity as PieceIcon);
+                    System.Diagnostics.Debug.WriteLine("Mouse released at: " + piece + " " + piece.Position + " " + MouseInput.MousePosition);
+                    PieceMovedByMouse(piece);
                     UpdateIcons();
                     UpdateSquares();
                 },
-                OnMouseDown = (entity) => PiecePickedUp(entity as PieceIcon)
+                OnMouseDown = (entity) => PiecePickedUp(piece)
             };
             AddChild(icon);
         });
         UpdateIcons();
     }
-    protected virtual void PieceMovedByMouse(PieceIcon icon)
+    protected virtual void PieceMovedByMouse(Piece piece)
     {
-        var piece = icon.Piece;
         if (piece.IsWhite != board.WhiteToMove) return;
 
         var clicked = PositionConverter.ToGrid(MouseInput.MousePosition);
@@ -58,23 +49,21 @@ internal abstract class ChessGame : Panel
         if (move is not null) board.ExecuteMove(move);
 
     }
-    protected virtual void PiecePickedUp(PieceIcon icon)
+    protected virtual void PiecePickedUp(Piece piece)
     {
-        var selected = icon.Piece;
-        if (selected.IsWhite != board.WhiteToMove) return;
+        if (piece.IsWhite != board.WhiteToMove) return;
         for (int i = 0; i < 8; i++)
         {
             for (int j = 0; j < 8; j++)
             {
                 var pos = new Vector2(i, j);
-                var move = selected.TryCreatingMove(pos, board);
-                if (selected.Position != pos && move is not null)
+                var move = piece.TryCreatingMove(pos, board);
+                if (piece.Position != pos && move is not null)
                 {
                     AddChild(new ColorField(pos, move.IsCapture ? ColorField.HighlightType.Capture : ColorField.HighlightType.Move));
                 }
             }
         }
-        icon.BringToFront();
     }
     protected void ProcessMove(Move move)
     {
@@ -108,5 +97,5 @@ internal abstract class ChessGame : Panel
         RemoveAllChildren((child) => child is ColorField && (child as ColorField).Type != ColorField.HighlightType.Check);
     }
 
-    protected abstract bool IsDraggable(PieceIcon icon);
+    protected bool IsDraggable(PieceIcon icon) => board.WhiteToMove == icon.Piece.IsWhite;
 }

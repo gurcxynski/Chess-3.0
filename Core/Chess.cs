@@ -1,28 +1,60 @@
-using Chess.Core.Util;
+using Chess.Core.UI.Menus;
 using GeonBit.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-
+using System.Linq;
+using MonoGame.Extended.Input.InputListeners;
 namespace Chess.Core;
-public partial class Chess : Game
+public class Chess : Game
 {
-    readonly GraphicsDeviceManager graphics;
-    SpriteBatch spriteBatch;
+    internal static DisplayMode currentMode;
+    readonly internal GraphicsDeviceManager graphics;
+    internal static KeyboardListener keyboardListener;
 
+    SpriteBatch spriteBatch;
+    static internal Chess Instance { get; private set; }
     public Chess()
     {
+        Instance = this;
         graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "Content";
-        graphics.PreferredBackBufferWidth = 800;
-        graphics.PreferredBackBufferHeight = 800;
         IsMouseVisible = true;
+        keyboardListener = new KeyboardListener();
+
+        var mode = GraphicsAdapter.DefaultAdapter.SupportedDisplayModes.Last();
+        currentMode = (new(mode.Width, mode.Height, true, true));
+        ApplyDisplayModeChanges();
+    }
+    internal void ApplyDisplayModeChanges()
+    {
+        graphics.PreferredBackBufferWidth = currentMode.Width;
+        graphics.PreferredBackBufferHeight = currentMode.Height;
+        graphics.IsFullScreen = currentMode.Fullscreen;
+        Window.IsBorderless = currentMode.Borderless;
+        graphics.ApplyChanges();
+
+        CenterWindow();
+    }
+    private void CenterWindow()
+    {
+        var displayMode = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode;
+        int screenWidth = displayMode.Width;
+        int screenHeight = displayMode.Height;
+
+        int windowWidth = graphics.PreferredBackBufferWidth;
+        int windowHeight = graphics.PreferredBackBufferHeight;
+
+        int windowX = (screenWidth - windowWidth) / 2;
+        int windowY = (screenHeight - windowHeight) / 2;
+
+        Window.Position = new Point(windowX, windowY);
     }
 
     protected override void Initialize()
     {
         UserInterface.Initialize(Content, "chess");
 
-        StateMachine.Init();
+        StateMachine.ToMenu<StartMenu>();
 
         base.Initialize();
     }
@@ -35,6 +67,7 @@ public partial class Chess : Game
     protected override void Update(GameTime gameTime)
     {
         UserInterface.Active.Update(gameTime);
+        keyboardListener.Update(gameTime);
 
         base.Update(gameTime);
     }

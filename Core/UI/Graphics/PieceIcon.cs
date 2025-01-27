@@ -2,28 +2,17 @@ using Chess.Core.Engine;
 using Chess.Core.Util;
 using GeonBit.UI;
 using GeonBit.UI.Entities;
-using Microsoft.Xna.Framework;
-
-namespace Chess.Core.UI;
+namespace Chess.Core.UI.Graphics;
 internal class PieceIcon : Icon
 {
     internal Piece Piece { get; private init; }
-    internal bool IsDragged { get; private set; }
     internal PieceIcon(Piece piece) : base()
     {
-        Anchor = Anchor.TopLeft;
         Piece = piece;
+        Anchor = Anchor.TopLeft;
         Texture = Resources.Instance.LoadTexture("pieces\\" + piece.ToString());
-        Size = new Vector2(1 / 8f, 1 / 8f);
+        Size = ChessGame.Instance.BoardSize / 8;
         LimitDraggingToParentBoundaries = false;
-        OnStartDrag = (entity) =>
-        {
-            IsDragged = true;
-        };
-        OnStopDrag = (entity) =>
-        {
-            IsDragged = false;
-        };
     }
 
     internal void Update(bool draggable)

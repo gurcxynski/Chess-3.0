@@ -1,22 +1,15 @@
-using Chess.Core.GameTypes;
+using Chess.Core.UI.Menus;
 using GeonBit.UI;
-using GeonBit.UI.Entities;
-using Microsoft.Xna.Framework;
 
 namespace Chess.Core.UI;
-internal partial class PlayArea : UserInterface
+internal class PlayArea : UserInterface
 {
-    readonly ChessGame game;
-    internal PlayArea(Vector2 size) : base()
+    internal PlayArea() : base()
     {
         ShowCursor = false;
-        game = new HotSeatGame(size)
-        {
-            Anchor = Anchor.Center
-        };
+        var game = new ChessGame();
         game.Init();
-
-
         AddEntity(game);
+        AddEntity(new MyButton("quit", StateMachine.ToMenu<StartMenu>));
     }
 }

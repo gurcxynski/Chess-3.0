@@ -12,8 +12,16 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Content\bin\**" />
+    <Compile Remove="Content\obj\**" />
+    <EmbeddedResource Remove="Content\bin\**" />
+    <EmbeddedResource Remove="Content\obj\**" />
+    <None Remove="Content\bin\**" />
+    <None Remove="Content\obj\**" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="GeonBit.UI" Version="4.3.0.4" />
-    <PackageReference Include="MonoGame.Extended" Version="4.0.3" />
+    <PackageReference Include="MonoGame.Extended" Version="4.0.4" />
     <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.2.1105" />
     <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.2.1105" />
   </ItemGroup>

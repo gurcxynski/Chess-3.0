@@ -4,15 +4,16 @@ using GeonBit.UI.Entities;
 using Microsoft.Xna.Framework;
 using System.Diagnostics;
 
-namespace Chess.Core.UI;
+namespace Chess.Core.UI.Graphics;
 internal class BoardSquare : ColoredRectangle
 {
-    internal BoardSquare(Vector2 square)
+    internal BoardSquare(bool light)
     {
-        FillColor = (square.X + square.Y) % 2 == 0 ? new(240, 155, 89) : new(120, 67, 21);
+        FillColor = light ? new(240, 155, 89) : new(120, 67, 21);
         Size = Vector2.One / 8;
-        Anchor = Anchor.TopLeft;
-        Offset = PositionConverter.ToOffset(square);
+        Anchor = Anchor.AutoInline;
+        SpaceAfter = Vector2.Zero;
+        //Offset = PositionConverter.ToOffset(square);
         //FillColor = type switch
         //{
         //    HighlightType.Move => Color.Blue,
