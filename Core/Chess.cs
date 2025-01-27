@@ -4,10 +4,11 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Linq;
 using MonoGame.Extended.Input.InputListeners;
+using System;
 namespace Chess.Core;
 public class Chess : Game
 {
-    internal static DisplayMode currentMode;
+    internal static DisplayMode displaySettings;
     readonly internal GraphicsDeviceManager graphics;
     internal static KeyboardListener keyboardListener;
 
@@ -22,15 +23,18 @@ public class Chess : Game
         keyboardListener = new KeyboardListener();
 
         var mode = GraphicsAdapter.DefaultAdapter.SupportedDisplayModes.Last();
-        currentMode = (new(mode.Width, mode.Height, true, true));
-        ApplyDisplayModeChanges();
+        displaySettings = (new(mode.Width, mode.Height, true, true));
+        ApplyDisplaySettings();
+        Window.ClientSizeChanged += (object sender, EventArgs e) => { if (IsActive) ApplyDisplaySettings(); };
     }
-    internal void ApplyDisplayModeChanges()
+    internal void ApplyDisplaySettings()
     {
-        graphics.PreferredBackBufferWidth = currentMode.Width;
-        graphics.PreferredBackBufferHeight = currentMode.Height;
-        graphics.IsFullScreen = currentMode.Fullscreen;
-        Window.IsBorderless = currentMode.Borderless;
+        graphics.PreferredBackBufferWidth = displaySettings.Width;
+        graphics.PreferredBackBufferHeight = displaySettings.Height;
+        graphics.ApplyChanges();
+        graphics.IsFullScreen = displaySettings.Fullscreen;
+        graphics.ApplyChanges();
+        Window.IsBorderless = displaySettings.Borderless;
         graphics.ApplyChanges();
 
         CenterWindow();
