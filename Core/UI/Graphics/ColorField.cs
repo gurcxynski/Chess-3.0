@@ -12,7 +12,8 @@ internal class ColorField : Image
     {
         Move,
         Capture,
-        Check
+        Check,
+        LastMove
     }
     internal HighlightType Type { get; private init; }
     internal ColorField(Vector2 square, HighlightType type)
@@ -27,6 +28,7 @@ internal class ColorField : Image
             HighlightType.Move => Color.Blue,
             HighlightType.Capture => Color.Crimson,
             HighlightType.Check => Color.Red,
+            HighlightType.LastMove => Color.Yellow,
             _ => Color.Transparent
         };
         Opacity = type switch
@@ -34,6 +36,7 @@ internal class ColorField : Image
             HighlightType.Move => 200,
             HighlightType.Capture => 200,
             HighlightType.Check => 200,
+            HighlightType.LastMove => 200,
             _ => 0
         };
         PriorityBonus = -50;
