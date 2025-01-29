@@ -1,9 +1,11 @@
 using Chess.Core.Engine;
+using Chess.Core.UI;
 using Chess.Core.UI.Graphics;
+using Chess.Core.UI.Menus;
 using Chess.Core.Util;
+using GeonBit.UI;
 using GeonBit.UI.Entities;
 using Microsoft.Xna.Framework;
-using System;
 using System.Collections.Generic;
 
 namespace Chess.Core;
@@ -14,9 +16,12 @@ internal class ChessGame : Panel
     internal Vector2 BoardSize => Size - 2 * Padding;
     internal ChessGame()
     {
+        Anchor = Anchor.AutoCenter;
         Instance = this;
         Padding = Vector2.One * 10;
         Chess.Bot.OnMoveCalculationFinished += (sender, move) => ExecuteMove(move);
+        int smaller = System.Math.Min(UserInterface.Active.ScreenHeight, UserInterface.Active.ScreenWidth);
+        Size = new Vector2(smaller, smaller) * 0.8f;
     }
     internal void Initialize()
     {
@@ -45,7 +50,7 @@ internal class ChessGame : Panel
         var clicked = PositionConverter.ToGrid(MouseInput.MousePosition);
         if (clicked.X < 0 || clicked.X > 7 || clicked.Y < 0 || clicked.Y > 7 || clicked == piece.Position) return;
 
-        ExecuteMove(piece.TryCreatingMove(clicked, Board));
+        if (!ExecuteMove(piece.TryCreatingMove(clicked, Board))) return;
         Chess.Bot.CalculateMoveAsync(Board.MoveHistory, 3000);
     }
     private bool ExecuteMove(Move move)
@@ -60,7 +65,7 @@ internal class ChessGame : Panel
     }
     protected virtual void PiecePickedUp(Piece piece)
     {
-        if (piece.IsWhite != Board.WhiteToMove) return;
+        if (!IsDraggable(piece)) return;
         for (int i = 0; i < 8; i++)
         {
             for (int j = 0; j < 8; j++)
@@ -74,13 +79,7 @@ internal class ChessGame : Panel
             }
         }
     }
-    protected void ProcessMove(Move move)
-    {
-        Board.ExecuteMove(move);
-        UpdateIcons();
-        UpdateSquares();
-    }
-    void RemoveAllChildren(Predicate<Entity> predicate)
+    void RemoveAllChildren(System.Predicate<Entity> predicate)
     {
         List<Entity> toRemove = [];
         foreach (var child in Children) if (predicate(child)) toRemove.Add(child);
@@ -90,7 +89,7 @@ internal class ChessGame : Panel
     {
         foreach (var child in Children)
         {
-            if (child is PieceIcon icon) icon.Update(IsDraggable(icon));
+            if (child is PieceIcon icon) icon.Update(IsDraggable(icon.Piece));
         }
     }
     protected void UpdateSquares()
@@ -106,5 +105,5 @@ internal class ChessGame : Panel
         RemoveAllChildren((child) => child is ColorField && (child as ColorField).Type != ColorField.HighlightType.Check);
     }
 
-    protected bool IsDraggable(PieceIcon icon) => Board.WhiteToMove == true && icon.Piece.IsWhite == true;
+    protected bool IsDraggable(Piece piece) => Board.WhiteToMove && piece.IsWhite;
 }

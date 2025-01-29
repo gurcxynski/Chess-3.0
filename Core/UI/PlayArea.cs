@@ -1,5 +1,6 @@
 using Chess.Core.UI.Menus;
 using GeonBit.UI;
+using GeonBit.UI.Entities;
 
 namespace Chess.Core.UI;
 internal class PlayArea : UserInterface
@@ -8,8 +9,8 @@ internal class PlayArea : UserInterface
     {
         ShowCursor = false;
         var game = new ChessGame();
-        game.Initialize();
         AddEntity(game);
         AddEntity(new MyButton("quit", StateMachine.ToMenu<StartMenu>));
+        game.Initialize();
     }
 }
