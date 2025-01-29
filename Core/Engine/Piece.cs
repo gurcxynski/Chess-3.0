@@ -11,10 +11,9 @@ internal abstract class Piece(Vector2 position, bool isWhite = true)
     internal bool HasMoved { get; set; } = false;
     internal bool IsCaptured { get; set; } = false;
     protected virtual bool CanJumpOver { get; } = false;
-    internal void Move(Vector2 pos)
+    internal void Move(Vector2 position)
     {
-        Position = pos;
-        HasMoved = true;
+        Position = position;
     }
     internal Move TryCreatingMove(Vector2 target, Board board, bool verifyCheck = true)
     {
@@ -23,7 +22,7 @@ internal abstract class Piece(Vector2 position, bool isWhite = true)
         if (!CanJumpOver && !MoveHelper.CheckPath(Position, target, board)) return null;
         if (!MoveHelper.CheckDestination(Position, target, board)) return null;
         Piece capturedPiece = MoveHelper.IsEnPassant(Position, target, board) ? MoveHelper.GetPieceCapturedByEnPassant(target, board) : board.GetPieceAt(target);
-        Move move = new(Position, target, this, capturedPiece, firstMove: !HasMoved);
+        Move move = new(Position, target, this, capturedPiece, firstMove: !HasMoved, castles: MoveHelper.IsCastles(Position, target, board));
         if (verifyCheck && MoveHelper.WillBeChecked(move, board)) return null;
         return move;
     }

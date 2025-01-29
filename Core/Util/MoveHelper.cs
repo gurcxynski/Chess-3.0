@@ -74,4 +74,9 @@ internal static class MoveHelper
     {
         return $"{(char)('a' + (int)vector.X)}{(int)vector.Y + 1}";
     }
+
+    internal static bool IsCastles(Vector2 position, Vector2 target, Board board)
+    {
+        return board.GetPieceAt(position) is King && Math.Abs(position.X - target.X) == 2;
+    }
 }

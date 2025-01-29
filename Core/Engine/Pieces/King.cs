@@ -15,7 +15,8 @@ internal class King(Vector2 position, bool isWhite = true) : Piece(position, isW
             {
                 if (MoveHelper.IsAttackedBy(square, board, !IsWhite)) return false;
             }
-            return true;
+            var piece = board.GetPieceAt(new Vector2(direction.X > 0 ? 7 : 0, Position.Y));
+            return piece is not null && piece is Rook && !piece.HasMoved;
         }
         return false;
     }

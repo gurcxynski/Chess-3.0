@@ -51,7 +51,7 @@ internal class ChessGame : Panel
         if (clicked.X < 0 || clicked.X > 7 || clicked.Y < 0 || clicked.Y > 7 || clicked == piece.Position) return;
 
         if (!ExecuteMove(piece.TryCreatingMove(clicked, Board))) return;
-        Chess.Bot.CalculateMoveAsync(Board.MoveHistory, 3000);
+        //Chess.Bot.CalculateMoveAsync(Board.MoveHistory, 3000);
     }
     private bool ExecuteMove(Move move)
     {
@@ -105,5 +105,5 @@ internal class ChessGame : Panel
         RemoveAllChildren((child) => child is ColorField && (child as ColorField).Type != ColorField.HighlightType.Check);
     }
 
-    protected bool IsDraggable(Piece piece) => Board.WhiteToMove && piece.IsWhite;
+    protected bool IsDraggable(Piece piece) => Board.WhiteToMove == piece.IsWhite;
 }

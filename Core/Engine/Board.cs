@@ -55,6 +55,7 @@ internal class Board
     {
         if (move.IsCapture) move.CapturedPiece.IsCaptured = true;
         move.MovedPiece.Move(move.End);
+        if (isReal) move.MovedPiece.HasMoved = true;
         WhiteToMove = !WhiteToMove;
         moveStack.Push(move);
         LastFifty.Enqueue(move);

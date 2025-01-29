@@ -18,6 +18,6 @@ namespace Chess.Core.Engine
         internal bool IsPromotion { get; private init; } = promotion;
         internal bool IsCastles { get; private init; } = castles;
         internal bool IsFirstMoveOfPiece { get; private init; } = firstMove;
-        override public string ToString() => MoveHelper.ToFieldString(Start) + MoveHelper.ToFieldString(End);
+        override public string ToString() => IsCastles ? "O-O": MoveHelper.ToFieldString(Start) + MoveHelper.ToFieldString(End);
     }
 }
