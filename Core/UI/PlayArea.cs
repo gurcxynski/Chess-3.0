@@ -10,7 +10,6 @@ internal class PlayArea : UserInterface
         ShowCursor = false;
         var game = new ChessGame();
         AddEntity(game);
-        AddEntity(new MyButton("quit", StateMachine.ToMenu<StartMenu>));
         game.Initialize();
     }
 }

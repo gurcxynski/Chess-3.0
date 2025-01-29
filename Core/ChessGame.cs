@@ -7,6 +7,7 @@ using GeonBit.UI;
 using GeonBit.UI.Entities;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Chess.Core;
 internal class ChessGame : Panel
@@ -16,16 +17,15 @@ internal class ChessGame : Panel
     internal Vector2 BoardSize => Size - 2 * Padding;
     internal ChessGame()
     {
-        Anchor = Anchor.AutoCenter;
+        Anchor = Anchor.Center;
         Instance = this;
-        Padding = Vector2.One * 10;
         Chess.Bot.OnMoveCalculationFinished += (sender, move) => ExecuteMove(move);
         int smaller = System.Math.Min(UserInterface.Active.ScreenHeight, UserInterface.Active.ScreenWidth);
         Size = new Vector2(smaller, smaller) * 0.8f;
     }
     internal void Initialize()
     {
-        for (int i = 0; i < 8; i++) for (int j = 0; j < 8; j++) AddChild(new BoardSquare((i + j) % 2 == 0));
+        for (int i = 0; i < 8; i++) for (int j = 0; j < 8; j++) AddChild(new BoardSquare(j, 7 - i));
         Board.Pieces.ForEach((piece) =>
         {
             var icon = new PieceIcon(piece)
@@ -74,16 +74,10 @@ internal class ChessGame : Panel
                 var move = piece.TryCreatingMove(pos, Board);
                 if (piece.Position != pos && move is not null)
                 {
-                    AddChild(new ColorField(pos, move.IsCapture ? ColorField.HighlightType.Capture : ColorField.HighlightType.Move));
+                    GetSquare(pos).Highlight(move.IsCapture ? BoardSquare.HighlightType.Capture : BoardSquare.HighlightType.Move);
                 }
             }
         }
-    }
-    void RemoveAllChildren(System.Predicate<Entity> predicate)
-    {
-        List<Entity> toRemove = [];
-        foreach (var child in Children) if (predicate(child)) toRemove.Add(child);
-        foreach (var child in toRemove) RemoveChild(child);
     }
     internal void UpdateIcons()
     {
@@ -94,15 +88,16 @@ internal class ChessGame : Panel
     }
     protected void UpdateSquares()
     {
-        RemoveAllChildren((child) => child is ColorField);
-        if (Board.IsInCheck)  AddChild(new ColorField(Board.GetKing(Board.WhiteToMove).Position, ColorField.HighlightType.Check));
+        BoardSquares.ForEach((square) => square.UnHighlight());
+        if (Board.IsInCheck) GetSquare(Board.GetKing(Board.WhiteToMove).Position).Highlight(BoardSquare.HighlightType.Check);
         if (Board.MoveCount > 0)
         {
             Move lastMove = Board.LastMove;
-            AddChild(new ColorField(lastMove.Start, ColorField.HighlightType.LastMove));
-            AddChild(new ColorField(lastMove.End, ColorField.HighlightType.LastMove));
+            GetSquare(lastMove.Start).Highlight(BoardSquare.HighlightType.LastMove);
+            GetSquare(lastMove.End).Highlight(BoardSquare.HighlightType.LastMove);
         }
     }
-
+    private BoardSquare GetSquare(Vector2 pos) => Children.Where((Entity child) => { return (child as BoardSquare).Coordinates == pos; }).First() as BoardSquare;
+    private List<BoardSquare> BoardSquares => Children.Where((Entity child) => child is BoardSquare).Select((Entity child) => child as BoardSquare).ToList();
     protected bool IsDraggable(Piece piece) => Board.WhiteToMove == piece.IsWhite && piece.IsWhite;
 }
