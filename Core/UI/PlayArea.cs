@@ -8,7 +8,7 @@ internal class PlayArea : UserInterface
     {
         ShowCursor = false;
         var game = new ChessGame();
-        game.Init();
+        game.Initialize();
         AddEntity(game);
         AddEntity(new MyButton("quit", StateMachine.ToMenu<StartMenu>));
     }

@@ -8,6 +8,14 @@ using System.Linq;
 namespace Chess.Core.Util;
 internal static class MoveHelper
 {
+    internal static Move TryCreatingMove(string move)
+    {
+        var fields = move.Split(' ')[1];
+        var start = new Vector2(fields[0] - 'a', (fields[1] - '1'));
+        var end = new Vector2(fields[2] - 'a', (fields[3] - '1'));
+        var piece = ChessGame.Instance.Board.GetPieceAt(start);
+        return piece.TryCreatingMove(end, ChessGame.Instance.Board);
+    }
     internal static bool CheckPath(Vector2 start, Vector2 end, Board board)
     {
         if (end == start) return false;
@@ -60,5 +68,10 @@ internal static class MoveHelper
         if (!board.IsMate && board.ValidMoves.Count == 0) return true;
         if (board.LastFifty.Count > 50 && board.LastFifty.All(move => !move.IsCapture || move.MovePieceType == typeof(Pawn))) return true;
         return false;
+    }
+
+    internal static string ToFieldString(Vector2 vector)
+    {
+        return $"{(char)('a' + (int)vector.X)}{(int)vector.Y + 1}";
     }
 }

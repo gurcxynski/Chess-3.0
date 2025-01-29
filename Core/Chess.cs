@@ -1,18 +1,19 @@
-using Chess.Core.UI.Menus;
+using Chess.LC0;
 using GeonBit.UI;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System.Linq;
-using MonoGame.Extended.Input.InputListeners;
-using System;
 using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Graphics;
+using System;
+using System.Linq;
+
 namespace Chess.Core;
+
 public class Chess : Game
 {
     internal static DisplayMode displaySettings;
     readonly internal GraphicsDeviceManager graphics;
-    internal static KeyboardListener keyboardListener;
-
+    internal static MonoGame.Extended.Input.InputListeners.KeyboardListener keyboardListener = new();
+    internal static readonly IChessEngine Bot = new LcZeroIntegration();
 
     internal SoundEffect moveSound;
     internal SoundEffect captureSound;
@@ -22,13 +23,13 @@ public class Chess : Game
     public Chess()
     {
         Instance = this;
-        graphics = new GraphicsDeviceManager(this);
+        graphics = new(this);
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
-        keyboardListener = new KeyboardListener();
 
         var mode = GraphicsAdapter.DefaultAdapter.SupportedDisplayModes.Last();
-        displaySettings = (new(mode.Width, mode.Height, true, true));
+        // displaySettings = (new(mode.Width, mode.Height, true, true));
+        displaySettings = (new(1200, 800, false, false));
         ApplyDisplaySettings();
         Window.ClientSizeChanged += (object sender, EventArgs e) => { if (IsActive) ApplyDisplaySettings(); };
     }
@@ -36,13 +37,11 @@ public class Chess : Game
     {
         graphics.PreferredBackBufferWidth = displaySettings.Width;
         graphics.PreferredBackBufferHeight = displaySettings.Height;
-        graphics.ApplyChanges();
         graphics.IsFullScreen = displaySettings.Fullscreen;
-        graphics.ApplyChanges();
         Window.IsBorderless = displaySettings.Borderless;
         graphics.ApplyChanges();
 
-        CenterWindow();
+        if (displaySettings.Borderless) CenterWindow();
     }
     private void CenterWindow()
     {
@@ -63,7 +62,7 @@ public class Chess : Game
     {
         UserInterface.Initialize(Content, "chess");
 
-        StateMachine.ToMenu<StartMenu>();
+        StateMachine.Start();
 
         base.Initialize();
     }

@@ -1,5 +1,4 @@
-﻿using GeonBit.UI;
-using GeonBit.UI.Entities;
+﻿using GeonBit.UI.Entities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -15,7 +14,7 @@ internal class OptionsMenu : Menu
         {
             Anchor = Anchor.AutoCenter;
             Padding = Vector2.Zero;
-            Size = new Vector2(0.5f, 0.2f);
+            Size = new Vector2(0.5f, 0.25f);
             AddChild(new Label(name)
             {
                 Anchor = Anchor.AutoCenter,
@@ -56,7 +55,14 @@ internal class OptionsMenu : Menu
         var modes = GraphicsAdapter.DefaultAdapter.SupportedDisplayModes;
         foreach (var res in modes.Reverse()) resolutions.AddItem($"{res.Width}x{res.Height}");
 
-        resolutions.SelectedValue = $"{Chess.displaySettings.Width}x{Chess.displaySettings.Height}";
+        try
+        {
+            resolutions.SelectedValue = $"{Chess.displaySettings.Width}x{Chess.displaySettings.Height}";
+        }
+        catch {
+            resolutions.Unselect();
+        }
+        
         resolutions.OnValueChange = (Entity entity) =>
         {
             int[] res = resolutions.SelectedValue.Split('x').Select(int.Parse).ToArray();
@@ -69,11 +75,20 @@ internal class OptionsMenu : Menu
         AddSettings(
         [
             new Setting("Display Mode", displayMode),
-                    new Setting("Resolution", resolutions),
-                ]);
+            new Setting("Resolution", resolutions),
+        ]);
 
-        AddToPanel(new MyButton("Apply", () => { Chess.Instance.ApplyDisplaySettings(); }));
-        AddToPanel(new MyButton("Back", StateMachine.Back));
+        Panel buttons = new()
+        {
+            OutlineWidth = 0,
+            Padding = Vector2.Zero,
+            Anchor = Anchor.BottomCenter,
+            Size = new Vector2(0.5f, 0.1f)
+        };
+        Button a = new("Apply") { Anchor = Anchor.AutoInline, Size = new(0.5f, 0) };
+        buttons.AddChild(new MyButton("Apply", Chess.Instance.ApplyDisplaySettings) { Anchor = Anchor.AutoInline, Size = new(0.5f, 0) });
+        buttons.AddChild(new MyButton("Back", StateMachine.Back) { Anchor = Anchor.AutoInline, Size = new(0.5f, 0) });
+        AddToPanel(buttons);
 
         OnKeyPressed(Microsoft.Xna.Framework.Input.Keys.Enter, Chess.Instance.ApplyDisplaySettings);
     }

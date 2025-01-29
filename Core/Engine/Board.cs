@@ -17,10 +17,11 @@ internal class Board
     internal IEnumerable<Piece> ActivePieces => Pieces.Where(piece => !piece.IsCaptured);
     internal List<Move> ValidMoves => GetValidMoves();
 
-    private readonly Stack<Move> moveHistory = new();
+    private readonly Stack<Move> moveStack = new();
+    internal IEnumerable<Move> MoveHistory => moveStack.Reverse();
     internal Queue<Move> LastFifty { get; private init; } = new();
     internal bool WhiteToMove { get; private set; }
-    internal int MoveCount => moveHistory.Count;
+    internal int MoveCount => moveStack.Count;
     private King whiteKing;
     private King blackKing;
     internal Board(BoardSetup setup)
@@ -48,14 +49,14 @@ internal class Board
     internal Piece GetPieceAt(Vector2 pos) => Pieces.Find(piece => piece.Position == pos && !piece.IsCaptured);
     internal List<Piece> GetAll(Type type) => Pieces.Where(piece => piece.GetType() == type).ToList();
     internal Piece GetKing(bool isWhite) => isWhite ? whiteKing : blackKing;
-    internal Move LastMove => moveHistory.Count > 0 ? moveHistory.Peek() : null;
+    internal Move LastMove => moveStack.Count > 0 ? moveStack.Peek() : null;
 
     internal void ExecuteMove(Move move, bool isReal = true)
     {
         if (move.IsCapture) move.CapturedPiece.IsCaptured = true;
         move.MovedPiece.Move(move.End);
         WhiteToMove = !WhiteToMove;
-        moveHistory.Push(move);
+        moveStack.Push(move);
         LastFifty.Enqueue(move);
         if (LastFifty.Count > 50) LastFifty.Dequeue();
         if (isReal && IsMate) StateMachine.ToMenu<StartMenu>();
@@ -75,7 +76,7 @@ internal class Board
     internal void UndoMove()
     {
         if (MoveCount == 0) return;
-        Move move = moveHistory.Pop();
+        Move move = moveStack.Pop();
         move.MovedPiece.Move(move.Start);
         WhiteToMove = !WhiteToMove;
         if (move.IsCapture) move.CapturedPiece.IsCaptured = false;
