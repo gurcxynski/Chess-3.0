@@ -11,7 +11,7 @@ namespace Chess.Core
     {
         public event EventHandler<Move> OnMoveCalculationFinished;
         public Task CalculateMoveAsync(IEnumerable<Move> moves, int time);
-        public void Start();
+        public void Start(string path);
         public void Stop();
     }
 }

@@ -41,7 +41,7 @@ internal class ChessGame : Panel
             AddChild(icon);
         });
         UpdateIcons();
-        Chess.Bot.Start();
+        Chess.Bot.Start("LC0\\lc0.exe");
     }
     protected virtual void PieceMovedByMouse(Piece piece)
     {

@@ -1,23 +1,22 @@
-﻿using Chess.Core;
-using Chess.Core.Engine;
+﻿using Chess.Core.Engine;
 using Chess.Core.Util;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
-namespace Chess.LC0;
-class LcZeroIntegration : IChessEngine
+namespace Chess.Core;
+class EngineIntegration : IChessEngine
 {
-    private Process lcProcess;
+    private Process process;
     public event EventHandler<Move> OnMoveCalculationFinished;
-    public void Start()
+    public void Start(string path)
     {
-        lcProcess = new Process
+        process = new Process
         {
             StartInfo = new ProcessStartInfo
             {
-                FileName = "LC0\\lc0.exe",
+                FileName = path,
                 RedirectStandardInput = true,
                 RedirectStandardOutput = true,
                 UseShellExecute = false,
@@ -25,23 +24,23 @@ class LcZeroIntegration : IChessEngine
             }
         };
 
-        lcProcess.Start();
+        process.Start();
     }
 
     private void SendCommand(string command)
     {
-        if (lcProcess != null && !lcProcess.HasExited)
+        if (process != null && !process.HasExited)
         {
-            lcProcess.StandardInput.WriteLine(command);
-            lcProcess.StandardInput.Flush();
+            process.StandardInput.WriteLine(command);
+            process.StandardInput.Flush();
         }
     }
 
     private string ReadResponse()
     {
-        if (lcProcess != null && !lcProcess.HasExited)
+        if (process != null && !process.HasExited)
         {
-            return lcProcess.StandardOutput.ReadLine();
+            return process.StandardOutput.ReadLine();
         }
 
         return string.Empty;
@@ -49,9 +48,9 @@ class LcZeroIntegration : IChessEngine
 
     public void Stop()
     {
-        if (lcProcess != null && !lcProcess.HasExited)
+        if (process != null && !process.HasExited)
         {
-            lcProcess.Kill();
+            process.Kill();
         }
     }
     public async Task CalculateMoveAsync(IEnumerable<Move> moves, int time)

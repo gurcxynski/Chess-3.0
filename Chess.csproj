@@ -62,5 +62,8 @@
     <None Update="LC0\mimalloc-redirect.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="LC0\TK-6430 aka 128x10-BPR-64M-6430000.pb.gz">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

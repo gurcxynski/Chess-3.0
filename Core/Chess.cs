@@ -1,4 +1,3 @@
-using Chess.LC0;
 using GeonBit.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
@@ -13,7 +12,7 @@ public class Chess : Game
     internal static DisplayMode displaySettings;
     readonly internal GraphicsDeviceManager graphics;
     internal static MonoGame.Extended.Input.InputListeners.KeyboardListener keyboardListener = new();
-    internal static readonly IChessEngine Bot = new LcZeroIntegration();
+    internal static readonly IChessEngine Bot = new EngineIntegration();
 
     internal SoundEffect moveSound;
     internal SoundEffect captureSound;
