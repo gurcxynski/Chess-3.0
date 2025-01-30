@@ -25,6 +25,12 @@ class EngineIntegration : IChessEngine
         };
 
         process.Start();
+        SendCommand("uci");
+        while (!(ReadResponse() == "uciok")) { }
+        SendCommand("ucinewgame");
+        SendCommand("isready");
+        while (!(ReadResponse() == "readyok")) { }
+        ChessGame.Instance.OnPlayerMove += async (sender, args) => await CalculateMoveAsync(args.MoveHistory, args.Time);
     }
 
     private void SendCommand(string command)

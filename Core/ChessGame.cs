@@ -1,18 +1,25 @@
 using Chess.Core.Engine;
 using Chess.Core.UI;
 using Chess.Core.UI.Graphics;
-using Chess.Core.UI.Menus;
 using Chess.Core.Util;
 using GeonBit.UI;
 using GeonBit.UI.Entities;
 using Microsoft.Xna.Framework;
+using SharpDX.Direct3D9;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Chess.Core;
+class MoveEventArgs(IEnumerable<Move> moveHistory, int time) : EventArgs
+{
+    internal IEnumerable<Move> MoveHistory { get; private set; } = moveHistory;
+    internal int Time { get; private set; } = time;
+}
 internal class ChessGame : Panel
 {
     internal static ChessGame Instance { get; private set; }
+    public event EventHandler<MoveEventArgs> OnPlayerMove;
     internal readonly Board Board = new(PositionLoader.LoadBoardSetup("boardSetup.json"));
     internal Vector2 BoardSize => Size - 2 * Padding;
     internal ChessGame()
@@ -41,7 +48,8 @@ internal class ChessGame : Panel
             AddChild(icon);
         });
         UpdateIcons();
-        Chess.Bot.Start("LC0\\lc0.exe");
+        Chess.Bot.Start("ChessEngines\\stockfish\\stockfish.exe");
+
     }
     protected virtual void PieceMovedByMouse(Piece piece)
     {
@@ -50,8 +58,9 @@ internal class ChessGame : Panel
         var clicked = PositionConverter.ToGrid(MouseInput.MousePosition);
         if (clicked.X < 0 || clicked.X > 7 || clicked.Y < 0 || clicked.Y > 7 || clicked == piece.Position) return;
 
-        if (!ExecuteMove(piece.TryCreatingMove(clicked, Board))) return;
-        Chess.Bot.CalculateMoveAsync(Board.MoveHistory, 3000);
+        var move = piece.TryCreatingMove(clicked, Board);
+        if (!ExecuteMove(move)) return;
+        OnPlayerMove.Invoke(this, new(Board.MoveHistory, 3000));
     }
     private bool ExecuteMove(Move move)
     {
