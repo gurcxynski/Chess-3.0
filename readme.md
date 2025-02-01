@@ -28,13 +28,16 @@ Ensure you have the following installed:
 ### Installation
           
 1. Clone the repository:
+    ```console
     git clone https://github.com/your-repo/chess-game.git
-
+    ```
 2. Open the solution in Visual Studio 2022.
 
 3. Restore the NuGet packages:
+    ```console
     dotnet restore
-
+    ```
+    
 ### Running the Game
 
 1. Set the `Chess` project as the startup project.
@@ -48,6 +51,16 @@ Ensure you have the following installed:
   - **ChessGame.cs**: Abstract class representing a chess game with different game modes.
   - **Engine**: Contains the game engine components such as the board and pieces.
   - **Util**: Utility classes for handling textures, moves, and other helper functions.
+- **ChessEngines**: Contains the integration with various chess engines.
+
+## Adding a Specific Chess Engine
+
+To add a specific chess engine to the game, follow these steps:
+
+1. Create a new folder under the `ChessEngines` directory for the specific engine.
+2. Implement the necessary classes and methods to interface with the engine. This typically involves creating a class that can communicate with the engine's API or executable.
+3. Update the game logic to utilize the new engine. This may involve modifying the `ChessGame` class or creating a new subclass that uses the engine for move generation and evaluation.
+4. Ensure that any dependencies required by the engine are included in the project and properly configured.
 
 ## Dependencies
 
