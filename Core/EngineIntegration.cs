@@ -3,13 +3,14 @@ using Chess.Core.Util;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text;
 using System.Threading.Tasks;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 namespace Chess.Core;
 class EngineIntegration(bool isWhite, int elo) : IMoveReceiver
 {
-    Stack<Move> moves = new();
+    string moves;
     private Process process;
     public event EventHandler<(byte[], int)> OnMoveDataReceived;
     public event EventHandler OnConnectionEstablished;
@@ -31,65 +32,55 @@ class EngineIntegration(bool isWhite, int elo) : IMoveReceiver
         };
 
         process.Start();
-        SendCommand("uci");
+        Send("uci");
         while (!(ReadResponse() == "uciok")) { }
-        SendCommand("ucinewgame");
-        SendCommand("setoption name Skill Level value " + Elo);
-        SendCommand("isready");
+        Send("ucinewgame");
+        Send("setoption name Skill Level value " + Elo);
+        Send("isready");
         while (!(ReadResponse() == "readyok")) { }
     }
 
     private string ReadResponse()
     {
-        if (process != null && !process.HasExited)
-        {
-            var response = process.StandardOutput.ReadLine();
-            Debug.WriteLine("Data received: " + response);
-            return response;
-        }
+        if (process is null || process.HasExited) return string.Empty;
 
-        return string.Empty;
+        return process.StandardOutput.ReadLine();
     }
 
-    public void Stop()
-    {
-        if (process != null && !process.HasExited)
-        {
-            process.Kill();
-        }
-    }
+    public void Stop() => process?.Kill();
 
     public async void Listen()
     {
-        var history = "position startpos moves";
-        foreach (var move in moves) history += " " + move.ToString();
-        SendCommand(history);
-        SendCommand("go movetime 1000");
+        var history = $"position startpos moves {moves}";
+        Send(history);
+        Send("go movetime 1000");
 
         string response;
         while ((response = await Task.Run(ReadResponse)) != null)
         {
             if (response.StartsWith("bestmove"))
             {
-                OnMoveDataReceived?.Invoke(this, (System.Text.Encoding.UTF8.GetBytes(response.Split(" ")[1]), response.Length));
+                var move = response.Split(" ")[1];
+                moves += move + " ";
+                OnMoveDataReceived?.Invoke(this, (Encoding.UTF8.GetBytes(move), response.Length));
                 break;
             }
         }
     }
-    private void SendCommand(string command)
+    public void Send(string data)
     {
-        byte[] data = System.Text.Encoding.UTF8.GetBytes(command);
-        Send(data);
-        Debug.WriteLine("Data sent: " + command);
-    }
-    public void Send(byte[] data)
-    {
-        string command = System.Text.Encoding.UTF8.GetString(data);
+        Debug.WriteLine($"Sending data: {data}");
         if (process != null && !process.HasExited)
         {
-            process.StandardInput.WriteLine(command);
+            process.StandardInput.WriteLine(data);
             process.StandardInput.Flush();
         }
+    }
+    public void ProcessMove(Move move)
+    {
+        moves += move + " ";
+        Debug.WriteLine($"Move processed: {move}");
+        Listen();
     }
 
     public void Dispose()

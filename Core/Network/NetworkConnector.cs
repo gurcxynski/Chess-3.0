@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using Chess.Core.Engine;
 
 namespace Chess.Core.Network;
 
@@ -29,7 +30,7 @@ abstract public class NetworkConnector : IMoveReceiver
 
     abstract public void Start();
 
-    public async void Send(byte[] data)
+    public async void Send(string data)
     {
         if (networkStream == null || !tcpClient.Connected)
         {
@@ -39,9 +40,9 @@ abstract public class NetworkConnector : IMoveReceiver
 
         try
         {
-            await networkStream.WriteAsync(data);
+            await networkStream.WriteAsync(Encoding.UTF8.GetBytes(data));
             OnMessageSent?.Invoke(this, EventArgs.Empty);
-            System.Diagnostics.Debug.WriteLine($"Data sent: {Encoding.UTF8.GetString(data)}");
+            System.Diagnostics.Debug.WriteLine($"Data sent: {data}");
         }
         catch (Exception ex)
         {
@@ -114,5 +115,11 @@ abstract public class NetworkConnector : IMoveReceiver
             }
         }
         throw new InvalidOperationException("No network adapters with an IPv4 address in the system!");
+    }
+
+    public void ProcessMove(Move move)
+    {
+        Send(move.ToString());
+        Listen();
     }
 }

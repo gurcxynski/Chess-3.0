@@ -10,6 +10,7 @@ namespace Chess.Core
         public void Start();
         public void Stop();
         public void Listen();
-        public void Send(byte[] data);
+        protected void Send(string data);
+        public void ProcessMove(Engine.Move move);
     }
 }

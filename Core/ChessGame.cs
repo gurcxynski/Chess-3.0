@@ -41,7 +41,7 @@ internal class ChessGame : Panel
     }
     internal void Initialize()
     {
-        for (int i = 0; i < 8; i++) for (int j = 0; j < 8; j++) AddChild(new BoardSquare(j, 7 - i));
+        for (int i = 0; i < 8; i++) for (int j = 0; j < 8; j++) AddChild(new BoardSquare(j, IsWhitePlayer ? 7 - i : i));
 
         Board.Pieces.ForEach((piece) =>
         {
@@ -67,7 +67,7 @@ internal class ChessGame : Panel
         if (clicked.X < 0 || clicked.X > 7 || clicked.Y < 0 || clicked.Y > 7 || clicked == piece.Position) return;
 
         var move = piece.TryCreatingMove(clicked, Board);
-        if (!ExecuteMove(move)) return;
+        if (ExecuteMove(move)) Opponent.ProcessMove(move);
     }
     private bool ExecuteMove(Move move)
     {

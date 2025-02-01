@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Chess.Core.Engine;
 
@@ -113,6 +114,42 @@ public class Board
         }
         return validMoves;
     }
+
+    //public override string ToString()
+    //{
+    //    // return FEN representation of the board
+    //    StringBuilder fen = new();
+    //    for (int y = 7; y >= 0; y--)
+    //    {
+    //        int empty = 0;
+    //        for (int x = 0; x < 8; x++)
+    //        {
+    //            Piece piece = GetPieceAt(new(x, y));
+    //            if (piece is null)
+    //            {
+    //                empty++;
+    //                continue;
+    //            }
+    //            if (empty > 0)
+    //            {
+    //                fen.Append(empty);
+    //                empty = 0;
+    //            }
+    //            fen.Append(piece.ToString());
+    //        }
+    //        if (empty > 0) fen.Append(empty);
+    //        if (y > 0) fen.Append('/');
+    //    }
+    //    fen.Append(WhiteToMove ? " w " : " b ");
+    //    if (whiteKing.HasMoved && GetPieceAt(new Vector2(7,0)).HasMoved) fen.Append('K');
+    //    if (whiteKing.HasMoved && GetPieceAt(new Vector2(0, 0)).HasMoved) fen.Append('Q');
+    //    if (blackKing.HasMoved && GetPieceAt(new Vector2(7, 7)).HasMoved) fen.Append('k');
+    //    if (blackKing.HasMoved && GetPieceAt(new Vector2(0, 7)).HasMoved) fen.Append('q');
+    //    fen.Append(' ');
+    //    if (LastMove.MovePieceType == typeof(Pawn) && LastMove.IsFirstMoveOfPiece) fen.Append(MoveHelper.ToFieldString(LastMove.Start + (Vector2.UnitY * (LastMove.OfWhite ? 1 : -1))));
+    //    else fen.Append('-');
+    //    return fen.ToString();
+    //}
 
     internal bool IsInCheck => MoveHelper.IsAttackedBy(GetKing(WhiteToMove).Position, this, !WhiteToMove);
     internal bool IsChecking => MoveHelper.IsAttackedBy(GetKing(!WhiteToMove).Position, this, WhiteToMove);

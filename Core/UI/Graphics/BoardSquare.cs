@@ -16,7 +16,7 @@ internal class BoardSquare : ColoredRectangle
     internal Vector2 Coordinates { get; private init; }
     internal BoardSquare(int x, int y)
     {
-        FillColor = (x + y) % 2 == 0 ? dark : light;
+        FillColor = (x + y) % 2 != 0 ? dark : light;
         Coordinates = new(x, y);
         Size = Vector2.One / 8;
         Anchor = Anchor.AutoInline;
