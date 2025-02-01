@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 using System.IO.Pipelines;
 
 namespace Chess.Core.Engine;
-internal abstract class Piece(Vector2 position, bool isWhite = true)
+public abstract class Piece(Vector2 position, bool isWhite = true)
 {
     internal Vector2 Position { get; private set; } = position;
     internal bool IsWhite { get; } = isWhite;

@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace Chess.Core.Engine;
 
-internal class Board
+public class Board
 {
     internal List<Piece> Pieces { get; private init; } = [];
     internal IEnumerable<Piece> WhitePieces => Pieces.Where(piece => piece.IsWhite);

@@ -26,7 +26,7 @@ internal class ChessGame : Panel
     {
         Anchor = Anchor.Center;
         Instance = this;
-        Chess.Bot.OnMoveCalculationFinished += (sender, move) => ExecuteMove(move);
+        //Chess.Bot.OnMoveCalculationFinished += (sender, move) => ExecuteMove(move);
         int smaller = System.Math.Min(UserInterface.Active.ScreenHeight, UserInterface.Active.ScreenWidth);
         Size = new Vector2(smaller, smaller) * 0.8f;
     }
@@ -48,7 +48,7 @@ internal class ChessGame : Panel
             AddChild(icon);
         });
         UpdateIcons();
-        Chess.Bot.Start("ChessEngines\\stockfish\\stockfish.exe");
+        //Chess.Bot.Start("ChessEngines\\stockfish\\stockfish.exe");
 
     }
     protected virtual void PieceMovedByMouse(Piece piece)
@@ -60,7 +60,7 @@ internal class ChessGame : Panel
 
         var move = piece.TryCreatingMove(clicked, Board);
         if (!ExecuteMove(move)) return;
-        OnPlayerMove.Invoke(this, new(Board.MoveHistory, 3000));
+        OnPlayerMove?.Invoke(this, new(Board.MoveHistory, 3000));
     }
     private bool ExecuteMove(Move move)
     {

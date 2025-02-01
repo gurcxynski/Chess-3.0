@@ -4,7 +4,7 @@ using System;
 
 namespace Chess.Core.Engine
 {
-    internal class Move(Vector2 start, Vector2 end, Piece movedPiece, Piece capturedPiece = null, bool castles = false, bool promotion = false, bool firstMove = false)
+    public class Move(Vector2 start, Vector2 end, Piece movedPiece, Piece capturedPiece = null, bool castles = false, bool promotion = false, bool firstMove = false)
     {
         internal Vector2 Start { get; private init; } = start;
         internal Vector2 End { get; private init; } = end;

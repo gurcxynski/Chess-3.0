@@ -6,7 +6,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace Chess.Core;
-class EngineIntegration : IChessEngine
+class EngineIntegration
 {
     private Process process;
     public event EventHandler<Move> OnMoveCalculationFinished;

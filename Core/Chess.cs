@@ -12,7 +12,6 @@ public class Chess : Game
     internal static DisplayMode displaySettings;
     readonly internal GraphicsDeviceManager graphics;
     internal static MonoGame.Extended.Input.InputListeners.KeyboardListener keyboardListener = new();
-    internal static readonly IChessEngine Bot = new EngineIntegration();
 
     internal SoundEffect moveSound;
     internal SoundEffect captureSound;
