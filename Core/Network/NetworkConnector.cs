@@ -15,7 +15,7 @@ abstract public class NetworkConnector : IMoveReceiver
 
     private bool disposed = false;
 
-    public event EventHandler<string> OnMoveDataReceived;
+    public event EventHandler<(byte[], int)> OnMoveDataReceived;
     public event EventHandler OnConnectionEstablished;
     public event EventHandler OnMessageSent;
 
@@ -29,7 +29,6 @@ abstract public class NetworkConnector : IMoveReceiver
 
     abstract public void Start();
 
-
     public async void Send(byte[] data)
     {
         if (networkStream == null || !tcpClient.Connected)
@@ -42,6 +41,7 @@ abstract public class NetworkConnector : IMoveReceiver
         {
             await networkStream.WriteAsync(data);
             OnMessageSent?.Invoke(this, EventArgs.Empty);
+            System.Diagnostics.Debug.WriteLine($"Data sent: {Encoding.UTF8.GetString(data)}");
         }
         catch (Exception ex)
         {
@@ -49,9 +49,9 @@ abstract public class NetworkConnector : IMoveReceiver
         }
     }
 
-    public async void ListenIncoming()
+    public async void Listen()
     {
-        if (networkStream == null || !tcpClient.Connected)
+        if (Connected)
         {
             System.Diagnostics.Debug.WriteLine("TCP client is not connected.");
             return;
@@ -63,7 +63,7 @@ abstract public class NetworkConnector : IMoveReceiver
             int bytesRead = await networkStream.ReadAsync(buffer);
             if (bytesRead > 0)
             {
-                var moveData = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                var moveData = (buffer, bytesRead);
                 OnMoveDataReceived?.Invoke(this, moveData);
             }
         }

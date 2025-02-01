@@ -7,8 +7,9 @@ namespace Chess.Core;
 
 internal static class StateMachine
 {
+    internal enum GameType { Engine, Online }
     private static UserInterface PreviousState;
-    internal static void StartGame() => UserInterface.Active = new PlayArea();
+    internal static void StartGame(bool white, IMoveReceiver receiver) => UserInterface.Active = new PlayArea(white, receiver);
     internal static void Start() => ToMenu<StartMenu>();
     internal static void QuitGame() => Environment.Exit(0);
 

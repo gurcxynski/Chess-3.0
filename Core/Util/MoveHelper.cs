@@ -10,9 +10,8 @@ internal static class MoveHelper
 {
     internal static Move TryCreatingMove(string move)
     {
-        var fields = move.Split(' ')[1];
-        var start = new Vector2(fields[0] - 'a', (fields[1] - '1'));
-        var end = new Vector2(fields[2] - 'a', (fields[3] - '1'));
+        var start = new Vector2(move[0] - 'a', (move[1] - '1'));
+        var end = new Vector2(move[2] - 'a', (move[3] - '1'));
         var piece = ChessGame.Instance.Board.GetPieceAt(start);
         return piece.TryCreatingMove(end, ChessGame.Instance.Board);
     }

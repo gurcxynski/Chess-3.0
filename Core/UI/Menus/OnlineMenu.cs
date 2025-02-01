@@ -20,7 +20,7 @@ namespace Chess.Core.UI.Menus
                 ClientConnector client = new ClientConnector();
                 client.OnConnectionEstablished += (object sender, EventArgs e) =>
                 {
-                    StateMachine.StartGame();
+                    StateMachine.StartGame(true, client);
                 };
                 client.Start();
                 SelectList servers = new SelectList();
@@ -50,6 +50,8 @@ namespace Chess.Core.UI.Menus
             });
             MyButton host = new MyButton("Host", () =>
             {
+                ColorSelector colorSelector = new ColorSelector();
+                AddToPanel(colorSelector);
                 TextInput textInput = new TextInput();
                 AddToPanel(textInput);
                 MyButton hostButton = new MyButton("Start", () =>
@@ -57,7 +59,7 @@ namespace Chess.Core.UI.Menus
                     ServerConnector server = new ServerConnector(); 
                     server.OnConnectionEstablished += (object sender, EventArgs e) =>
                     {
-                        StateMachine.StartGame();
+                        StateMachine.StartGame(colorSelector.WhiteSelected, server);
                     };
                     server.Start();
                 });
