@@ -1,25 +1,26 @@
 ﻿using GeonBit.UI.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Chess.Core.UI
 {
     internal class ColorSelector : Panel
     {
-        readonly RadioButton white = new("white");
-        readonly RadioButton black = new("black");
-        readonly RadioButton random = new("random");
-        internal bool WhiteSelected => white.Checked || (random.Checked && new Random().Next(2) == 0);
+        readonly ColorItem white;
+        readonly ColorItem black;
+        internal bool WhiteSelected => white.Checked;
         public ColorSelector() : base()
         {
-            Size = new Microsoft.Xna.Framework.Vector2(0.9f, 0.5f);
-            white.Checked = true;
+            Size = new Microsoft.Xna.Framework.Vector2(0.6f, 0.3f);
+            Anchor = Anchor.AutoCenter;
+            white = new ColorItem(true)
+            {
+                Anchor = Anchor.CenterLeft,
+            };
+            black = new ColorItem(false)
+            {
+                Anchor = Anchor.CenterRight,
+            };
             AddChild(white);
             AddChild(black);
-            AddChild(random);
         }
     }
 }

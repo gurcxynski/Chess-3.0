@@ -19,18 +19,6 @@
 /processorParam:Quality=Best
 /build:capture.wav
 
-#begin GeonBit.UI/Themes/chess/circle.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:GeonBit.UI/Themes/chess/circle.png
-
 #begin GeonBit.UI/Themes/chess/effects/disabled.fx
 /importer:EffectImporter
 /processor:EffectProcessor

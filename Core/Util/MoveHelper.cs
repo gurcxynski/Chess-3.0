@@ -13,7 +13,7 @@ internal static class MoveHelper
         var start = new Vector2(move[0] - 'a', (move[1] - '1'));
         var end = new Vector2(move[2] - 'a', (move[3] - '1'));
         var piece = ChessGame.Instance.Board.GetPieceAt(start);
-        return piece.TryCreatingMove(end, ChessGame.Instance.Board);
+        return piece?.TryCreatingMove(end, ChessGame.Instance.Board);
     }
     internal static bool CheckPath(Vector2 start, Vector2 end, Board board)
     {
