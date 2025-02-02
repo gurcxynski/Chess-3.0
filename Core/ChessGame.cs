@@ -63,7 +63,7 @@ internal class ChessGame : Panel
     }
     protected virtual void PieceMovedByMouse(Piece piece)
     {
-        var clicked = PositionConverter.ToGrid(MouseInput.MousePosition, !IsWhitePlayer);
+        var clicked = PositionConverter.ToGrid(MouseInput.MousePosition);
         if (clicked.X < 0 || clicked.X > 7 || clicked.Y < 0 || clicked.Y > 7 || clicked == piece.Position) return;
 
         var move = piece.TryCreatingMove(clicked, Board);
@@ -75,6 +75,13 @@ internal class ChessGame : Panel
         Board.ExecuteMove(move);
         if (move.IsCapture) Chess.Instance.captureSound.Play();
         else Chess.Instance.moveSound.Play();
+        if (move.IsPromotion)
+        {
+            var popup = new UI.PromotionPopup(move.End, move.OfWhite);
+            AddChild(popup);
+            var task = popup.WaitForPromotion();
+            task.Wait();
+        }
         UpdateIcons();
         UpdateSquares();
         return true;
@@ -116,4 +123,21 @@ internal class ChessGame : Panel
     private BoardSquare GetSquare(Vector2 pos) => Children.Where((Entity child) => { return (child as BoardSquare).Coordinates == pos; }).First() as BoardSquare;
     private List<BoardSquare> BoardSquares => Children.Where((Entity child) => child is BoardSquare).Select((Entity child) => child as BoardSquare).ToList();
     protected bool IsDraggable(Piece piece) => Board.WhiteToMove == piece.IsWhite && piece.IsWhite == IsWhitePlayer;
+
+    internal void PromotePawn(Type type)
+    {
+        var piece = Board.PromotePawn(type);
+        AddChild(new PieceIcon(piece)
+        {
+            OnMouseReleased = (entity) =>
+            {
+                PieceMovedByMouse(piece);
+                UpdateIcons();
+                UpdateSquares();
+            },
+            OnMouseDown = (entity) => PiecePickedUp(piece)
+        });
+        UpdateIcons();
+        UpdateSquares();
+    }
 }

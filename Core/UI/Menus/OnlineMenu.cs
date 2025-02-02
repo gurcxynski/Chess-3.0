@@ -18,9 +18,10 @@ namespace Chess.Core.UI.Menus
             MyButton join = new MyButton("Join", () =>
             {
                 ClientConnector client = new ClientConnector();
-                client.OnConnectionEstablished += (object sender, EventArgs e) =>
+                client.OnConnectionEstablished += (object sender, string extraInfo) =>
                 {
-                    StateMachine.StartGame(true, client);
+                    System.Diagnostics.Debug.WriteLine($"Connection established: {extraInfo}");
+                    StateMachine.StartGame(!bool.Parse(extraInfo), client);
                 };
                 client.Start();
                 SelectList servers = new SelectList();
@@ -29,14 +30,14 @@ namespace Chess.Core.UI.Menus
                 {
                     while (true)
                     {
-                        var server = client.GetServerNames();
+                        var server = client.GetServers();
                         foreach (var s in server)
                         {
-                            if (!servers.Items.Contains(s)) servers.AddItem(s);
+                            if (!servers.Items.Any(x => x == s.Item1)) servers.AddItem(s.Item1);
                         }
                         foreach (var s in servers.Items)
                         {
-                            if (!server.Contains(s)) servers.RemoveItem(s);
+                            if (!server.Any(x => x.Item1 == s)) servers.RemoveItem(s);
                         }
                         Thread.Sleep(1000);
                     }
@@ -57,11 +58,12 @@ namespace Chess.Core.UI.Menus
                 MyButton hostButton = new MyButton("Start", () =>
                 {
                     ServerConnector server = new ServerConnector(); 
-                    server.OnConnectionEstablished += (object sender, EventArgs e) =>
+                    server.OnConnectionEstablished += (object sender, string extraInfo) =>
                     {
+                        System.Diagnostics.Debug.WriteLine("Connection established.");
                         StateMachine.StartGame(colorSelector.WhiteSelected, server);
                     };
-                    server.Start();
+                    server.Start(textInput.Value, colorSelector.WhiteSelected.ToString());
                 });
                 AddToPanel(hostButton);
             });

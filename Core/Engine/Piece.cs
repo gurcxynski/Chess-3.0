@@ -22,7 +22,7 @@ public abstract class Piece(Vector2 position, bool isWhite = true)
         if (!CanJumpOver && !MoveHelper.CheckPath(Position, target, board)) return null;
         if (!MoveHelper.CheckDestination(Position, target, board)) return null;
         Piece capturedPiece = MoveHelper.IsEnPassant(Position, target, board) ? MoveHelper.GetPieceCapturedByEnPassant(target, board) : board.GetPieceAt(target);
-        Move move = new(Position, target, this, capturedPiece, firstMove: !HasMoved, castles: MoveHelper.IsCastles(Position, target, board));
+        Move move = new(Position, target, this, capturedPiece, firstMove: !HasMoved, castles: MoveHelper.IsCastles(Position, target, board), promotion: MoveHelper.IsPromotion(this, target));
         if (verifyCheck && MoveHelper.WillBeChecked(move, board)) return null;
         return move;
     }

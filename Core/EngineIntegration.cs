@@ -1,11 +1,8 @@
 ﻿using Chess.Core.Engine;
-using Chess.Core.Util;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 namespace Chess.Core;
 class EngineIntegration(bool isWhite, int elo) : IMoveReceiver
@@ -13,7 +10,7 @@ class EngineIntegration(bool isWhite, int elo) : IMoveReceiver
     string moves;
     private Process process;
     public event EventHandler<(byte[], int)> OnMoveDataReceived;
-    public event EventHandler OnConnectionEstablished;
+    public event EventHandler<string> OnConnectionEstablished;
     public event EventHandler OnMessageSent;
     public bool EnginePlaysWhite { get; } = isWhite;
     public int Elo { get; } = elo;

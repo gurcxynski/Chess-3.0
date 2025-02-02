@@ -17,7 +17,7 @@ abstract public class NetworkConnector : IMoveReceiver
     private bool disposed = false;
 
     public event EventHandler<(byte[], int)> OnMoveDataReceived;
-    public event EventHandler OnConnectionEstablished;
+    public event EventHandler<string> OnConnectionEstablished;
     public event EventHandler OnMessageSent;
 
     protected CancellationTokenSource cancellationTokenSource = new();
@@ -52,7 +52,7 @@ abstract public class NetworkConnector : IMoveReceiver
 
     public async void Listen()
     {
-        if (Connected)
+        if (!Connected)
         {
             System.Diagnostics.Debug.WriteLine("TCP client is not connected.");
             return;
@@ -66,6 +66,7 @@ abstract public class NetworkConnector : IMoveReceiver
             {
                 var moveData = (buffer, bytesRead);
                 OnMoveDataReceived?.Invoke(this, moveData);
+
             }
         }
         catch (Exception ex)
@@ -97,7 +98,7 @@ abstract public class NetworkConnector : IMoveReceiver
         }
         disposed = true;
     }
-    protected void RaiseConnectionEstablished() => OnConnectionEstablished?.Invoke(this, EventArgs.Empty); 
+    protected void RaiseConnectionEstablished(string extraInfo) => OnConnectionEstablished?.Invoke(this, extraInfo); 
     protected static IPAddress GetLocalIPAddress()
     {
         foreach (var networkInterface in NetworkInterface.GetAllNetworkInterfaces())

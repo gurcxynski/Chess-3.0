@@ -10,7 +10,8 @@ namespace Chess.Core.Network;
 
 public class ServerConnector : NetworkConnector
 {
-    const string serverName = "CHESS";
+    string serverName;
+    string extraInfo;
     const int broadcastInterval = 1500;
     public override void Start()
     {
@@ -24,13 +25,19 @@ public class ServerConnector : NetworkConnector
         Task.Run(ListenForConnectionAsync);
         Task.Run(() => BroadcastServerInfoAsync(udpClient, cancellationTokenSource.Token));
     }
+    public void Start(string name, string extra)
+    {
+        serverName = name;
+        extraInfo = extra;
+        Start();
+    }
 
     private async Task BroadcastServerInfoAsync(UdpClient udpClient, CancellationToken cancellationToken)
     {
         try
         {
             IPEndPoint endPoint = tcpListener.LocalEndpoint as IPEndPoint;
-            string serverInfo = $"{prefix}{separator}{serverName}{separator}{endPoint.Address}{separator}{endPoint.Port}";
+            string serverInfo = string.Join(separator, prefix, serverName, endPoint.Address, endPoint.Port, extraInfo);
             IPEndPoint destination = new(IPAddress.Broadcast, UDP_DESTINATION_PORT);
             Debug.WriteLine($"Broadcasting server info: {serverInfo}");
             while (true)
@@ -57,7 +64,7 @@ public class ServerConnector : NetworkConnector
                 {
                     tcpClient = client;
                     networkStream = tcpClient.GetStream();
-                    RaiseConnectionEstablished();
+                    RaiseConnectionEstablished(extraInfo);
                     cancellationTokenSource.Cancel();
                     break;
                 }

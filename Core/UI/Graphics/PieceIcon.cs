@@ -17,7 +17,7 @@ internal class PieceIcon : Icon
 
     internal void Update(bool draggable)
     {
-        Offset = PositionConverter.ToOffset(Piece.Position, !ChessGame.Instance.IsWhitePlayer);
+        Offset = PositionConverter.ToOffset(Piece.Position);
         Visible = !Piece.IsCaptured;
         Draggable = Visible && draggable;
     }

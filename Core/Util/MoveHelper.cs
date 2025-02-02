@@ -3,6 +3,7 @@ using Chess.Core.Engine.Pieces;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 
 namespace Chess.Core.Util;
@@ -77,5 +78,15 @@ internal static class MoveHelper
     internal static bool IsCastles(Vector2 position, Vector2 target, Board board)
     {
         return board.GetPieceAt(position) is King && Math.Abs(position.X - target.X) == 2;
+    }
+    internal static string TypeToString<T>(bool white) where T : Piece
+    {
+        return (white ? "w" : "b") + typeof(T).Name.Split('.')[^1];
+    }
+
+    internal static bool IsPromotion(Piece piece, Vector2 target)
+    {
+        if (piece is not Pawn) return false;
+        return (piece.IsWhite && target.Y == 7) || (!piece.IsWhite && target.Y == 0);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -11,10 +12,21 @@ namespace Chess.Core.Network;
 
 public class ClientConnector : NetworkConnector
 {
-    readonly Dictionary<string, IPEndPoint> serverInfos = [];
+    struct ServerDescription 
+    {
+        public string Name;
+        public IPEndPoint EndPoint;
+        public string ExtraInfo;
+    }
+    readonly HashSet<ServerDescription> serverInfos = new();
 
-    public IEnumerable<string> GetServerNames() => serverInfos.Keys;
-
+    public IEnumerable<(string, string)> GetServers()
+    {
+        foreach (var server in serverInfos)
+        {
+            yield return (server.Name, server.ExtraInfo);
+        };
+    }
     public override void Start()
     {
         UdpClient udpClient = new(new IPEndPoint(IPAddress.Any, UDP_DESTINATION_PORT));
@@ -29,9 +41,15 @@ public class ClientConnector : NetworkConnector
             {
                 var result = await udpClient.ReceiveAsync(cancellationToken);
                 var serverInfo = Encoding.UTF8.GetString(result.Buffer).Split(separator);
-                if (serverInfo.Length == 4 && serverInfo[0] == prefix && IPAddress.TryParse(serverInfo[2], out var serverIPAddress) && int.TryParse(serverInfo[3], out var serverPort))
+                if (serverInfo.Length == 5 && serverInfo[0] == prefix && IPAddress.TryParse(serverInfo[2], out var serverIPAddress) && int.TryParse(serverInfo[3], out var serverPort))
                 {
-                    serverInfos.Add(serverInfo[1], new IPEndPoint(serverIPAddress, serverPort));
+                    var server = new ServerDescription
+                    {
+                        Name = serverInfo[1],
+                        EndPoint = new IPEndPoint(serverIPAddress, serverPort),
+                        ExtraInfo = serverInfo[4]
+                    };
+                    serverInfos.Add(server);
                 }
             }
         }
@@ -44,7 +62,8 @@ public class ClientConnector : NetworkConnector
 
     public async void Connect(string serverName)
     {
-        if (!serverInfos.TryGetValue(serverName, out var selected))
+        var selected = serverInfos.First(s => s.Name == serverName);
+        if (selected.Name is null)
         {
             System.Diagnostics.Debug.WriteLine("Server not found.");
             return;
@@ -53,9 +72,9 @@ public class ClientConnector : NetworkConnector
         tcpClient = new TcpClient();
         try
         {
-            await tcpClient.ConnectAsync(selected);
+            await tcpClient.ConnectAsync(selected.EndPoint);
             networkStream = tcpClient.GetStream();
-            RaiseConnectionEstablished();
+            RaiseConnectionEstablished(selected.ExtraInfo);
         }
         catch (SocketException ex)
         {

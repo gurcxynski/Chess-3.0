@@ -115,6 +115,21 @@ public class Board
         return validMoves;
     }
 
+    internal Piece PromotePawn(Type type)
+    {
+        Piece pawn = GetPieceAt(LastMove.End);
+        pawn.IsCaptured = true;
+        PieceData data = new()
+        {
+            Position = [(int)pawn.Position.X, (int)pawn.Position.Y],
+            Color = pawn.IsWhite ? "white" : "black",
+            Type = type.Name
+        };
+        var piece = PieceFactory.CreatePiece(data);
+        Pieces.Add(piece);
+        return piece;
+    }
+
     //public override string ToString()
     //{
     //    // return FEN representation of the board
