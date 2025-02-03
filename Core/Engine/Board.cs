@@ -57,6 +57,7 @@ public class Board
         if (move.IsCapture) move.CapturedPiece.IsCaptured = true;
         move.MovedPiece.Move(move.End);
         if (isReal) move.MovedPiece.HasMoved = true;
+        if (isReal && move.IsPromotion) PromotePawn(move.MovedPiece, move.PromotionPieceType);
         WhiteToMove = !WhiteToMove;
         moveStack.Push(move);
         LastFifty.Enqueue(move);
@@ -115,17 +116,10 @@ public class Board
         return validMoves;
     }
 
-    internal Piece PromotePawn(Type type)
+    internal Piece PromotePawn(Piece pawn, Type type)
     {
-        Piece pawn = GetPieceAt(LastMove.End);
         pawn.IsCaptured = true;
-        PieceData data = new()
-        {
-            Position = [(int)pawn.Position.X, (int)pawn.Position.Y],
-            Color = pawn.IsWhite ? "white" : "black",
-            Type = type.Name
-        };
-        var piece = PieceFactory.CreatePiece(data);
+        var piece = PieceFactory.PromotePiece(pawn, type);
         Pieces.Add(piece);
         return piece;
     }

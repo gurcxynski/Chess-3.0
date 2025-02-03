@@ -6,13 +6,12 @@ using GeonBit.UI.Entities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Threading.Tasks;
 
 namespace Chess.Core.UI;
 
 internal class PromotionPopup : Panel
 {
-    private TaskCompletionSource<Type> promotionTaskCompletionSource;
+    public EventHandler<Type> OnPromotionCompleted;
 
     class PromotionIcon<T> : Image where T : Piece
     {
@@ -20,12 +19,11 @@ internal class PromotionPopup : Panel
         {
             Texture = GetTexture<T>(white);
             Anchor = Anchor.AutoCenter;
-            Size = new(0.2f, 0.2f);
+            Size = new(0f, 0.25f);
             OnClick = (entity) =>
             {
-                ChessGame.Instance.PromotePawn(typeof(T));
-                (Parent as PromotionPopup).PromotionCompleted(typeof(T));
                 Parent?.Parent?.RemoveChild(Parent);
+                (Parent as PromotionPopup).OnPromotionCompleted?.Invoke(this, typeof(T));
             };
         }
     }
@@ -34,8 +32,7 @@ internal class PromotionPopup : Panel
     {
         Anchor = Anchor.TopLeft;
         Offset = PositionConverter.ToOffset(square);
-        promotionTaskCompletionSource = new TaskCompletionSource<Type>();
-
+        Size = new(0.2f, 0.8f);
         AddChild(new PromotionIcon<Queen>(white));
         AddChild(new PromotionIcon<Rook>(white));
         AddChild(new PromotionIcon<Knight>(white));
@@ -47,13 +44,4 @@ internal class PromotionPopup : Panel
         return Resources.Instance.LoadTexture("pieces\\" + MoveHelper.TypeToString<T>(white));
     }
 
-    internal async Task<Type> WaitForPromotion()
-    {
-        return await promotionTaskCompletionSource.Task;
-    }
-
-    private void PromotionCompleted(Type pieceType)
-    {
-        promotionTaskCompletionSource.SetResult(pieceType);
-    }
 }

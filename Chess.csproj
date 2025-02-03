@@ -10,6 +10,7 @@
   <PropertyGroup>
     <ApplicationIcon>chess.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <LangVersion>preview</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Content\bin\**" />

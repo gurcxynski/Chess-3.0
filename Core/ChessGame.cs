@@ -6,7 +6,10 @@ using GeonBit.UI.Entities;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Chess.Core;
 class MoveEventArgs(IEnumerable<Move> moveHistory, int time) : EventArgs
@@ -32,7 +35,8 @@ internal class ChessGame : Panel
         Opponent = receiver;
         Opponent.OnMoveDataReceived += (sender, e) =>
         {
-            var move = MoveHelper.TryCreatingMove(System.Text.Encoding.UTF8.GetString(e.Item1));
+            Debug.WriteLine($"Received move data: {System.Text.Encoding.UTF8.GetString(e.Item1, 0, e.Item2)}");
+            var move = MoveHelper.TryCreatingMove(System.Text.Encoding.UTF8.GetString(e.Item1, 0, e.Item2));
             ExecuteMove(move);
         };
 
@@ -47,12 +51,7 @@ internal class ChessGame : Panel
         {
             var icon = new PieceIcon(piece)
             {
-                OnMouseReleased = (entity) =>
-                {
-                    PieceMovedByMouse(piece);
-                    UpdateIcons();
-                    UpdateSquares();
-                },
+                OnMouseReleased = (entity) => PieceMovedByMouse(piece),
                 OnMouseDown = (entity) => PiecePickedUp(piece)
             };
             AddChild(icon);
@@ -61,14 +60,31 @@ internal class ChessGame : Panel
         UpdateIcons();
         if (!IsWhitePlayer) Opponent.Listen();
     }
-    protected virtual void PieceMovedByMouse(Piece piece)
+    protected void PieceMovedByMouse(Piece piece)
     {
-        var clicked = PositionConverter.ToGrid(MouseInput.MousePosition);
-        if (clicked.X < 0 || clicked.X > 7 || clicked.Y < 0 || clicked.Y > 7 || clicked == piece.Position) return;
+        var dest = PositionConverter.ToGrid(MouseInput.MousePosition);
+        if (dest.X < 0 || dest.X > 7 || dest.Y < 0 || dest.Y > 7) return;
 
-        var move = piece.TryCreatingMove(clicked, Board);
-        if (ExecuteMove(move)) Opponent.ProcessMove(move);
+        var move = piece.TryCreatingMove(dest, Board);
+        if (move is null)
+        {
+            UpdateIcons();
+            UpdateSquares();
+            return;
+        }
+        if (move.IsPromotion)
+        {
+            var popup = new UI.PromotionPopup(move.End, move.OfWhite);
+            AddChild(popup);
+            popup.OnPromotionCompleted += (sender, e) =>
+            {
+                move.PromotionPieceType = e;
+                if (ExecuteMove(move)) Opponent.ProcessMove(move);
+            };
+        }
+        else if (ExecuteMove(move)) Opponent.ProcessMove(move);
     }
+
     private bool ExecuteMove(Move move)
     {
         if (move == null) return false;
@@ -77,10 +93,13 @@ internal class ChessGame : Panel
         else Chess.Instance.moveSound.Play();
         if (move.IsPromotion)
         {
-            var popup = new UI.PromotionPopup(move.End, move.OfWhite);
-            AddChild(popup);
-            var task = popup.WaitForPromotion();
-            task.Wait();
+            var piece = Board.GetPieceAt(move.End);
+            var icon = new PieceIcon(piece)
+            {
+                OnMouseReleased = (entity) => PieceMovedByMouse(piece),
+                OnMouseDown = (entity) => PiecePickedUp(piece)
+            };
+            AddChild(icon);
         }
         UpdateIcons();
         UpdateSquares();
@@ -123,21 +142,4 @@ internal class ChessGame : Panel
     private BoardSquare GetSquare(Vector2 pos) => Children.Where((Entity child) => { return (child as BoardSquare).Coordinates == pos; }).First() as BoardSquare;
     private List<BoardSquare> BoardSquares => Children.Where((Entity child) => child is BoardSquare).Select((Entity child) => child as BoardSquare).ToList();
     protected bool IsDraggable(Piece piece) => Board.WhiteToMove == piece.IsWhite && piece.IsWhite == IsWhitePlayer;
-
-    internal void PromotePawn(Type type)
-    {
-        var piece = Board.PromotePawn(type);
-        AddChild(new PieceIcon(piece)
-        {
-            OnMouseReleased = (entity) =>
-            {
-                PieceMovedByMouse(piece);
-                UpdateIcons();
-                UpdateSquares();
-            },
-            OnMouseDown = (entity) => PiecePickedUp(piece)
-        });
-        UpdateIcons();
-        UpdateSquares();
-    }
 }

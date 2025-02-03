@@ -13,11 +13,11 @@ namespace Chess.Core.Engine
         internal bool OfWhite => MovedPiece.IsWhite;
         internal Type MovePieceType => MovedPiece.GetType();
         internal Type CapturePieceType => CapturedPiece?.GetType();
-        internal Type PromotionPieceType { get; private init; }
+        internal Type PromotionPieceType { get; set; }
         internal bool IsCapture => CapturedPiece is not null;
         internal bool IsPromotion { get; private init; } = promotion;
         internal bool IsCastles { get; private init; } = castles;
         internal bool IsFirstMoveOfPiece { get; private init; } = firstMove;
-        override public string ToString() => MoveHelper.ToFieldString(Start) + MoveHelper.ToFieldString(End);
+        override public string ToString() => MoveHelper.ToFieldString(Start) + MoveHelper.ToFieldString(End) + PromotionPieceType?.Name[0].ToString().ToLower();
     }
 }

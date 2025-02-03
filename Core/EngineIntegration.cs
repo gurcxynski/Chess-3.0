@@ -59,7 +59,7 @@ class EngineIntegration(bool isWhite, int elo) : IMoveReceiver
             {
                 var move = response.Split(" ")[1];
                 moves += move + " ";
-                OnMoveDataReceived?.Invoke(this, (Encoding.UTF8.GetBytes(move), response.Length));
+                OnMoveDataReceived?.Invoke(this, (Encoding.UTF8.GetBytes(move), move.Length));
                 break;
             }
         }

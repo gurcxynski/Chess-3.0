@@ -1,6 +1,7 @@
 using Chess.Core.Engine.Pieces;
 using Chess.Core.Util;
 using Microsoft.Xna.Framework;
+using System;
 using System.IO.Pipelines;
 
 namespace Chess.Core.Engine;
@@ -15,14 +16,18 @@ public abstract class Piece(Vector2 position, bool isWhite = true)
     {
         Position = position;
     }
-    internal Move TryCreatingMove(Vector2 target, Board board, bool verifyCheck = true)
+    internal Move TryCreatingMove(Vector2 target, Board board, bool verifyCheck = true, Type promotionType = null)
     {
+        if (target == Position) return null;
         if (IsCaptured) return null;
         if (!CheckBasicMovement(target - Position, board)) return null;
         if (!CanJumpOver && !MoveHelper.CheckPath(Position, target, board)) return null;
         if (!MoveHelper.CheckDestination(Position, target, board)) return null;
         Piece capturedPiece = MoveHelper.IsEnPassant(Position, target, board) ? MoveHelper.GetPieceCapturedByEnPassant(target, board) : board.GetPieceAt(target);
-        Move move = new(Position, target, this, capturedPiece, firstMove: !HasMoved, castles: MoveHelper.IsCastles(Position, target, board), promotion: MoveHelper.IsPromotion(this, target));
+        Move move = new(Position, target, this, capturedPiece, firstMove: !HasMoved, castles: MoveHelper.IsCastles(Position, target, board), promotion: MoveHelper.IsPromotion(this, target))
+        {
+            PromotionPieceType = promotionType
+        };
         if (verifyCheck && MoveHelper.WillBeChecked(move, board)) return null;
         return move;
     }

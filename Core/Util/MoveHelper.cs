@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Chess.Core.Util;
@@ -13,8 +14,16 @@ internal static class MoveHelper
     {
         var start = new Vector2(move[0] - 'a', (move[1] - '1'));
         var end = new Vector2(move[2] - 'a', (move[3] - '1'));
+        Type promotion = null;
+        if (move.Length == 5)
+        {
+            var typeName = $"Chess.Core.Engine.Pieces.{(move[4] == 'q' ? "Queen" : move[4] == 'r' ? "Rook" : move[4] == 'b' ? "Bishop" : "Knight")}";
+            promotion = Type.GetType(typeName, throwOnError: true);
+            Debug.WriteLine(promotion);
+        }
         var piece = ChessGame.Instance.Board.GetPieceAt(start);
-        return piece?.TryCreatingMove(end, ChessGame.Instance.Board);
+        var moveObj = piece?.TryCreatingMove(end, ChessGame.Instance.Board, promotionType: promotion);
+        return moveObj;
     }
     internal static bool CheckPath(Vector2 start, Vector2 end, Board board)
     {

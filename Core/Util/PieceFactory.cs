@@ -15,5 +15,11 @@ namespace Chess.Core.Util
 
             return (Piece)constructor.Invoke([new Vector2(data.Position[0], data.Position[1]), data.Color == "white"]);
         }
+        internal static Piece PromotePiece(Piece piece, Type type)
+        {
+            ConstructorInfo constructor = type.GetConstructor([typeof(Vector2), typeof(bool)]) ?? throw new ArgumentException($"No matching constructor found for type: {type}");
+
+            return (Piece)constructor.Invoke([piece.Position, piece.IsWhite]);
+        }
     }
 }
