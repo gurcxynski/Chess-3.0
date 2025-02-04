@@ -13,7 +13,6 @@ internal class Menu : UserInterface
     private readonly Panel holder = new(Vector2.One * 0.85f, anchor: Anchor.Center);
     internal Menu(IEnumerable<Entity> items) : base()
     {
-        ShowCursor = false;
         foreach (var item in items)
         {
             holder.AddChild(item);

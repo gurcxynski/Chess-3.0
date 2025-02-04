@@ -23,7 +23,6 @@ public class Chess : Game
         Instance = this;
         graphics = new(this);
         Content.RootDirectory = "Content";
-        IsMouseVisible = true;
 
         var mode = GraphicsAdapter.DefaultAdapter.SupportedDisplayModes.Last();
         displaySettings = (new(mode.Width, mode.Height, false, true));
