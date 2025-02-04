@@ -1,5 +1,5 @@
-using Chess.Core.UI;
-using Chess.Core.UI.Menus;
+using Chess.UI;
+using Chess.UI.Menus;
 using GeonBit.UI;
 using System;
 

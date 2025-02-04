@@ -1,4 +1,4 @@
-﻿using Chess.Core.Engine;
+﻿using Chess.Engine;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Chess.Core;
-class EngineIntegration() : IMoveReceiver
+class EngineIntegration(string path) : IMoveReceiver
 {
     public enum OptionType
     {
@@ -30,8 +30,7 @@ class EngineIntegration() : IMoveReceiver
     {
         StartInfo = new ProcessStartInfo
         {
-            //FileName = "ChessEngines\\stockfish\\stockfish.exe",
-            FileName = "ChessEngines\\LC0\\lc0.exe",
+            FileName = path,
             RedirectStandardInput = true,
             RedirectStandardOutput = true,
             UseShellExecute = false,
@@ -100,6 +99,13 @@ class EngineIntegration() : IMoveReceiver
         throw new NotImplementedException();
     }
 
+    public void SetOptions(IEnumerable<KeyValuePair<string, string>> options)
+    {
+        foreach (var (name, value) in options)
+            Send($"setoption name {name} value {value}");
+    }
+    public void PushOptionButton(string name) => Send($"setoption name {name}");
+
     public List<Option> GetOptions()
     {
         process.Start();
@@ -116,8 +122,9 @@ class EngineIntegration() : IMoveReceiver
             int i = 2;
             while (split[i] != "type")
             {
-                name += split[i++];
+                name += split[i++] + " ";
             }
+            name = name.Trim();
             var type = split[i + 1];
             string def = null;
             string min = null;

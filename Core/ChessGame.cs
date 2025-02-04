@@ -1,6 +1,6 @@
-using Chess.Core.Engine;
-using Chess.Core.UI.Graphics;
-using Chess.Core.Util;
+using Chess.Engine;
+using Chess.UI.Graphics;
+using Chess.Util;
 using GeonBit.UI;
 using GeonBit.UI.Entities;
 using Microsoft.Xna.Framework;
