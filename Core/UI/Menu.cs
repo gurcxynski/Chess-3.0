@@ -9,7 +9,7 @@ using System.Collections.Generic;
 namespace Chess.Core.UI;
 internal class Menu : UserInterface
 {
-    private readonly Panel holder = new(Vector2.One * 0.8f, anchor : Anchor.Center);
+    private readonly Panel holder = new(Vector2.One * 0.85f, anchor : Anchor.Center);
     internal Menu(IEnumerable<Entity> items) : base()
     {
         ShowCursor = false;

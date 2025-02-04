@@ -1,38 +1,52 @@
 ﻿using Chess.Core.Engine;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Chess.Core;
-class EngineIntegration(bool isWhite, int elo) : IMoveReceiver
+class EngineIntegration() : IMoveReceiver
 {
+    public enum OptionType
+    {
+        Check,
+        Spin,
+        Combo,
+        Button,
+        String
+    }
+    public readonly struct Option(string name, OptionType type, string def, string min, string max, IReadOnlyList<string> values)
+    {
+        public readonly string Name = name;
+        public readonly OptionType Type = type;
+        public readonly string Default = def;
+        public readonly string Min = min;
+        public readonly string Max = max;
+        public readonly IReadOnlyList<string> Values = values;
+    }
     string moves;
-    private Process process;
+    private readonly Process process = new()
+    {
+        StartInfo = new ProcessStartInfo
+        {
+            //FileName = "ChessEngines\\stockfish\\stockfish.exe",
+            FileName = "ChessEngines\\LC0\\lc0.exe",
+            RedirectStandardInput = true,
+            RedirectStandardOutput = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        }
+    };
     public event EventHandler<(byte[], int)> OnMoveDataReceived;
     public event EventHandler<string> OnConnectionEstablished;
     public event EventHandler OnMessageSent;
-    public bool EnginePlaysWhite { get; } = isWhite;
-    public int Elo { get; } = elo;
     public void Start()
     {
-        process = new Process
-        {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = "ChessEngines\\stockfish\\stockfish.exe",
-                RedirectStandardInput = true,
-                RedirectStandardOutput = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            }
-        };
-
         process.Start();
         Send("uci");
         while (!(ReadResponse() == "uciok")) { }
         Send("ucinewgame");
-        Send("setoption name Skill Level value " + Elo);
         Send("isready");
         while (!(ReadResponse() == "readyok")) { }
     }
@@ -40,8 +54,9 @@ class EngineIntegration(bool isWhite, int elo) : IMoveReceiver
     private string ReadResponse()
     {
         if (process is null || process.HasExited) return string.Empty;
-
-        return process.StandardOutput.ReadLine();
+        string response = process.StandardOutput.ReadLine();
+        Debug.WriteLine($"Received data: {response}");
+        return response;
     }
 
     public void Stop() => process?.Kill();
@@ -83,5 +98,55 @@ class EngineIntegration(bool isWhite, int elo) : IMoveReceiver
     public void Dispose()
     {
         throw new NotImplementedException();
+    }
+
+    public List<Option> GetOptions()
+    {
+        process.Start();
+
+        List<Option> options = [];
+
+        Send("uci");
+        string response = ReadResponse();
+        while (!response.StartsWith("uciok"))
+        {
+            if (!response.StartsWith("option")) { response = ReadResponse(); continue; }
+            var split = response.Split(" ");
+            string name = "";
+            int i = 2;
+            while (split[i] != "type")
+            {
+                name += split[i++];
+            }
+            var type = split[i + 1];
+            string def = null;
+            string min = null;
+            string max = null;
+            List<string> values = [];
+            for (; i < split.Length; i++) {
+                var value = split[i];
+                switch (value)
+                {
+                    case "default": def = split[++i]; break;
+                    case "min": min = split[++i]; break;
+                    case "max": max = split[++i]; break;
+                    case "var": values.Add(split[++i]); break;
+                }
+            }
+            OptionType typeEnum = type switch
+            {
+                "check" => OptionType.Check,
+                "spin" => OptionType.Spin,
+                "combo" => OptionType.Combo,
+                "button" => OptionType.Button,
+                "string" => OptionType.String,
+                _ => throw new NotImplementedException(),
+            };
+            Option option = new(name, typeEnum, def, min, max, values);
+            options.Add(option);
+            response = ReadResponse();
+        }
+        process.Kill();
+        return options;
     }
 }

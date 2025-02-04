@@ -15,7 +15,7 @@ internal class OptionsMenu : Menu
             Anchor = Anchor.AutoCenter;
             Padding = Vector2.Zero;
             Size = new Vector2(0.5f, 0.25f);
-            AddChild(new Label(name)
+            AddChild(new Paragraph(name)
             {
                 Anchor = Anchor.AutoCenter,
             });
@@ -93,14 +93,14 @@ internal class OptionsMenu : Menu
         OnKeyPressed(Microsoft.Xna.Framework.Input.Keys.Enter, Chess.Instance.ApplyDisplaySettings);
     }
 
-    private void AddSettings(IEnumerable<Setting> list)
+    private void AddSettings(List<Setting> list)
     {
-        int amount = 100;
+        int amount = list.Count * 2;
         foreach (var setting in list)
         {
             setting.PriorityBonus = amount;
             AddToPanel(setting);
-            amount -= 10;
+            amount -= 2;
         }
     }
 }

@@ -21,7 +21,7 @@ internal class EngineMenu : Menu
         AddToPanel(colorSelector);
         AddToPanel(elo);
         AddToPanel(new MyButton("Start", () => {
-            EngineIntegration engineIntegration = new(colorSelector.WhiteSelected, elo.Value);
+            EngineIntegration engineIntegration = new();
             engineIntegration.Start();
             StateMachine.StartGame(colorSelector.WhiteSelected, engineIntegration);
         }));

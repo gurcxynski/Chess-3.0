@@ -26,8 +26,8 @@ public class Chess : Game
         IsMouseVisible = true;
 
         var mode = GraphicsAdapter.DefaultAdapter.SupportedDisplayModes.Last();
-        // displaySettings = (new(mode.Width, mode.Height, true, true));
-        displaySettings = (new(1200, 800, false, false));
+        displaySettings = (new(mode.Width, mode.Height, false, true));
+        //displaySettings = (new(1200, 800, false, false));
         ApplyDisplaySettings();
         Window.ClientSizeChanged += (object sender, EventArgs e) => { if (IsActive) ApplyDisplaySettings(); };
     }
@@ -83,9 +83,20 @@ public class Chess : Game
 
     protected override void Draw(GameTime gameTime)
     {
-        GraphicsDevice.Clear(Color.CornflowerBlue);
+        if (UserInterface.Active.UseRenderTarget)
+        {
+            UserInterface.Active.Draw(spriteBatch);
 
-        UserInterface.Active.Draw(spriteBatch);
+            GraphicsDevice.Clear(Color.CornflowerBlue);
+
+            UserInterface.Active.DrawMainRenderTarget(spriteBatch);
+        }
+        else
+        {
+            GraphicsDevice.Clear(Color.CornflowerBlue);
+
+            UserInterface.Active.Draw(spriteBatch);
+        }
 
         base.Draw(gameTime);
     }
