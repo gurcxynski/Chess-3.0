@@ -80,17 +80,8 @@ internal class OptionsMenu : Menu
             new Setting("Resolution", resolutions),
         ]);
 
-        Panel buttons = new()
-        {
-            OutlineWidth = 0,
-            Padding = Vector2.Zero,
-            Anchor = Anchor.BottomCenter,
-            Size = new Vector2(0.5f, 0.1f)
-        };
-        Button a = new("Apply") { Anchor = Anchor.AutoInline, Size = new(0.5f, 0) };
-        buttons.AddChild(new MyButton("Apply", Core.Chess.Instance.ApplyDisplaySettings) { Anchor = Anchor.AutoInline, Size = new(0.5f, 0) });
-        buttons.AddChild(new MyButton("Back", StateMachine.Back) { Anchor = Anchor.AutoInline, Size = new(0.5f, 0) });
-        AddToPanel(buttons);
+        AddToPanel(new MyButton("Apply", Core.Chess.Instance.ApplyDisplaySettings) { Anchor = Anchor.BottomLeft });
+        AddToPanel(new MyButton("Back", StateMachine.ToMenu<StartMenu>) { Anchor = Anchor.BottomRight });
 
         OnKeyPressed(Microsoft.Xna.Framework.Input.Keys.Enter, Core.Chess.Instance.ApplyDisplaySettings);
     }

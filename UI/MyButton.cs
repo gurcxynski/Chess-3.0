@@ -7,7 +7,7 @@ internal class MyButton : Button
     internal MyButton(string text, Action onClick) : base(text)
     {
         Anchor = Anchor.AutoCenter;
-        Size = new(0.5f, 0.1f);
+        Size = new(0.5f, 0.15f);
         OnClick = (entity) => { onClick(); };
     }
 }

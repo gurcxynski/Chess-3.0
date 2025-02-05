@@ -10,7 +10,8 @@ using System.Collections.Generic;
 namespace Chess.UI;
 internal class Menu : UserInterface
 {
-    private readonly Panel holder = new(Vector2.One * 0.85f, anchor: Anchor.Center);
+    private readonly Panel holder = new(Vector2.One * 0.85f, anchor: Anchor.Center) { Padding = new(80) };
+    internal UserInterface Previous;
     internal Menu(IEnumerable<Entity> items) : base()
     {
         foreach (var item in items)
@@ -18,7 +19,6 @@ internal class Menu : UserInterface
             holder.AddChild(item);
         }
         AddEntity(holder);
-        OnKeyPressed(Keys.Escape, StateMachine.Back);
     }
     protected static void OnKeyPressed(Keys key, Action action)
     {

@@ -10,8 +10,10 @@ internal class CheckOption : EngineOption
         AddChild(new Paragraph(option.Name) { Anchor = Anchor.TopCenter });
         CheckBox checkBox = new()
         {
-            Checked = option.Default == "true"
+            Checked = option.Default == "true",
+            Anchor = Anchor.BottomCenter
         };
+        checkBox.RemoveChild(checkBox.TextParagraph);
         checkBox.OnValueChange = (e) => { OnOptionChanged?.Invoke(this, (option.Name, checkBox.Checked ? "true" : "false")); };
         AddChild(checkBox);
     }

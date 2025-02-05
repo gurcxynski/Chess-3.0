@@ -11,7 +11,7 @@ namespace Chess.UI.Menus
         {
             AddToPanel(new MyButton("Play against a chess engine", StateMachine.ToMenu<EngineMenu>));
             AddToPanel(new MyButton("Play against a network opponent", StateMachine.ToMenu<OnlineMenu>));
-            AddToPanel(new MyButton("Back", StateMachine.Back));
+            AddToPanel(new MyButton("Back", StateMachine.ToMenu<StartMenu>));
         }
     }
 }

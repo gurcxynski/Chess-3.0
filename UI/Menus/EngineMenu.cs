@@ -38,6 +38,6 @@ internal class EngineMenu : Menu
             integration.Start();
             StateMachine.StartGame(colorSelector.WhiteSelected, integration);
         }));
-        AddToPanel(new MyButton("Back", StateMachine.Back));
+        AddToPanel(new MyButton("Back", StateMachine.ToMenu<NewGameMenu>));
     }
 }
