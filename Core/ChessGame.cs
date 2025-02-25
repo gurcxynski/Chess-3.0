@@ -1,5 +1,6 @@
 using Chess.Engine;
 using Chess.UI.Graphics;
+using Chess.UI.Menus;
 using Chess.Util;
 using GeonBit.UI;
 using GeonBit.UI.Entities;
@@ -27,11 +28,11 @@ internal class ChessGame : Panel
     IMoveReceiver Opponent { get; init; }
     internal Vector2 BoardSize => Size - 2 * Padding;
 
-    internal ChessGame(IMoveReceiver receiver, bool white)
+    internal ChessGame(IMoveReceiver receiver, GameCreator.GameData data)
     {
         Instance = this;
 
-        IsWhitePlayer = white;
+        IsWhitePlayer = data.SelectedWhite;
         Opponent = receiver;
         Opponent.OnMoveDataReceived += (sender, e) =>
         {

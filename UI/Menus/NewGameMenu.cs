@@ -7,7 +7,7 @@ namespace Chess.UI.Menus
 {
     internal class NewGameMenu : Menu
     {
-        public NewGameMenu() : base([])
+        public NewGameMenu() : base("New Game", [])
         {
             AddToPanel(new MyButton("Play against a chess engine", StateMachine.ToMenu<EngineMenu>));
             AddToPanel(new MyButton("Play against a network opponent", StateMachine.ToMenu<OnlineMenu>));

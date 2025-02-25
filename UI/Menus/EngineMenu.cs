@@ -11,10 +11,10 @@ internal class EngineMenu : Menu
     {
         AutoSetListHeight = true,
     };
-    public EngineMenu() : base([])
+    public EngineMenu() : base("New Game", [])
     {
-        ColorSelector colorSelector = new();
-        AddToPanel(colorSelector);
+        GameCreator creator = new();
+        AddToPanel(creator);
         foreach (var directory in Directory.GetDirectories("ChessEngines"))
         {
             var files = Directory.GetFiles(directory, "*.exe");
@@ -36,7 +36,7 @@ internal class EngineMenu : Menu
         AddToPanel(new MyButton("Start", () =>
         {
             integration.Start();
-            StateMachine.StartGame(colorSelector.WhiteSelected, integration);
+            StateMachine.StartGame(creator.Data, integration);
         }));
         AddToPanel(new MyButton("Back", StateMachine.ToMenu<NewGameMenu>));
     }

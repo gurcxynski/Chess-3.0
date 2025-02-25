@@ -25,7 +25,7 @@ internal class OptionsMenu : Menu
         }
     }
 
-    public OptionsMenu() : base([])
+    public OptionsMenu() : base("Settings", [])
     {
         DropDown displayMode = new();
         DropDown resolutions = new();
@@ -54,7 +54,7 @@ internal class OptionsMenu : Menu
         });
 
         var modes = GraphicsAdapter.DefaultAdapter.SupportedDisplayModes;
-        foreach (var res in modes.Reverse()) resolutions.AddItem($"{res.Width}x{res.Height}");
+        foreach (var res in modes.Reverse()) if (res.Width >= 1200 && res.Height >= 800) resolutions.AddItem($"{res.Width}x{res.Height}");
 
         try
         {
@@ -71,7 +71,6 @@ internal class OptionsMenu : Menu
             Core.Chess.displaySettings.SetResolution(res[0], res[1]);
         };
 
-        AddToPanel(new Header("Options"));
         AddToPanel(new LineSpace(2));
 
         AddSettings(
@@ -82,8 +81,6 @@ internal class OptionsMenu : Menu
 
         AddToPanel(new MyButton("Apply", Core.Chess.Instance.ApplyDisplaySettings) { Anchor = Anchor.BottomLeft });
         AddToPanel(new MyButton("Back", StateMachine.ToMenu<StartMenu>) { Anchor = Anchor.BottomRight });
-
-        OnKeyPressed(Microsoft.Xna.Framework.Input.Keys.Enter, Core.Chess.Instance.ApplyDisplaySettings);
     }
 
     private void AddSettings(List<Setting> list)

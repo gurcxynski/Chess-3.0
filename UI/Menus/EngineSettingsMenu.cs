@@ -10,7 +10,7 @@ namespace Chess.UI.Menus;
 internal class EngineSettingsMenu : Menu
 {
     readonly Dictionary<string, string> changes = [];
-    public EngineSettingsMenu(EngineIntegration engineIntegration, Menu returnTo) : base([])
+    public EngineSettingsMenu(EngineIntegration engineIntegration, Menu returnTo) : base("Engine Settings", [])
     {
         UseRenderTarget = true;
         List<Option> options = engineIntegration.GetOptions();

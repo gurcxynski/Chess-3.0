@@ -13,16 +13,17 @@ public class ServerConnector : NetworkConnector
     string serverName;
     string extraInfo;
     const int broadcastInterval = 1500;
+    UdpClient udpClient;
     public override void Start()
     {
         tcpListener = new TcpListener(new IPEndPoint(GetLocalIPAddress(), 0));
         tcpListener.Start();
-        UdpClient udpClient = new()
+        udpClient = new()
         {
             EnableBroadcast = true
         };
 
-        Task.Run(ListenForConnectionAsync);
+        Task.Run(() => ListenForConnectionAsync(cancellationTokenSource.Token));
         Task.Run(() => BroadcastServerInfoAsync(udpClient, cancellationTokenSource.Token));
     }
     public void Start(string name, string extra)
@@ -52,14 +53,14 @@ public class ServerConnector : NetworkConnector
             udpClient.Close();
         }
     }
-    private async Task ListenForConnectionAsync()
+    private async Task ListenForConnectionAsync(CancellationToken cancellationToken)
     {
         try
         {
             Debug.WriteLine($"Listening for incoming connections at: {tcpListener.LocalEndpoint}");
             while (true)
             {
-                var client = await tcpListener.AcceptTcpClientAsync();
+                var client = await tcpListener.AcceptTcpClientAsync(cancellationToken);
                 if (client != null)
                 {
                     tcpClient = client;
@@ -70,9 +71,6 @@ public class ServerConnector : NetworkConnector
                 }
             }
         }
-        catch (SocketException ex)
-        {
-            Debug.WriteLine($"SocketException: {ex.Message}");
-        }
+        catch (OperationCanceledException) { }
     }
 }

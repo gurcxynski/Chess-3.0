@@ -81,6 +81,7 @@ abstract public class NetworkConnector : IMoveReceiver
         tcpListener?.Stop();
         tcpClient?.Close();
         cancellationTokenSource.Cancel();
+        Dispose();
     }
     public void Dispose()
     {
@@ -92,6 +93,7 @@ abstract public class NetworkConnector : IMoveReceiver
         if (disposed) return;
         if (disposing)
         {
+            cancellationTokenSource?.Cancel();
             cancellationTokenSource?.Dispose();
             tcpClient?.Dispose();
             networkStream?.Dispose();

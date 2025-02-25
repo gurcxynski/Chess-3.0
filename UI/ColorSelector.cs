@@ -2,14 +2,14 @@
 
 namespace Chess.UI;
 
-internal class ColorSelector : Panel
+internal class ColorSelector : Entity
 {
     readonly ColorItem white;
     readonly ColorItem black;
-    internal bool WhiteSelected => white.Checked;
-    public ColorSelector() : base()
+    internal bool SelectedWhite => white.Checked;
+    internal ColorSelector() : base()
     {
-        Size = new Microsoft.Xna.Framework.Vector2(0.6f, 0.3f);
+        Size = new(0);
         Anchor = Anchor.AutoCenter;
         white = new ColorItem(true)
         {

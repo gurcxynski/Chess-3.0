@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Chess.Core;
@@ -69,12 +70,17 @@ public class Chess : Game
         spriteBatch = new SpriteBatch(GraphicsDevice); 
         moveSound = Content.Load<SoundEffect>("move");
         captureSound = Content.Load<SoundEffect>("capture");
-
     }
 
     protected override void Update(GameTime gameTime)
     {
-        UserInterface.Active.Update(gameTime);
+        try
+        {
+            UserInterface.Active?.Update(gameTime);
+        }
+        catch (NullReferenceException)
+        {
+        }
         keyboardListener.Update(gameTime);
 
         base.Update(gameTime);

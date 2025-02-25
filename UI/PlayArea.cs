@@ -1,13 +1,13 @@
 using Chess.Core;
+using Chess.UI.Menus;
 using GeonBit.UI;
 
 namespace Chess.UI;
 internal class PlayArea : UserInterface
 {
-    internal PlayArea(bool white, IMoveReceiver receiver) : base()
+    internal PlayArea(GameCreator.GameData data, IMoveReceiver receiver) : base()
     {
-        ShowCursor = false;
-        var game = new ChessGame(receiver, white);
+        var game = new ChessGame(receiver, data);
         AddEntity(game);
         game.Initialize();
     }

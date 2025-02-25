@@ -15,7 +15,7 @@ internal class ColorItem : RadioButton
     };
     public ColorItem(bool white) : base()
     {
-        Size = new(0.3f, 0);
+        Size = new(0.2f, 0.8f);
         Padding = Vector2.Zero;
         Checked = white;
         rectangle.OutlineColor = white ? Color.Black : Color.White;
