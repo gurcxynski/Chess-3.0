@@ -1,8 +1,7 @@
-using Chess.Util;
-using System;
+using Chess.Backend.Util;
 using System.Numerics;
 
-namespace Chess.Engine;
+namespace Chess.Backend.Engine;
 
 public class Move(Vector2 start, Vector2 end, Piece movedPiece, Piece capturedPiece = null, bool castles = false, bool promotion = false, bool firstMove = false)
 {

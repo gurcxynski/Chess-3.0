@@ -1,16 +1,15 @@
-﻿using Chess.Core;
-using Chess.Engine;
+﻿using Chess.Backend.Core;
+using Chess.Backend.Engine;
 using System.Numerics;
-using System;
 using System.Reflection;
 
-namespace Chess.Util
+namespace Chess.Backend.Util
 {
     internal static class PieceFactory
     {
         internal static Piece CreatePiece(PieceData data)
         {
-            Type pieceType = Type.GetType($"Chess.Engine.Pieces.{data.Type}", throwOnError: true);
+            Type pieceType = Type.GetType($"Chess.Backend.Engine.Pieces.{data.Type}", throwOnError: true);
 
             ConstructorInfo constructor = pieceType.GetConstructor([typeof(Vector2), typeof(bool)]) ?? throw new ArgumentException($"No matching constructor found for type: {data.Type}");
 

@@ -1,8 +1,8 @@
-using Chess.Util;
+using Chess.Backend.Util;
 using System.Numerics;
-using System;
 
-namespace Chess.Engine;
+namespace Chess.Backend.Engine;
+
 public abstract class Piece(Vector2 position, bool isWhite = true)
 {
     internal Vector2 Position { get; private set; } = position;
@@ -31,4 +31,17 @@ public abstract class Piece(Vector2 position, bool isWhite = true)
     }
     protected abstract bool CheckBasicMovement(Vector2 direction, Board board);
     public override string ToString() => (IsWhite ? "w" : "b") + GetType().ToString().Split('.')[^1];
+    public string UnicodeIcon()
+    {
+        return GetType().Name switch
+        {
+            "Pawn" => IsWhite ? "\u2659" : "\u265F",
+            "Rook" => IsWhite ? "\u2656" : "\u265C",
+            "Knight" => IsWhite ? "\u2658" : "\u265E",
+            "Bishop" => IsWhite ? "\u2657" : "\u265D",
+            "Queen" => IsWhite ? "\u2655" : "\u265B",
+            "King" => IsWhite ? "\u2654" : "\u265A",
+            _ => string.Empty,
+        };
+    }
 }

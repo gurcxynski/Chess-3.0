@@ -1,9 +1,7 @@
-using Chess.Engine;
-using Chess.Util;
+using Chess.Backend.Util;
 using System.Numerics;
-using System;
 
-namespace Chess.Engine.Pieces;
+namespace Chess.Backend.Engine.Pieces;
 internal class Pawn(Vector2 position, bool isWhite = true) : Piece(position, isWhite)
 {
     protected override bool CheckBasicMovement(Vector2 direction, Board board)

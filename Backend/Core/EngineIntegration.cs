@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Text;
-using System.Threading.Tasks;
-using Chess.Engine;
+using Chess.Backend.Engine;
 
-namespace Chess.Core;
+namespace Chess.Backend.Core;
 class EngineIntegration(string path) : IMoveReceiver
 {
     public enum OptionType

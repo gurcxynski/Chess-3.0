@@ -1,8 +1,6 @@
-using Chess.Engine;
 using System.Numerics;
-using System;
 
-namespace Chess.Engine.Pieces;
+namespace Chess.Backend.Engine.Pieces;
 internal class Knight(Vector2 position, bool isWhite = true) : Piece(position, isWhite)
 {
     protected override bool CanJumpOver { get; } = true;

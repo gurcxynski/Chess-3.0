@@ -1,13 +1,9 @@
-using Chess.Core;
-using Chess.Engine.Pieces;
-using Chess.Util;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Chess.Backend.Core;
+using Chess.Backend.Engine.Pieces;
+using Chess.Backend.Util;
 using System.Numerics;
-using System.Text;
 
-namespace Chess.Engine;
+namespace Chess.Backend.Engine;
 
 public class Board
 {
@@ -48,6 +44,7 @@ public class Board
     }
 
     internal Piece GetPieceAt(Vector2 pos) => Pieces.Find(piece => piece.Position == pos && !piece.IsCaptured);
+    internal Piece GetPieceAt(int x, int y) => GetPieceAt(new Vector2(x, y));
     internal List<Piece> GetAll(Type type) => Pieces.Where(piece => piece.GetType() == type).ToList();
     internal Piece GetKing(bool isWhite) => isWhite ? whiteKing : blackKing;
     internal Move LastMove => moveStack.Count > 0 ? moveStack.Peek() : null;

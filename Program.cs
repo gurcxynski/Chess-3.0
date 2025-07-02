@@ -1,4 +1,4 @@
-using Chess.Components;
+using Chess_3._0.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 

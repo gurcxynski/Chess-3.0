@@ -1,14 +1,8 @@
-using Chess.Core;
-using Chess.Engine;
-using Chess.Engine.Pieces;
+using Chess.Backend.Engine;
+using Chess.Backend.Engine.Pieces;
 using System.Numerics;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
 
-namespace Chess.Util;
+namespace Chess.Backend.Util;
 internal static class MoveHelper
 {
     //internal static Move TryCreatingMove(string move)
@@ -18,7 +12,7 @@ internal static class MoveHelper
     //    Type promotion = null;
     //    if (move.Length == 5)
     //    {
-    //        var typeName = $"Chess.Core.Engine.Pieces.{(move[4] == 'q' ? "Queen" : move[4] == 'r' ? "Rook" : move[4] == 'b' ? "Bishop" : "Knight")}";
+    //        var typeName = $"Chess.Backend.Core.Engine.Pieces.{(move[4] == 'q' ? "Queen" : move[4] == 'r' ? "Rook" : move[4] == 'b' ? "Bishop" : "Knight")}";
     //        promotion = Type.GetType(typeName, throwOnError: true);
     //        Debug.WriteLine(promotion);
     //    }

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Chess.Core;
+﻿namespace Chess.Backend.Core;
 
 internal interface IMoveReceiver : IDisposable
 {
@@ -11,5 +9,5 @@ internal interface IMoveReceiver : IDisposable
     public void Stop();
     public void Listen();
     protected void Send(string data);
-    public void ProcessMove(Engine.Move move);
+    public void ProcessMove(Backend.Engine.Move move);
 }

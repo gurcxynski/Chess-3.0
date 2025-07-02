@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Text.Json;
+﻿using System.Text.Json;
 
-namespace Chess.Core;
+namespace Chess.Backend.Core;
 internal struct BoardSetup
 {
     public List<PieceData> Pieces { get; set; }
@@ -16,8 +14,6 @@ internal struct PieceData
 
 internal static class PositionLoader
 {
-
-
     internal static BoardSetup LoadBoardSetup(string file)
     {
         string json = File.ReadAllText(file);
