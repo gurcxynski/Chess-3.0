@@ -16,6 +16,53 @@
     align-items: center;
     justify-content: center;
     transition: background-color 0.2s ease;
+    position: relative;
+}
+
+.row-number {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    font-size: 12px;
+    font-weight: bold;
+    pointer-events: none;
+    z-index: 1;
+    padding: 1px 3px;
+    border-radius: 2px;
+    line-height: 1;
+}
+
+.board-row:nth-child(odd) button:nth-child(odd) .row-number,
+.board-row:nth-child(even) button:nth-child(even) .row-number {
+    color: #b58863;
+}
+
+.board-row:nth-child(odd) button:nth-child(even) .row-number,
+.board-row:nth-child(even) button:nth-child(odd) .row-number {
+    color: #f0d9b5;
+}
+
+.col-letter {
+    position: absolute;
+    bottom: 2px;
+    left: 2px;
+    font-size: 12px;
+    font-weight: bold;
+    pointer-events: none;
+    z-index: 1;
+    padding: 1px 3px;
+    border-radius: 2px;
+    line-height: 1;
+}
+
+.board-row:nth-child(odd) button:nth-child(odd) .col-letter,
+.board-row:nth-child(even) button:nth-child(even) .col-letter {
+    color: #b58863;
+}
+
+.board-row:nth-child(odd) button:nth-child(even) .col-letter,
+.board-row:nth-child(even) button:nth-child(odd) .col-letter {
+    color: #f0d9b5;
 }
 
 /* Alternating square colors */

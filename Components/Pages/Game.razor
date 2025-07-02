@@ -11,13 +11,23 @@
 }
 
 <div class="chess-board">
-    @for (var row = 0; row < 8; row++)
+    @for (var row = 7; row >= 0; row--)
     {
         <div class="board-row">
             @for (var col = 0; col < 8; col++)
             {
                 var piece = board.GetPieceAt(col, row);
-                <button> @piece?.UnicodeIcon() </button>
+                <button> 
+                    @piece?.UnicodeIcon() 
+                    @if (col == 7)
+                    {
+                        <span class="row-number">@(row + 1)</span>
+                    }
+                    @if (row == 0)
+                    {
+                        <span class="col-letter">@((char)('a' + col))</span>
+                    }
+                </button>
             }
         </div>
     }
