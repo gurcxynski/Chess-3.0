@@ -1,0 +1,24 @@
+﻿@page "/"
+
+@using Chess.Backend.Engine;
+@using Chess.Backend.Core;
+@using System.Diagnostics;
+
+<PageTitle>Chess</PageTitle>
+
+@code {
+    Board board = new Board(PositionLoader.LoadBoardSetup("Backend\\boardSetup.json"));
+}
+
+<div class="chess-board">
+    @for (var row = 0; row < 8; row++)
+    {
+        <div class="board-row">
+            @for (var col = 0; col < 8; col++)
+            {
+                var piece = board.GetPieceAt(col, row);
+                <button> @piece?.UnicodeIcon() </button>
+            }
+        </div>
+    }
+</div>
