@@ -42,6 +42,24 @@
     color: #f0d9b5;
 }
 
+/* Selected piece highlighting */
+.board-row button.selected {
+    background-color: #ffeb3b !important; /* Yellow highlight */
+    box-shadow: 0 0 10px rgba(255, 235, 59, 0.8);
+    border: 2px solid #ffc107;
+}
+
+/* Optional: Different highlight for selected piece on dark/light squares */
+.board-row:nth-child(odd) button:nth-child(odd).selected,
+.board-row:nth-child(even) button:nth-child(even).selected {
+    background-color: #fff176 !important; /* Lighter yellow for light squares */
+}
+
+.board-row:nth-child(odd) button:nth-child(even).selected,
+.board-row:nth-child(even) button:nth-child(odd).selected {
+    background-color: #ffb300 !important; /* Darker yellow for dark squares */
+}
+
 .col-letter {
     position: absolute;
     bottom: 2px;

@@ -1,0 +1,23 @@
+﻿@page "/"  
+@rendermode InteractiveServer 
+
+<h1>Welcome to WebChess!</h1>  
+
+<div class="startmenu">  
+    <button class="localgame" @onclick="NewLocalGame"> New Game </button>
+    <button class="onlinegame"> Online Game </button>
+</div>  
+
+
+@code {
+    [Inject]
+    NavigationManager NavigationManager { get; set; }
+    private void NewLocalGame()
+    {
+        NavigationManager.NavigateTo("/game");
+    }
+    private void NewOnlineGame()
+    {
+
+    }
+}

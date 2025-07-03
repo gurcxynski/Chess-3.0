@@ -1,23 +1,25 @@
-﻿@page "/"
+﻿@page "/game"
+@rendermode InteractiveServer
 
 @using Chess.Backend.Engine;
 @using Chess.Backend.Core;
-@using System.Diagnostics;
-
-<PageTitle>Chess</PageTitle>
 
 @code {
     Board board = new Board(PositionLoader.LoadBoardSetup("Backend\\boardSetup.json"));
 }
-
+<h1> Turn: @(board.WhiteToMove ? "White" : "Black") </h1>
 <div class="chess-board">
     @for (var row = 7; row >= 0; row--)
     {
         <div class="board-row">
             @for (var col = 0; col < 8; col++)
             {
+                var localCol = col;
+                var localRow = row;
                 var piece = board.GetPieceAt(col, row);
-                <button> 
+                var isSelected = selected is not null && selected.Position.X == localCol && selected.Position.Y == localRow;
+                <button class="@(isSelected ? "selected" : "")" @onclick="() => SquareSelected(localCol, localRow)"> 
+
                     @piece?.UnicodeIcon() 
                     @if (col == 7)
                     {
@@ -32,3 +34,35 @@
         </div>
     }
 </div>
+<br />
+<button class="tostart" @onclick="ToStart"> Back </button>
+@code {
+    [Inject]
+    NavigationManager NavigationManager { get; set; }
+    Piece? selected;
+    private void ToStart()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+    private void SquareSelected(int col, int row)
+    {
+        Console.WriteLine($"Square selected: {col}, {row}");
+        Piece? clicked = board.GetPieceAt(col, row);
+        if (selected is null && clicked is null) return;
+        if (selected is null || clicked?.IsWhite == board.WhiteToMove)
+        {
+            selected = clicked;
+            Console.WriteLine($"Selected piece: {selected}");
+            return;
+        }
+        Console.WriteLine($"Moving {selected} to {col}, {row}");
+        Move? move = selected.TryCreatingMove(col, row, board);
+        if (move is null) {
+            Console.WriteLine("Invalid move");
+            return;
+        }
+        board.ExecuteMove(move);
+        selected = null;
+        return;
+    }
+}

@@ -14,6 +14,7 @@ public abstract class Piece(Vector2 position, bool isWhite = true)
     {
         Position = position;
     }
+    internal Move TryCreatingMove(int col, int row, Board board, bool verifyCheck = true, Type promotionType = null) => TryCreatingMove(new (col, row), board, verifyCheck, promotionType);
     internal Move TryCreatingMove(Vector2 target, Board board, bool verifyCheck = true, Type promotionType = null)
     {
         if (target == Position) return null;
