@@ -1,25 +1,25 @@
-using Chess.Backend.Engine;
-using Chess.Backend.Engine.Pieces;
+using Backend.Engine;
+using Backend.Engine.Pieces;
 using System.Numerics;
 
-namespace Chess.Backend.Util;
+namespace Backend.Util;
+
 internal static class MoveHelper
 {
-    //internal static Move TryCreatingMove(string move)
-    //{
-    //    var start = new Vector2(move[0] - 'a', move[1] - '1');
-    //    var end = new Vector2(move[2] - 'a', move[3] - '1');
-    //    Type promotion = null;
-    //    if (move.Length == 5)
-    //    {
-    //        var typeName = $"Chess.Backend.Core.Engine.Pieces.{(move[4] == 'q' ? "Queen" : move[4] == 'r' ? "Rook" : move[4] == 'b' ? "Bishop" : "Knight")}";
-    //        promotion = Type.GetType(typeName, throwOnError: true);
-    //        Debug.WriteLine(promotion);
-    //    }
-    //    var piece = ChessGame.Instance.Board.GetPieceAt(start);
-    //    var moveObj = piece?.TryCreatingMove(end, ChessGame.Instance.Board, promotionType: promotion);
-    //    return moveObj;
-    //}
+    internal static Move? TryCreatingMove(Board board, string move)
+    {
+        var start = new Vector2(move[0] - 'a', move[1] - '1');
+        var end = new Vector2(move[2] - 'a', move[3] - '1');
+        Type? promotion = null;
+        if (move.Length == 5)
+        {
+            var typeName = $"Chess.Backend.Core.Engine.Pieces.{(move[4] == 'q' ? "Queen" : move[4] == 'r' ? "Rook" : move[4] == 'b' ? "Bishop" : "Knight")}";
+            promotion = Type.GetType(typeName, throwOnError: true);
+        }
+        var piece = board.GetPieceAt(start);
+        var moveObj = piece?.TryCreatingMove(end, board, promotionType: promotion);
+        return moveObj;
+    }
     internal static bool CheckPath(Vector2 start, Vector2 end, Board board)
     {
         if (end == start) return false;
@@ -34,7 +34,7 @@ internal static class MoveHelper
 
     internal static bool CheckDestination(Vector2 start, Vector2 dest, Board board)
     {
-        return !(board.GetPieceAt(dest) is not null && board.GetPieceAt(dest).IsWhite == board.GetPieceAt(start).IsWhite);
+        return !(board.GetPieceAt(dest) is not null && board.GetPieceAt(dest)!.IsWhite == board.GetPieceAt(start)!.IsWhite);
     }
 
     internal static bool IsAttackedBy(Vector2 pos, Board board, bool white, bool verifyCheck = true)
@@ -57,11 +57,11 @@ internal static class MoveHelper
     internal static bool IsEnPassant(Vector2 origin, Vector2 target, Board board)
     {
         if (!((target - origin).Y == 1 && Math.Abs((target - origin).X) == 1)) return false;
-        Move lastMove = board.LastMove;
+        Move? lastMove = board.LastMove;
         return lastMove is not null && lastMove.MovedPiece is Pawn && lastMove.IsFirstMoveOfPiece &&
             lastMove.End.X == target.X && lastMove.End.Y == origin.Y;
     }
-    internal static Piece GetPieceCapturedByEnPassant(Vector2 target, Board board)
+    internal static Piece? GetPieceCapturedByEnPassant(Vector2 target, Board board)
     {
         if (board.WhiteToMove) return board.GetPieceAt(target - Vector2.UnitY);
         return board.GetPieceAt(target + Vector2.UnitY);

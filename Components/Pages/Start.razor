@@ -1,23 +1,32 @@
-﻿@page "/"  
+﻿@using Chess_3._0.Components
+@page "/"  
 @rendermode InteractiveServer 
 
 <h1>Welcome to WebChess!</h1>  
 
 <div class="startmenu">  
-    <button class="localgame" @onclick="NewLocalGame"> New Game </button>
-    <button class="onlinegame"> Online Game </button>
+    <button @onclick="NewLocalGame"> Play locally </button>
+    <button @onclick="NewOnlineGame"> Play with a friend </button>
+    <button @onclick="NewBotGame"> Play against computer </button>
 </div>  
+@if (showColorSelector) {
+    <ColorSelector />
+}
 
 
 @code {
     [Inject]
-    NavigationManager NavigationManager { get; set; }
+    public required NavigationManager NavigationManager { get; init; }
+    bool showColorSelector = false;
     private void NewLocalGame()
     {
         NavigationManager.NavigateTo("/game");
     }
     private void NewOnlineGame()
     {
-
+        showColorSelector = true;
+    }
+    private void NewBotGame() {
+        showColorSelector = true;
     }
 }

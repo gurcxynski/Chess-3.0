@@ -1,11 +1,11 @@
-﻿@page "/game"
+@page "/botgame"
 @rendermode InteractiveServer
 
+@using Backend.Core
 @using Backend.Engine
+@using Backend.Util
 
-@code {
-    Board board = new Board(Backend.Core.PositionLoader.LoadBoardSetup("Backend\\boardSetup.json"));
-}
+@code { Board board = new Board(PositionLoader.LoadBoardSetup("Backend\\boardSetup.json")); }
 <h1> Turn: @(board.WhiteToMove ? "White" : "Black") </h1>
 <div class="chess-board">
     @for (var row = 7; row >= 0; row--)
@@ -36,17 +36,39 @@
 <br />
 <button class="tostart" @onclick="ToStart"> Back </button>
 @code {
+    bool playingWhite = true;
     [Inject]
     public required NavigationManager NavigationManager { get; init; }
-    Piece? selected;
+    Backend.Interfaces.IStatelessOpponent api = new ChessAPI();
+    Piece? selected;    
+    protected override void OnInitialized()
+    {
+        api.OnMoveDataReceived += (sender, e) =>
+        {
+            Console.WriteLine($"Received move data: {System.Text.Encoding.UTF8.GetString(e.Item1, 0, e.Item2)}");
+            var move = MoveHelper.TryCreatingMove(board, System.Text.Encoding.UTF8.GetString(e.Item1, 0, e.Item2));
+            if (move is null)
+            {
+                Console.WriteLine("Invalid move received from bot");
+                return;
+            }
+            board.ExecuteMove(move);
+            StateHasChanged();
+        };
+        board.OnGameOver += (sender, e) =>
+        {
+            Console.WriteLine("Game over");
+        };
+    }
     private void ToStart()
     {
         NavigationManager.NavigateTo("/");
     }
     private void SquareSelected(int col, int row)
     {
+        if (board.WhiteToMove != playingWhite) return;
         Piece? clicked = board.GetPieceAt(col, row);
-        if ((selected is null && clicked is null) || (clicked is not null && clicked.IsWhite != board.WhiteToMove)) return;
+        if ((selected is null && clicked is null) || (selected is null && clicked is not null && clicked.IsWhite != board.WhiteToMove)) return;
         if (selected is null || clicked?.IsWhite == board.WhiteToMove)
         {
             selected = clicked;
@@ -58,6 +80,7 @@
             return;
         }
         board.ExecuteMove(move);
+        api.SendFen(board.ToString());
         selected = null;
         return;
     }

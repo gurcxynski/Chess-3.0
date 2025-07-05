@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 
-namespace Chess.Backend.Core;
+namespace Backend.Core;
+
 internal struct BoardSetup
 {
     public List<PieceData> Pieces { get; set; }

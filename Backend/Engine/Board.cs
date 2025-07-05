@@ -1,9 +1,10 @@
-using Chess.Backend.Core;
-using Chess.Backend.Engine.Pieces;
-using Chess.Backend.Util;
+using Backend.Engine.Pieces;
+using Backend.Util;
 using System.Numerics;
+using System.Text;
+using Backend.Core;
 
-namespace Chess.Backend.Engine;
+namespace Backend.Engine;
 
 public class Board
 {
@@ -13,7 +14,7 @@ public class Board
     internal IEnumerable<Piece> CapturedPieces => Pieces.Where(piece => piece.IsCaptured);
     internal IEnumerable<Piece> ActivePieces => Pieces.Where(piece => !piece.IsCaptured);
     internal List<Move> ValidMoves => GetValidMoves();
-
+    public event EventHandler OnGameOver = delegate { };
     private readonly Stack<Move> moveStack = new();
     internal IEnumerable<Move> MoveHistory => moveStack.Reverse();
     internal Queue<Move> LastFifty { get; private init; } = new();
@@ -43,32 +44,32 @@ public class Board
         }
     }
 
-    internal Piece GetPieceAt(Vector2 pos) => Pieces.Find(piece => piece.Position == pos && !piece.IsCaptured);
-    internal Piece GetPieceAt(int x, int y) => GetPieceAt(new Vector2(x, y));
+    internal Piece? GetPieceAt(Vector2 pos) => Pieces.Find(piece => piece.Position == pos && !piece.IsCaptured);
+    internal Piece? GetPieceAt(int x, int y) => GetPieceAt(new Vector2(x, y));
     internal List<Piece> GetAll(Type type) => Pieces.Where(piece => piece.GetType() == type).ToList();
     internal Piece GetKing(bool isWhite) => isWhite ? whiteKing : blackKing;
-    internal Move LastMove => moveStack.Count > 0 ? moveStack.Peek() : null;
+    internal Move? LastMove => moveStack.Count > 0 ? moveStack.Peek() : null;
 
     internal void ExecuteMove(Move move, bool isReal = true)
     {
-        if (move.IsCapture) move.CapturedPiece.IsCaptured = true;
+        if (move.IsCapture) move.CapturedPiece!.IsCaptured = true;
         move.MovedPiece.Move(move.End);
         if (isReal) move.MovedPiece.HasMoved = true;
-        if (isReal && move.IsPromotion) PromotePawn(move.MovedPiece, move.PromotionPieceType);
+        if (isReal && move.IsPromotion) PromotePawn(move.MovedPiece, move.PromotionPieceType!);
         WhiteToMove = !WhiteToMove;
         moveStack.Push(move);
         LastFifty.Enqueue(move);
         if (LastFifty.Count > 50) LastFifty.Dequeue();
-        //if (isReal && IsMate) StateMachine.ToMenu<StartMenu>();
+        if (isReal && IsMate) OnGameOver.Invoke(this, EventArgs.Empty);
         if (!move.IsCastles) return;
         if (move.End.X == 2)
         {
-            Piece rook = GetPieceAt(new(0, move.Start.Y));
+            Piece rook = GetPieceAt(new(0, move.Start.Y))!;
             rook.Move(new(3, move.Start.Y));
         }
         else if (move.End.X == 6)
         {
-            Piece rook = GetPieceAt(new(7, move.Start.Y));
+            Piece rook = GetPieceAt(new(7, move.Start.Y))!;
             rook.Move(new(5, move.Start.Y));
         }
     }
@@ -79,17 +80,17 @@ public class Board
         Move move = moveStack.Pop();
         move.MovedPiece.Move(move.Start);
         WhiteToMove = !WhiteToMove;
-        if (move.IsCapture) move.CapturedPiece.IsCaptured = false;
+        if (move.IsCapture) move.CapturedPiece!.IsCaptured = false;
         if (move.IsFirstMoveOfPiece) move.MovedPiece.HasMoved = false;
         if (!move.IsCastles) return;
         if (move.End.X == 2)
         {
-            Piece rook = GetPieceAt(new(3, move.Start.Y));
+            Piece rook = GetPieceAt(new(3, move.Start.Y))!;
             rook.Move(new(0, move.Start.Y));
         }
         if (move.End.X == 6)
         {
-            Piece rook = GetPieceAt(new(5, move.Start.Y));
+            Piece rook = GetPieceAt(new(5, move.Start.Y))!;
             rook.Move(new(7, move.Start.Y));
         }
     }
@@ -105,7 +106,7 @@ public class Board
                 {
                     Vector2 pos = new(x, y);
                     if (pos == piece.Position) continue;
-                    Move move = piece.TryCreatingMove(pos, this);
+                    Move? move = piece.TryCreatingMove(pos, this);
                     if (move is not null) validMoves.Add(move);
                 }
             }
@@ -121,41 +122,48 @@ public class Board
         return piece;
     }
 
-    //public override string ToString()
-    //{
-    //    // return FEN representation of the board
-    //    StringBuilder fen = new();
-    //    for (int y = 7; y >= 0; y--)
-    //    {
-    //        int empty = 0;
-    //        for (int x = 0; x < 8; x++)
-    //        {
-    //            Piece piece = GetPieceAt(new(x, y));
-    //            if (piece is null)
-    //            {
-    //                empty++;
-    //                continue;
-    //            }
-    //            if (empty > 0)
-    //            {
-    //                fen.Append(empty);
-    //                empty = 0;
-    //            }
-    //            fen.Append(piece.ToString());
-    //        }
-    //        if (empty > 0) fen.Append(empty);
-    //        if (y > 0) fen.Append('/');
-    //    }
-    //    fen.Append(WhiteToMove ? " w " : " b ");
-    //    if (whiteKing.HasMoved && GetPieceAt(new Vector2(7,0)).HasMoved) fen.Append('K');
-    //    if (whiteKing.HasMoved && GetPieceAt(new Vector2(0, 0)).HasMoved) fen.Append('Q');
-    //    if (blackKing.HasMoved && GetPieceAt(new Vector2(7, 7)).HasMoved) fen.Append('k');
-    //    if (blackKing.HasMoved && GetPieceAt(new Vector2(0, 7)).HasMoved) fen.Append('q');
-    //    fen.Append(' ');
-    //    if (LastMove.MovePieceType == typeof(Pawn) && LastMove.IsFirstMoveOfPiece) fen.Append(MoveHelper.ToFieldString(LastMove.Start + (Vector2.UnitY * (LastMove.OfWhite ? 1 : -1))));
-    //    else fen.Append('-');
-    //    return fen.ToString();
-    //}
+    public override string ToString()
+    {
+        // return FEN representation of the board
+        StringBuilder fen = new();
+        for (int y = 7; y >= 0; y--)
+        {
+            int empty = 0;
+            for (int x = 0; x < 8; x++)
+            {
+                var piece = GetPieceAt(new(x, y));
+                if (piece is null)
+                {
+                    empty++;
+                    continue;
+                }
+                if (empty > 0)
+                {
+                    fen.Append(empty);
+                    empty = 0;
+                }
+                fen.Append(piece.ToString());
+            }
+            if (empty > 0) fen.Append(empty);
+            if (y > 0) fen.Append('/');
+        }
+        fen.Append(WhiteToMove ? " w " : " b ");
+        if (!whiteKing.HasMoved && !(GetPieceAt(new Vector2(7,0))?.HasMoved ?? true)) fen.Append('K');
+        if (!whiteKing.HasMoved && !(GetPieceAt(new Vector2(0, 0))?.HasMoved ?? true)) fen.Append('Q');
+        if (!blackKing.HasMoved && !(GetPieceAt(new Vector2(7, 7))?.HasMoved ?? true)) fen.Append('k');
+        if (!blackKing.HasMoved && !(GetPieceAt(new Vector2(0, 7))?.HasMoved ?? true)) fen.Append('q');
+        if (fen[^1] == ' ') fen.Append('-');
+        fen.Append(' ');
+        if (LastMove is not null && LastMove.MovePieceType == typeof(Pawn) && LastMove.IsFirstMoveOfPiece) fen.Append(MoveHelper.ToFieldString(LastMove.Start + (Vector2.UnitY * (LastMove.OfWhite ? 1 : -1))));
+        else fen.Append('-');
+        fen.Append(' ');
+
+        // TODO: implement counting 50 move rule
+        fen.Append("0 ");
+
+        fen.Append(MoveCount / 2 + 1); // halfmove clock, incremented after each move
+        return fen.ToString();
+    }
 
     internal bool IsInCheck => MoveHelper.IsAttackedBy(GetKing(WhiteToMove).Position, this, !WhiteToMove);
     internal bool IsChecking => MoveHelper.IsAttackedBy(GetKing(!WhiteToMove).Position, this, WhiteToMove);

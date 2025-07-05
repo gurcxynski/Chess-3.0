@@ -1,7 +1,7 @@
-using Chess.Backend.Util;
+using Backend.Util;
 using System.Numerics;
 
-namespace Chess.Backend.Engine;
+namespace Backend.Engine;
 
 public abstract class Piece(Vector2 position, bool isWhite = true)
 {
@@ -14,15 +14,15 @@ public abstract class Piece(Vector2 position, bool isWhite = true)
     {
         Position = position;
     }
-    internal Move TryCreatingMove(int col, int row, Board board, bool verifyCheck = true, Type promotionType = null) => TryCreatingMove(new (col, row), board, verifyCheck, promotionType);
-    internal Move TryCreatingMove(Vector2 target, Board board, bool verifyCheck = true, Type promotionType = null)
+    internal Move? TryCreatingMove(int col, int row, Board board, bool verifyCheck = true, Type? promotionType = null) => TryCreatingMove(new (col, row), board, verifyCheck, promotionType);
+    internal Move? TryCreatingMove(Vector2 target, Board board, bool verifyCheck = true, Type? promotionType = null)
     {
         if (target == Position) return null;
         if (IsCaptured) return null;
         if (!CheckBasicMovement(target - Position, board)) return null;
         if (!CanJumpOver && !MoveHelper.CheckPath(Position, target, board)) return null;
         if (!MoveHelper.CheckDestination(Position, target, board)) return null;
-        Piece capturedPiece = MoveHelper.IsEnPassant(Position, target, board) ? MoveHelper.GetPieceCapturedByEnPassant(target, board) : board.GetPieceAt(target);
+        Piece? capturedPiece = MoveHelper.IsEnPassant(Position, target, board) ? MoveHelper.GetPieceCapturedByEnPassant(target, board) : board.GetPieceAt(target);
         Move move = new(Position, target, this, capturedPiece, firstMove: !HasMoved, castles: MoveHelper.IsCastles(Position, target, board), promotion: MoveHelper.IsPromotion(this, target))
         {
             PromotionPieceType = promotionType
@@ -31,7 +31,19 @@ public abstract class Piece(Vector2 position, bool isWhite = true)
         return move;
     }
     protected abstract bool CheckBasicMovement(Vector2 direction, Board board);
-    public override string ToString() => (IsWhite ? "w" : "b") + GetType().ToString().Split('.')[^1];
+    public override string ToString()
+    {
+        return GetType().Name switch
+        {
+            "Pawn" => IsWhite ? "P" : "p",
+            "Rook" => IsWhite ? "R" : "r",
+            "Knight" => IsWhite ? "N" : "n",
+            "Bishop" => IsWhite ? "B" : "b",
+            "Queen" => IsWhite ? "Q" : "q",
+            "King" => IsWhite ? "K" : "k",
+            _ => string.Empty,
+        };
+    }
     public string UnicodeIcon()
     {
         return GetType().Name switch

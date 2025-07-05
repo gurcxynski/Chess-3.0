@@ -1,9 +1,9 @@
 ﻿using System.Diagnostics;
 using System.Text;
-using Chess.Backend.Engine;
 
-namespace Chess.Backend.Core;
-class EngineIntegration(string path) : IMoveReceiver
+namespace Backend.Core;
+
+class EngineIntegration(string path) : Interfaces.IStatefulOpponent
 {
     public enum OptionType
     {
@@ -22,7 +22,7 @@ class EngineIntegration(string path) : IMoveReceiver
         public readonly string Max = max;
         public readonly IReadOnlyList<string> Values = values;
     }
-    string moves;
+    string moves = string.Empty;
     private readonly Process process = new()
     {
         StartInfo = new ProcessStartInfo
@@ -34,9 +34,9 @@ class EngineIntegration(string path) : IMoveReceiver
             CreateNoWindow = true
         }
     };
-    public event EventHandler<(byte[], int)> OnMoveDataReceived;
-    public event EventHandler<string> OnConnectionEstablished;
-    public event EventHandler OnMessageSent;
+    public event EventHandler<(byte[], int)> OnMoveDataReceived = delegate { };
+    public event EventHandler<string> OnConnectionEstablished = delegate { };
+    public event EventHandler OnMessageSent = delegate { };
     public void Start()
     {
         process.Start();
@@ -50,12 +50,12 @@ class EngineIntegration(string path) : IMoveReceiver
     private string ReadResponse()
     {
         if (process is null || process.HasExited) return string.Empty;
-        string response = process.StandardOutput.ReadLine();
+        string response = process.StandardOutput.ReadLine() ?? string.Empty;
         Debug.WriteLine($"Received data: {response}");
         return response;
     }
 
-    public void Stop() => process?.Kill();
+    public void Stop() => process.Kill();
 
     public async void Listen()
     {
@@ -70,7 +70,7 @@ class EngineIntegration(string path) : IMoveReceiver
             {
                 var move = response.Split(" ")[1];
                 moves += move + " ";
-                OnMoveDataReceived?.Invoke(this, (Encoding.UTF8.GetBytes(move), move.Length));
+                OnMoveDataReceived.Invoke(this, (Encoding.UTF8.GetBytes(move), move.Length));
                 break;
             }
         }
@@ -84,7 +84,7 @@ class EngineIntegration(string path) : IMoveReceiver
             process.StandardInput.Flush();
         }
     }
-    public void ProcessMove(Move move)
+    public void ProcessMove(Engine.Move move)
     {
         moves += move + " ";
         Debug.WriteLine($"Move processed: {move}");
@@ -115,7 +115,7 @@ class EngineIntegration(string path) : IMoveReceiver
         {
             if (!response.StartsWith("option")) { response = ReadResponse(); continue; }
             var split = response.Split(" ");
-            string name = "";
+            string name = string.Empty;
             int i = 2;
             while (split[i] != "type")
             {
@@ -123,9 +123,9 @@ class EngineIntegration(string path) : IMoveReceiver
             }
             name = name.Trim();
             var type = split[i + 1];
-            string def = "";
-            string min = "";;
-            string max = "";;
+            string def = string.Empty;
+            string min = string.Empty;;
+            string max = string.Empty;;
             List<string> values = [];
             for (; i < split.Length; i++) {
                 var value = split[i];

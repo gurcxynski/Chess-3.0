@@ -1,0 +1,12 @@
+<div>
+    <button @onclick="() => StartBotGame(true)"> White </button>
+    <button @onclick="() => StartBotGame(false)"> Black </button>
+</div>
+
+@code {
+    [Inject]
+    public required NavigationManager NavigationManager { get; init; }
+    private void StartBotGame(bool white) {
+        NavigationManager.NavigateTo("/botgame");
+    }
+}
