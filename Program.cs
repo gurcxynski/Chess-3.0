@@ -1,10 +1,14 @@
 using Chess_3._0.Components;
+using Backend.Core;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+// Register game session service as singleton
+builder.Services.AddSingleton<GameSessionService>();
 
 var app = builder.Build();
 

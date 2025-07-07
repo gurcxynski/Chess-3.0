@@ -1,3 +1,5 @@
+@using Backend.Core
+
 <div>
     <button @onclick="() => StartBotGame(true)"> White </button>
     <button @onclick="() => StartBotGame(false)"> Black </button>
@@ -6,7 +8,12 @@
 @code {
     [Inject]
     public required NavigationManager NavigationManager { get; init; }
+    
+    [Inject]
+    public required GameSessionService GameSessionService { get; init; }
+    
     private void StartBotGame(bool white) {
-        NavigationManager.NavigateTo("/botgame");
+        var sessionId = GameSessionService.CreateBotGameSession(white);
+        NavigationManager.NavigateTo($"/botgame/{sessionId}");
     }
 }

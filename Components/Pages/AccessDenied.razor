@@ -1,0 +1,19 @@
+@page "/botgame"
+@page "/game"
+@rendermode InteractiveServer
+
+<div>
+    <h3>Access Denied</h3>
+    <p>Direct access to game pages is not allowed. Please start a new game from the home page.</p>
+    <button @onclick="GoHome">Go to Home</button>
+</div>
+
+@code {
+    [Inject]
+    public required NavigationManager NavigationManager { get; init; }
+    
+    private void GoHome()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+}

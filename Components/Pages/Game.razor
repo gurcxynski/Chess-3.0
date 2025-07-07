@@ -1,44 +1,44 @@
-﻿@page "/game"
+﻿@page "/localgame/{SessionId}"
 @rendermode InteractiveServer
 
+@using Backend.Core
 @using Backend.Engine
+@using Backend.Util
 
-@code {
-    Board board = new Board(Backend.Core.PositionLoader.LoadBoardSetup("Backend\\boardSetup.json"));
+@if (gameSession != null)
+{
+    <ChessBoard board="board" OnSquareSelected="((int col, int row) p) => SquareSelected(p.col, p.row)"  />
 }
-<h1> Turn: @(board.WhiteToMove ? "White" : "Black") </h1>
-<div class="chess-board">
-    @for (var row = 7; row >= 0; row--)
-    {
-        <div class="board-row">
-            @for (var col = 0; col < 8; col++)
-            {
-                var localCol = col;
-                var localRow = row;
-                var piece = board.GetPieceAt(col, row);
-                var isSelected = selected is not null && selected.Position.X == localCol && selected.Position.Y == localRow;
-                <button class="@(isSelected ? "selected" : string.Empty)" @onclick="() => SquareSelected(localCol, localRow)"> 
+else
+{
+    <div>
+        <h3>Access Denied</h3>
+        <p>Invalid or expired game session. Please start a new game.</p>
+        <button @onclick="ToStart">Go to Home</button>
+    </div>
+}
 
-                    @piece?.UnicodeIcon() 
-                    @if (col == 7)
-                    {
-                        <span class="row-number">@(row + 1)</span>
-                    }
-                    @if (row == 0)
-                    {
-                        <span class="col-letter">@((char)('a' + col))</span>
-                    }
-                </button>
-            }
-        </div>
-    }
-</div>
-<br />
-<button class="tostart" @onclick="ToStart"> Back </button>
 @code {
+    [Parameter] public string SessionId { get; set; } = string.Empty;
+    private GameSession? gameSession;
+    Board board = new Board(Backend.Core.PositionLoader.LoadBoardSetup("Backend\\boardSetup.json"));
+    
+    [Inject]
+    public required GameSessionService GameSessionService { get; init; }
     [Inject]
     public required NavigationManager NavigationManager { get; init; }
     Piece? selected;
+    
+    protected override void OnInitialized()
+    {
+        // Validate session
+        gameSession = GameSessionService.GetSession(SessionId);
+        
+        if (gameSession == null || gameSession.GameType != GameType.LocalGame)
+        {
+            return; // Invalid session, will show access denied
+        }
+    }
     private void ToStart()
     {
         NavigationManager.NavigateTo("/");

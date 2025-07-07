@@ -1,48 +1,46 @@
-@page "/botgame"
+@page "/botgame/{SessionId}"
 @rendermode InteractiveServer
 
 @using Backend.Core
 @using Backend.Engine
 @using Backend.Util
 
-@code { Board board = new Board(PositionLoader.LoadBoardSetup("Backend\\boardSetup.json")); }
-<h1> Turn: @(board.WhiteToMove ? "White" : "Black") </h1>
-<div class="chess-board">
-    @for (var row = 7; row >= 0; row--)
-    {
-        <div class="board-row">
-            @for (var col = 0; col < 8; col++)
-            {
-                var localCol = col;
-                var localRow = row;
-                var piece = board.GetPieceAt(col, row);
-                var isSelected = selected is not null && selected.Position.X == localCol && selected.Position.Y == localRow;
-                <button class="@(isSelected ? "selected" : string.Empty)" @onclick="() => SquareSelected(localCol, localRow)"> 
+@if (gameSession != null)
+{
+    <ChessBoard board="board" OnSquareSelected="((int col, int row) p) => SquareSelected(p.col, p.row)"  />
+}
+else
+{
+    <div>
+        <h3>Access Denied</h3>
+        <p>Invalid or expired game session. Please start a new game.</p>
+        <button @onclick="GoHome">Go to Home</button>
+    </div>
+}
 
-                    @piece?.UnicodeIcon() 
-                    @if (col == 7)
-                    {
-                        <span class="row-number">@(row + 1)</span>
-                    }
-                    @if (row == 0)
-                    {
-                        <span class="col-letter">@((char)('a' + col))</span>
-                    }
-                </button>
-            }
-        </div>
-    }
-</div>
-<br />
-<button class="tostart" @onclick="ToStart"> Back </button>
 @code {
-    bool playingWhite = true;
+    private Board board = new Board(PositionLoader.LoadBoardSetup("Backend\\boardSetup.json"));
+    [Parameter] public string SessionId { get; set; } = string.Empty;
+    private GameSession? gameSession;
+    private bool PlayerIsWhite => gameSession?.PlayerIsWhite ?? true;
+    
+    [Inject]
+    public required GameSessionService GameSessionService { get; init; }
     [Inject]
     public required NavigationManager NavigationManager { get; init; }
-    Backend.Interfaces.IStatelessOpponent api = new ChessAPI();
-    Piece? selected;    
+    private Backend.Interfaces.IStatelessOpponent api = new ChessAPI();
+    Piece? selected;
+    
     protected override void OnInitialized()
     {
+        // Validate session
+        gameSession = GameSessionService.GetSession(SessionId);
+        
+        if (gameSession == null || gameSession.GameType != GameType.BotGame)
+        {
+            return; // Invalid session, will show access denied
+        }
+        
         api.OnMoveDataReceived += (sender, e) =>
         {
             Console.WriteLine($"Received move data: {System.Text.Encoding.UTF8.GetString(e.Item1, 0, e.Item2)}");
@@ -58,15 +56,18 @@
         board.OnGameOver += (sender, e) =>
         {
             Console.WriteLine("Game over");
+            // Invalidate session when game is over
+            GameSessionService.InvalidateSession(SessionId);
         };
     }
-    private void ToStart()
+    
+    private void GoHome()
     {
         NavigationManager.NavigateTo("/");
     }
     private void SquareSelected(int col, int row)
     {
-        if (board.WhiteToMove != playingWhite) return;
+        if (board.WhiteToMove != PlayerIsWhite) return;
         Piece? clicked = board.GetPieceAt(col, row);
         if ((selected is null && clicked is null) || (selected is null && clicked is not null && clicked.IsWhite != board.WhiteToMove)) return;
         if (selected is null || clicked?.IsWhite == board.WhiteToMove)
