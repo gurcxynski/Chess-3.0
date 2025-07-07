@@ -8,6 +8,7 @@ namespace Backend.Engine;
 
 public class Board
 {
+	public static string DefaultFEN => "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 	internal List<Piece> Pieces { get; private init; } = [];
 	internal IEnumerable<Piece> WhitePieces => Pieces.Where(piece => piece.IsWhite);
 	internal IEnumerable<Piece> BlackPieces => Pieces.Where(piece => !piece.IsWhite);

@@ -1,0 +1,54 @@
+@using Backend.Core
+@using Backend.Engine
+@using Backend.Util
+
+@code {
+	[Parameter] public bool InvertView { get; init; } = false;
+	[Parameter] public string SessionId { get; init; } = string.Empty;
+	[Parameter] public EventCallback<GameSession> OnGameInitialized { get; set; }
+	[Parameter] public EventCallback<((int col, int row), Board board)> OnSquareSelected { get; set; }
+}
+
+@if (gameSession != null)
+{	
+	<h3>Turn: @(Board.WhiteToMove ? "White" : "Black")</h3>
+	<ChessBoard Board="Board" OnSquareSelected="@(async (tuple) => await HandleSquareSelected(tuple))" InvertView="InvertView" />
+	<div class="game-info">
+		<p>Session ID: @SessionId</p>
+		<p>Player is @(gameSession.PlayerIsWhite ? "White" : "Black")</p>
+		<button @onclick="ToStart">Go to Home</button>
+	</div>
+}
+else
+{
+	<div>
+		<h3>Access Denied</h3>
+		<p>Invalid or expired game session. Please start a new game.</p>
+		<button @onclick="ToStart">Go to Home</button>
+	</div>
+}
+
+@code {
+	[Inject] public required GameSessionService GameSessionService { get; init; }
+	[Inject] public required NavigationManager NavigationManager { get; init; }
+	
+	public Board Board { get; } = new Board(PositionLoader.LoadBoardSetup("Backend\\boardSetup.json"));
+	private GameSession? gameSession;
+	public Piece? Selected { get; set; }
+	
+	protected override async Task OnInitializedAsync()
+	{
+		// Validate session
+		gameSession = GameSessionService.GetSession(SessionId);
+		
+		if (gameSession == null)
+		{
+			return; // Invalid session, will show access denied
+		}
+		
+		await OnGameInitialized.InvokeAsync(gameSession);
+	}
+	
+	private async Task HandleSquareSelected((int, int) tuple) => await OnSquareSelected.InvokeAsync((tuple, Board));
+	private void ToStart() => NavigationManager.NavigateTo("/");
+}

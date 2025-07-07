@@ -1,0 +1,213 @@
+/* Container for the entire board */
+.chess-board {
+	display: inline-block;
+	border: 2px solid #333;
+	margin: 20px;
+}
+
+.board-row {
+	display: flex;
+	margin: 0;
+	padding: 0;
+}
+
+.board-row button {
+	width: 60px;
+	height: 60px;
+	border: 1px solid #333;
+	margin: 0;
+	padding: 0;
+	font-size: 40px;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: background-color 0.2s ease;
+	position: relative;
+	color: #000; /* Default piece color */
+	text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+}
+
+/* Alternating square colors */
+.board-row:nth-child(odd) button:nth-child(odd),
+.board-row:nth-child(even) button:nth-child(even) {
+	background-color: #f0d9b5; /* Light squares */
+	color: #000; /* Black pieces on light squares */
+}
+
+.board-row:nth-child(odd) button:nth-child(even),
+.board-row:nth-child(even) button:nth-child(odd) {
+	background-color: #b58863; /* Dark squares */
+	color: #fff; /* White pieces on dark squares */
+}
+
+/* Row numbers */
+.row-number {
+	position: absolute;
+	top: 2px;
+	right: 2px;
+	font-size: 12px;
+	font-weight: bold;
+	pointer-events: none;
+	z-index: 1;
+	padding: 1px 3px;
+	border-radius: 2px;
+	line-height: 1;
+	text-shadow: none;
+}
+
+.board-row:nth-child(odd) button:nth-child(odd) .row-number,
+.board-row:nth-child(even) button:nth-child(even) .row-number {
+	color: #b58863;
+}
+
+.board-row:nth-child(odd) button:nth-child(even) .row-number,
+.board-row:nth-child(even) button:nth-child(odd) .row-number {
+	color: #f0d9b5;
+}
+
+/* Column letters */
+.col-letter {
+	position: absolute;
+	bottom: 2px;
+	left: 2px;
+	font-size: 12px;
+	font-weight: bold;
+	pointer-events: none;
+	z-index: 1;
+	padding: 1px 3px;
+	border-radius: 2px;
+	line-height: 1;
+	text-shadow: none;
+}
+
+.board-row:nth-child(odd) button:nth-child(odd) .col-letter,
+.board-row:nth-child(even) button:nth-child(even) .col-letter {
+	color: #b58863;
+}
+
+.board-row:nth-child(odd) button:nth-child(even) .col-letter,
+.board-row:nth-child(even) button:nth-child(odd) .col-letter {
+	color: #f0d9b5;
+}
+
+/* Selected piece highlighting */
+.board-row button.selected {
+	background-color: #f39c12 !important; /* Orange highlight for selected */
+	box-shadow: 0 0 15px rgba(243, 156, 18, 0.8), inset 0 0 0 3px #e67e22;
+	border: 2px solid #d35400 !important;
+	transform: scale(1.02);
+	z-index: 10;
+	position: relative;
+}
+
+/* Different highlight for selected piece on dark/light squares */
+.board-row:nth-child(odd) button:nth-child(odd).selected,
+.board-row:nth-child(even) button:nth-child(even).selected {
+	background-color: #fff176 !important; /* Lighter yellow for light squares */
+}
+
+.board-row:nth-child(odd) button:nth-child(even).selected,
+.board-row:nth-child(even) button:nth-child(odd).selected {
+	background-color: #ffb300 !important; /* Darker yellow for dark squares */
+}
+
+/* Unselected button styling */
+.board-row button.unselected {
+	/* Default styling - will use the alternating colors */
+	box-shadow: none;
+	transform: none;
+	transition: all 0.2s ease;
+}
+
+/* Hover effects */
+.board-row button:hover {
+	opacity: 0.8;
+	transform: scale(1.05);
+}
+
+.board-row button.unselected:hover {
+	box-shadow: inset 0 0 0 2px rgba(52, 152, 219, 0.6);
+	transform: scale(1.02);
+}
+
+/* Active/selected state */
+.board-row button:active {
+	transform: scale(0.95);
+}
+
+/* Focus styling */
+.board-row button:focus {
+	outline: 2px solid #4CAF50;
+	outline-offset: -2px;
+}
+
+/* Possible move indicators (if you want to add this later) */
+.board-row button.possible-move {
+	box-shadow: inset 0 0 0 3px rgba(46, 204, 113, 0.7);
+}
+
+.board-row button.possible-move:hover {
+	background-color: rgba(46, 204, 113, 0.3) !important;
+}
+
+/* Attack move indicators */
+.board-row button.attack-move {
+	box-shadow: inset 0 0 0 3px rgba(231, 76, 60, 0.7);
+}
+
+.board-row button.attack-move:hover {
+	background-color: rgba(231, 76, 60, 0.3) !important;
+}
+
+/* Selected piece with piece on it gets special treatment */
+.board-row button.selected:not(:empty) {
+	animation: pulse-selected 1.5s infinite;
+}
+
+@keyframes pulse-selected {
+	0% {
+		box-shadow: 0 0 15px rgba(243, 156, 18, 0.8), inset 0 0 0 3px #e67e22;
+	}
+	50% {
+		box-shadow: 0 0 25px rgba(243, 156, 18, 1), inset 0 0 0 4px #e67e22;
+	}
+	100% {
+		box-shadow: 0 0 15px rgba(243, 156, 18, 0.8), inset 0 0 0 3px #e67e22;
+	}
+}
+
+/* Ensure piece symbols are properly styled */
+.board-row button .piece-symbol {
+	font-size: 2.5rem;
+	line-height: 1;
+	pointer-events: none;
+	user-select: none;
+}
+
+/* Piece color override based on actual piece color, not square color */
+.board-row button.white-piece {
+	color: #ffffff !important;
+	text-shadow: 2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.6);
+}
+
+.board-row button.black-piece {
+	color: #000000 !important;
+	text-shadow: 2px 2px 4px rgba(255,255,255,0.8), -1px -1px 2px rgba(255,255,255,0.6);
+}
+
+/* Enhanced piece visibility */
+.board-row button {
+	text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+}
+
+/* Special handling for selected pieces */
+.board-row button.selected.white-piece {
+	color: #ffffff !important;
+	text-shadow: 2px 2px 6px rgba(0,0,0,0.9), -1px -1px 3px rgba(0,0,0,0.7);
+}
+
+.board-row button.selected.black-piece {
+	color: #000000 !important;
+	text-shadow: 2px 2px 6px rgba(255,255,255,0.9), -1px -1px 3px rgba(255,255,255,0.7);
+}

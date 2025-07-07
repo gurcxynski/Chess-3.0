@@ -1,0 +1,36 @@
+@using Backend.Core
+@using Backend.Engine
+
+@code { 
+	[Parameter] public Board Board { get; init; } = null!;
+	[Parameter] public EventCallback<(int, int)> OnSquareSelected { get; set; }
+	[Parameter] public bool InvertView { get; init; } = false;
+	Piece? selected;
+}
+<div class="chess-board">
+	@for (var row = (InvertView ? 0 : 7); (InvertView ? row < 8 : row >= 0); row += (InvertView ? 1 : -1))
+	{
+		<div class="board-row">
+			@for (var col = (InvertView ? 7 : 0); (InvertView ? col >= 0 : col < 8); col += (InvertView ? -1 : 1))
+			{
+				var localCol = col;
+				var localRow = row;
+				var piece = Board.GetPieceAt(col, row);
+				var isSelected = selected is not null && selected.Position.X == localCol && selected.Position.Y == localRow;
+				var pieceColorClass = piece?.IsWhite == true ? "white-piece" : piece?.IsWhite == false ? "black-piece" : "";
+				<button class="@(isSelected ? "selected" : "unselected") @pieceColorClass" @onclick="() => OnSquareSelected.InvokeAsync((localCol, localRow))"> 
+
+					@piece?.UnicodeIcon()
+					@if (col == (InvertView ? 0 : 7))
+					{
+						<span class="row-number">@(row + 1)</span>
+					}
+					@if (row == (InvertView ? 7 : 0))
+					{
+						<span class="col-letter">@((char)('a' + col))</span>
+					}
+				</button>
+			}
+		</div>
+	}
+</div>
