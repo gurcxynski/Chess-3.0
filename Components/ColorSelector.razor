@@ -1,19 +1,19 @@
 @using Backend.Core
 
 <div>
-    <button @onclick="() => StartBotGame(true)"> White </button>
-    <button @onclick="() => StartBotGame(false)"> Black </button>
+	<button @onclick="() => StartBotGame(true)"> White </button>
+	<button @onclick="() => StartBotGame(false)"> Black </button>
 </div>
 
 @code {
-    [Inject]
-    public required NavigationManager NavigationManager { get; init; }
-    
-    [Inject]
-    public required GameSessionService GameSessionService { get; init; }
-    
-    private void StartBotGame(bool white) {
-        var sessionId = GameSessionService.CreateBotGameSession(white);
-        NavigationManager.NavigateTo($"/botgame/{sessionId}");
-    }
+	[Inject]
+	public required NavigationManager NavigationManager { get; init; }
+	
+	[Inject]
+	public required GameSessionService GameSessionService { get; init; }
+	
+	private void StartBotGame(bool white) {
+		var sessionId = GameSessionService.CreateBotGameSession(white);
+		NavigationManager.NavigateTo($"/botgame/{sessionId}");
+	}
 }

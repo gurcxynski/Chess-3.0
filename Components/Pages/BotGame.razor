@@ -7,82 +7,82 @@
 
 @if (gameSession != null)
 {
-    <ChessBoard board="board" OnSquareSelected="((int col, int row) p) => SquareSelected(p.col, p.row)"  />
+	<ChessBoard board="board" OnSquareSelected="((int col, int row) p) => SquareSelected(p.col, p.row)"  />
 }
 else
 {
-    <div>
-        <h3>Access Denied</h3>
-        <p>Invalid or expired game session. Please start a new game.</p>
-        <button @onclick="GoHome">Go to Home</button>
-    </div>
+	<div>
+		<h3>Access Denied</h3>
+		<p>Invalid or expired game session. Please start a new game.</p>
+		<button @onclick="GoHome">Go to Home</button>
+	</div>
 }
 
 @code {
-    private Board board = new Board(PositionLoader.LoadBoardSetup("Backend\\boardSetup.json"));
-    [Parameter] public string SessionId { get; set; } = string.Empty;
-    private GameSession? gameSession;
-    private bool PlayerIsWhite => gameSession?.PlayerIsWhite ?? true;
-    
-    [Inject]
-    public required GameSessionService GameSessionService { get; init; }
-    [Inject]
-    public required NavigationManager NavigationManager { get; init; }
-    private Backend.Interfaces.IStatelessOpponent api = new ChessAPI();
-    Piece? selected;
-    
-    protected override void OnInitialized()
-    {
-        // Validate session
-        gameSession = GameSessionService.GetSession(SessionId);
-        
-        if (gameSession == null || gameSession.GameType != GameType.BotGame)
-        {
-            return; // Invalid session, will show access denied
-        }
-        
-        api.OnMoveDataReceived += (sender, e) =>
-        {
-            Console.WriteLine($"Received move data: {System.Text.Encoding.UTF8.GetString(e.Item1, 0, e.Item2)}");
-            var move = MoveHelper.TryCreatingMove(board, System.Text.Encoding.UTF8.GetString(e.Item1, 0, e.Item2));
-            if (move is null)
-            {
-                Console.WriteLine("Invalid move received from bot");
-                return;
-            }
-            board.ExecuteMove(move);
-            StateHasChanged();
-        };
-        board.OnGameOver += (sender, e) =>
-        {
-            Console.WriteLine("Game over");
-            // Invalidate session when game is over
-            GameSessionService.InvalidateSession(SessionId);
-        };
-    }
-    
-    private void GoHome()
-    {
-        NavigationManager.NavigateTo("/");
-    }
-    private void SquareSelected(int col, int row)
-    {
-        if (board.WhiteToMove != PlayerIsWhite) return;
-        Piece? clicked = board.GetPieceAt(col, row);
-        if ((selected is null && clicked is null) || (selected is null && clicked is not null && clicked.IsWhite != board.WhiteToMove)) return;
-        if (selected is null || clicked?.IsWhite == board.WhiteToMove)
-        {
-            selected = clicked;
-            return;
-        }
-        Move? move = selected.TryCreatingMove(col, row, board);
-        if (move is null) {
-            Console.WriteLine("Invalid move");
-            return;
-        }
-        board.ExecuteMove(move);
-        api.SendFen(board.ToString());
-        selected = null;
-        return;
-    }
+	private Board board = new Board(PositionLoader.LoadBoardSetup("Backend\\boardSetup.json"));
+	[Parameter] public string SessionId { get; set; } = string.Empty;
+	private GameSession? gameSession;
+	private bool PlayerIsWhite => gameSession?.PlayerIsWhite ?? true;
+	
+	[Inject]
+	public required GameSessionService GameSessionService { get; init; }
+	[Inject]
+	public required NavigationManager NavigationManager { get; init; }
+	private Backend.Interfaces.IStatelessOpponent api = new ChessAPI();
+	Piece? selected;
+	
+	protected override void OnInitialized()
+	{
+		// Validate session
+		gameSession = GameSessionService.GetSession(SessionId);
+		
+		if (gameSession == null || gameSession.GameType != GameType.BotGame)
+		{
+			return; // Invalid session, will show access denied
+		}
+		
+		api.OnMoveDataReceived += (sender, e) =>
+		{
+			Console.WriteLine($"Received move data: {System.Text.Encoding.UTF8.GetString(e.Item1, 0, e.Item2)}");
+			var move = MoveHelper.TryCreatingMove(board, System.Text.Encoding.UTF8.GetString(e.Item1, 0, e.Item2));
+			if (move is null)
+			{
+				Console.WriteLine("Invalid move received from bot");
+				return;
+			}
+			board.ExecuteMove(move);
+			StateHasChanged();
+		};
+		board.OnGameOver += (sender, e) =>
+		{
+			Console.WriteLine("Game over");
+			// Invalidate session when game is over
+			GameSessionService.InvalidateSession(SessionId);
+		};
+	}
+	
+	private void GoHome()
+	{
+		NavigationManager.NavigateTo("/");
+	}
+	private void SquareSelected(int col, int row)
+	{
+		if (board.WhiteToMove != PlayerIsWhite) return;
+		Piece? clicked = board.GetPieceAt(col, row);
+		if ((selected is null && clicked is null) || (selected is null && clicked is not null && clicked.IsWhite != board.WhiteToMove)) return;
+		if (selected is null || clicked?.IsWhite == board.WhiteToMove)
+		{
+			selected = clicked;
+			return;
+		}
+		Move? move = selected.TryCreatingMove(col, row, board);
+		if (move is null) {
+			Console.WriteLine("Invalid move");
+			return;
+		}
+		board.ExecuteMove(move);
+		api.SendFen(board.ToString());
+		selected = null;
+		return;
+	}
 }

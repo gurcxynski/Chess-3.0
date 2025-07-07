@@ -6,34 +6,34 @@
 <h1>Welcome to WebChess!</h1>  
 
 <div class="startmenu">  
-    <button @onclick="NewLocalGame"> Play locally </button>
-    <button @onclick="NewOnlineGame"> Play with a friend </button>
-    <button @onclick="NewBotGame"> Play against computer </button>
+	<button @onclick="NewLocalGame"> Play locally </button>
+	<button @onclick="NewOnlineGame"> Play with a friend </button>
+	<button @onclick="NewBotGame"> Play against computer </button>
 </div>
 
 @if (showColorSelector) {
-    <ColorSelector />
+	<ColorSelector />
 }
 
 
 @code {
-    [Inject]
-    public required NavigationManager NavigationManager { get; init; }
-    
-    [Inject]
-    public required GameSessionService GameSessionService { get; init; }
-    
-    bool showColorSelector = false;
-    private void NewLocalGame()
-    {
-        var sessionId = GameSessionService.CreateLocalGameSession();
-        NavigationManager.NavigateTo($"/localgame/{sessionId}");
-    }
-    private void NewOnlineGame()
-    {
-        showColorSelector = true;
-    }
-    private void NewBotGame() {
-        showColorSelector = true;
-    }
+	[Inject]
+	public required NavigationManager NavigationManager { get; init; }
+	
+	[Inject]
+	public required GameSessionService GameSessionService { get; init; }
+	
+	bool showColorSelector = false;
+	private void NewLocalGame()
+	{
+		var sessionId = GameSessionService.CreateLocalGameSession();
+		NavigationManager.NavigateTo($"/localgame/{sessionId}");
+	}
+	private void NewOnlineGame()
+	{
+		showColorSelector = true;
+	}
+	private void NewBotGame() {
+		showColorSelector = true;
+	}
 }

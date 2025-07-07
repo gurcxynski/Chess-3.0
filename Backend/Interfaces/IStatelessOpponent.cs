@@ -2,5 +2,5 @@
 
 internal interface IStatelessOpponent : IOpponent
 {
-    public void SendFen(string fen);
+	public void SendFen(string fen);
 }
