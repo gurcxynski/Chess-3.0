@@ -1,25 +1,22 @@
 @page "/botgame/{SessionId}"
 @rendermode InteractiveServer
-
 @using Backend.Core
 @using Backend.Engine
+
+<GamePage @ref="gamePageRef"
+    SessionId="@SessionId"
+    OnSquareSelected="HandleSquareSelected"
+    OnGameInitialized="InitializeBotGame" 
+    InvertView="InvertView" />
 
 @code {
 	[Parameter] public string SessionId { get; set; } = string.Empty;
 	[Parameter] public bool InvertView { get; set; } = false;
-}
 
-<GamePage @ref="gamePageRef" 
-          SessionId="@SessionId" 
-          OnGameInitialized="InitializeBotGame" 
-          OnSquareSelected="HandleSquareSelected"
-		  InvertView="InvertView" />
-
-@code {
 	private GamePage? gamePageRef;
 	private Backend.Interfaces.IStatelessOpponent api = new ChessAPI();
 	private bool PlayerIsWhite;
-	
+
 	private Task InitializeBotGame(GameSession gameSession)
 	{
 		PlayerIsWhite = gameSession.PlayerIsWhite;
@@ -36,29 +33,27 @@
 
 		return Task.CompletedTask;
 	}
-	
+
 	private Task HandleSquareSelected(((int, int) tuple, Board board) data)
 	{
 		var ((col, row), board) = data;
-		
+		Console.WriteLine(board.WhiteToMove + ", " + PlayerIsWhite);
 		if (board.WhiteToMove != PlayerIsWhite) return Task.CompletedTask;
-		
 		Piece? clicked = board.GetPieceAt(col, row);
 		if ((gamePageRef!.Selected is null && clicked is null) || (gamePageRef!.Selected is null && clicked is not null && clicked.IsWhite != board.WhiteToMove)) return Task.CompletedTask;
-		
+
 		if (gamePageRef!.Selected is null || clicked?.IsWhite == board.WhiteToMove)
 		{
 			gamePageRef!.Selected = clicked;
 			return Task.CompletedTask;
 		}
-		
 		Move? move = gamePageRef!.Selected.TryCreatingMove(col, row, board);
 		if (move is null) return Task.CompletedTask;
-		
+
 		board.ExecuteMove(move);
 		api.SendFen(board.ToString());
 		gamePageRef!.Selected = null;
-		
+
 		return Task.CompletedTask;
 	}
 }

@@ -1,54 +1,65 @@
 @using Backend.Core
 @using Backend.Engine
 @using Backend.Util
+@using MudBlazor
 
 @code {
-	[Parameter] public bool InvertView { get; init; } = false;
-	[Parameter] public string SessionId { get; init; } = string.Empty;
-	[Parameter] public EventCallback<GameSession> OnGameInitialized { get; set; }
-	[Parameter] public EventCallback<((int col, int row), Board board)> OnSquareSelected { get; set; }
+    [Parameter] public bool InvertView { get; init; } = false;
+    [Parameter] public string SessionId { get; init; } = string.Empty;
+    [Parameter] public EventCallback<GameSession> OnGameInitialized { get; set; }
+    [Parameter] public EventCallback<((int col, int row), Board board)> OnSquareSelected { get; set; }
 }
 
-@if (gameSession != null)
-{	
-	<h3>Turn: @(Board.WhiteToMove ? "White" : "Black")</h3>
-	<ChessBoard Board="Board" OnSquareSelected="@(async (tuple) => await HandleSquareSelected(tuple))" InvertView="InvertView" />
-	<div class="game-info">
-		<p>Session ID: @SessionId</p>
-		<p>Player is @(gameSession.PlayerIsWhite ? "White" : "Black")</p>
-		<button @onclick="ToStart">Go to Home</button>
-	</div>
-}
-else
-{
-	<div>
-		<h3>Access Denied</h3>
-		<p>Invalid or expired game session. Please start a new game.</p>
-		<button @onclick="ToStart">Go to Home</button>
-	</div>
-}
+<MudContainer MaxWidth="MaxWidth.Medium">
+    @if (gameSession != null)
+    {
+        <MudStack Spacing="3" AlignItems="AlignItems.Center">
+            <ChessBoard Board="Board" OnSquareSelected="@(async (tuple) => await HandleSquareSelected(tuple))" InvertView="InvertView" />
+            <MudPaper>
+            <MudText Typo="Typo.h4" Align="Align.Center"> Turn: @(Board.WhiteToMove ? "White" : "Black") </MudText>
+            <MudText Typo="Typo.subtitle2">Session ID: @SessionId</MudText>
+            </MudPaper>
+        </MudStack>            
+        <MudButton OnClick="ToStart"> Go to Home </MudButton>
+        
+    }
+    else
+    {
+        <MudPaper>
+            <MudText Typo="Typo.h4" Align="Align.Center" >
+                Access Denied
+            </MudText>
+            <MudText Typo="Typo.body1" Align="Align.Center" >
+                Invalid or expired game session. Please start a new game.
+            </MudText>
+            <MudButton OnClick="ToStart">
+                Go to Home
+            </MudButton>
+        </MudPaper>
+    }
+</MudContainer>
 
 @code {
-	[Inject] public required GameSessionService GameSessionService { get; init; }
-	[Inject] public required NavigationManager NavigationManager { get; init; }
-	
-	public Board Board { get; } = new Board(PositionLoader.LoadBoardSetup("Backend\\boardSetup.json"));
-	private GameSession? gameSession;
-	public Piece? Selected { get; set; }
-	
-	protected override async Task OnInitializedAsync()
-	{
-		// Validate session
-		gameSession = GameSessionService.GetSession(SessionId);
-		
-		if (gameSession == null)
-		{
-			return; // Invalid session, will show access denied
-		}
-		
-		await OnGameInitialized.InvokeAsync(gameSession);
-	}
-	
-	private async Task HandleSquareSelected((int, int) tuple) => await OnSquareSelected.InvokeAsync((tuple, Board));
-	private void ToStart() => NavigationManager.NavigateTo("/");
+    [Inject] public required GameSessionService GameSessionService { get; init; }
+    [Inject] public required NavigationManager NavigationManager { get; init; }
+
+    public Board Board { get; } = new Board(PositionLoader.LoadBoardSetup("Backend\\boardSetup.json"));
+    private GameSession? gameSession;
+    public Piece? Selected { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Validate session
+        gameSession = GameSessionService.GetSession(SessionId);
+
+        if (gameSession == null)
+        {
+            return; // Invalid session, will show access denied
+        }
+
+        await OnGameInitialized.InvokeAsync(gameSession);
+    }
+
+    private async Task HandleSquareSelected((int, int) tuple) => await OnSquareSelected.InvokeAsync((tuple, Board));
+    private void ToStart() => NavigationManager.NavigateTo("/");
 }

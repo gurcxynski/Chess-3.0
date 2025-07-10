@@ -1,7 +1,7 @@
 @using Backend.Core
 @using Backend.Engine
 
-@code { 
+@code {
 	[Parameter] public Board Board { get; init; } = null!;
 	[Parameter] public EventCallback<(int, int)> OnSquareSelected { get; set; }
 	[Parameter] public bool InvertView { get; init; } = false;
@@ -18,7 +18,7 @@
 				var piece = Board.GetPieceAt(col, row);
 				var isSelected = selected is not null && selected.Position.X == localCol && selected.Position.Y == localRow;
 				var pieceColorClass = piece?.IsWhite == true ? "white-piece" : piece?.IsWhite == false ? "black-piece" : "";
-				<button class="@(isSelected ? "selected" : "unselected") @pieceColorClass" @onclick="() => OnSquareSelected.InvokeAsync((localCol, localRow))"> 
+				<button class="@(isSelected ? "selected" : "unselected") @pieceColorClass" @onclick="() => OnSquareSelected.InvokeAsync((localCol, localRow))">
 
 					@piece?.UnicodeIcon()
 					@if (col == (InvertView ? 0 : 7))

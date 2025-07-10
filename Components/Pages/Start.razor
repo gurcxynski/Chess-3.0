@@ -1,39 +1,50 @@
 ﻿@using Chess.Components
 @using Backend.Core
+@using MudBlazor
 @page "/"  
 @rendermode InteractiveServer 
 
-<h1>Welcome to WebChess!</h1>  
+<MudContainer MaxWidth="MaxWidth.Medium">
+    <MudPaper Class="pa-8" Elevation="3">
+        <MudText Typo="Typo.h3" Align="Align.Center" >
+            Welcome to WebChess!
+        </MudText>
+        
+        <MudText Typo="Typo.body1" Align="Align.Center"  Color="Color.Secondary">
+            Choose your game mode and start playing!
+        </MudText>
 
-<div class="startmenu">  
-	<button @onclick="NewLocalGame"> Play locally </button>
-	<button @onclick="NewOnlineGame"> Play with a friend </button>
-	<button @onclick="NewBotGame"> Play against computer </button>
-</div>
-
-@if (showColorSelector) {
-	<ColorSelector />
-}
-
+        <MudGrid Justify="Justify.Center" Spacing="6">
+                <MudButton 
+                    Size="Size.Large" 
+                    OnClick="NewLocalGame"
+                    Class="game-mode-button">
+                    <MudText Typo="Typo.button">Play Locally</MudText>
+                </MudButton>
+                <MudButton 
+                    Size="Size.Large" 
+                    OnClick="NewBotGame"
+                    Class="game-mode-button">
+                    <MudText Typo="Typo.button">Play vs Computer</MudText>
+                </MudButton>
+        </MudGrid>
+    </MudPaper>
+</MudContainer>
 
 @code {
-	[Inject]
-	public required NavigationManager NavigationManager { get; init; }
-	
-	[Inject]
-	public required GameSessionService GameSessionService { get; init; }
-	
-	bool showColorSelector = false;
-	private void NewLocalGame()
-	{
-		var sessionId = GameSessionService.CreateLocalGameSession();
-		NavigationManager.NavigateTo($"/localgame/{sessionId}");
-	}
-	private void NewOnlineGame()
-	{
-		showColorSelector = true;
-	}
-	private void NewBotGame() {
-		showColorSelector = true;
-	}
+    [Inject]
+    public required NavigationManager NavigationManager { get; init; }
+    
+    [Inject]
+    public required GameSessionService GameSessionService { get; init; }
+    private void NewLocalGame()
+    {
+        var sessionId = GameSessionService.CreateLocalGameSession();
+        NavigationManager.NavigateTo($"/localgame/{sessionId}");
+    }
+    private void NewBotGame()
+    {
+        var sessionId = GameSessionService.CreateBotGameSession(true);
+        NavigationManager.NavigateTo($"/botgame/{sessionId}");
+    }
 }

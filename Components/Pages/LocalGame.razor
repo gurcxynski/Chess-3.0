@@ -1,43 +1,47 @@
 ﻿@page "/localgame/{SessionId}"
 @rendermode InteractiveServer
-
 @using Backend.Core
 @using Backend.Engine
 
-@code {
-	[Parameter] public string SessionId { get; set; } = string.Empty;
-	[Parameter] public bool InvertView { get; set; } = false;
-}
-
-<GamePage @ref="gamePageRef" 
-          SessionId="@SessionId" 
-          OnSquareSelected="HandleSquareSelected"
-		  InvertView="InvertView" />
+<GamePage @ref="gamePageRef"
+    SessionId="@SessionId"
+    OnSquareSelected="HandleSquareSelected"
+    InvertView="InvertView" />
 
 @code {
-	private GamePage? gamePageRef;
-	private Task HandleSquareSelected(((int, int) tuple, Board board) data)
-	{
-		var ((col, row), board) = data;
-		
-		Piece? clicked = board.GetPieceAt(col, row);
-		if ((gamePageRef!.Selected is null && clicked is null) || (gamePageRef!.Selected is null && clicked is not null && clicked.IsWhite != board.WhiteToMove)) return Task.CompletedTask;
-		
-		if (gamePageRef!.Selected is null || clicked?.IsWhite == board.WhiteToMove)
-		{
-			gamePageRef!.Selected = clicked;
-			return Task.CompletedTask;
-		}
-		
-		Move? move = gamePageRef!.Selected.TryCreatingMove(col, row, board);
-		if (move is null) {
-			Console.WriteLine("Invalid move");
-			return Task.CompletedTask;
-		}
-		
-		board.ExecuteMove(move);
-		gamePageRef!.Selected = null;
-		
-		return Task.CompletedTask;
-	}
+    [Parameter] public string SessionId { get; set; } = string.Empty;
+    [Parameter] public bool InvertView { get; set; } = false;
+
+    private GamePage? gamePageRef;
+    
+    private Task HandleSquareSelected(((int, int) tuple, Board board) data)
+    {
+        var ((col, row), board) = data;
+        
+        Piece? clicked = board.GetPieceAt(col, row);
+        if ((gamePageRef!.Selected is null && clicked is null) || (gamePageRef!.Selected is null && clicked is not null && clicked.IsWhite != board.WhiteToMove)) return Task.CompletedTask;
+        
+        if (gamePageRef!.Selected is null || clicked?.IsWhite == board.WhiteToMove)
+        {
+            gamePageRef!.Selected = clicked;
+            return Task.CompletedTask;
+        }
+        
+        Move? move = gamePageRef!.Selected.TryCreatingMove(col, row, board);
+        if (move is null) {
+            Console.WriteLine("Invalid move");
+            return Task.CompletedTask;
+        }
+        
+        board.ExecuteMove(move);
+        gamePageRef!.Selected = null;
+        
+        return Task.CompletedTask;
+    }
+    
+    private void FlipBoard()
+    {
+        InvertView = !InvertView;
+        StateHasChanged();
+    }
 }
