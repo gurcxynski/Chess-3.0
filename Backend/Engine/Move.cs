@@ -18,4 +18,25 @@ public class Move(Vector2 start, Vector2 end, Piece movedPiece, Piece? capturedP
 	internal bool IsCastles { get; private init; } = castles;
 	internal bool IsFirstMoveOfPiece { get; private init; } = firstMove;
 	override public string ToString() => MoveHelper.ToFieldString(Start) + MoveHelper.ToFieldString(End) + (PromotionPieceType?.Name[0].ToString().ToLower() ?? string.Empty);
+	public string AlgebraicNotation
+	{
+		get
+		{
+			string result = "";
+			if (IsCastles) return Start.X < End.X ? "O-O" : "O-O-O";
+			result += MovePieceType.Name switch
+        	{
+        	    "Knight" => "N",
+        	    "Bishop" => "B",
+        	    "Rook" => "R",
+        	    "Queen" => "Q",
+        	    "King" => "K",
+        	    _ => "",
+        	};
+			if (IsCapture) result += "x";
+			result += MoveHelper.ToFieldString(End);
+			if (IsPromotion) result += "=" + (PromotionPieceType?.Name[0].ToString().ToLower() ?? string.Empty);
+			return result;
+		}
+	}
 }

@@ -1,12 +1,17 @@
 @page "/botgame"
 @page "/game"
 @rendermode InteractiveServer
-
-<div>
-	<h3>Access Denied</h3>
-	<p>Direct access to game pages is not allowed. Please start a new game from the home page.</p>
-	<button @onclick="GoHome">Go to Home</button>
-</div>
+@using MudBlazor
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-4">
+    <MudAlert Severity="Severity.Warning" Variant="Variant.Filled" Class="mb-4">
+        <MudText Typo="Typo.h5">Access Denied</MudText>
+        <MudText Typo="Typo.body1">Direct access to game pages is not allowed. Please start a new game from the home page.</MudText>
+    </MudAlert>
+    
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="GoHome">
+        Go to Home
+    </MudButton>
+</MudContainer>
 
 @code {
 	[Inject]

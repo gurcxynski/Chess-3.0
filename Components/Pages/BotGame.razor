@@ -37,7 +37,6 @@
 	private Task HandleSquareSelected(((int, int) tuple, Board board) data)
 	{
 		var ((col, row), board) = data;
-		Console.WriteLine(board.WhiteToMove + ", " + PlayerIsWhite);
 		if (board.WhiteToMove != PlayerIsWhite) return Task.CompletedTask;
 		Piece? clicked = board.GetPieceAt(col, row);
 		if ((gamePageRef!.Selected is null && clicked is null) || (gamePageRef!.Selected is null && clicked is not null && clicked.IsWhite != board.WhiteToMove)) return Task.CompletedTask;

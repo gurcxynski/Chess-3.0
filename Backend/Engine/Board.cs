@@ -166,7 +166,29 @@ public class Board
 		return fen.ToString();
 	}
 
-	internal bool IsInCheck => MoveHelper.IsAttackedBy(GetKing(WhiteToMove).Position, this, !WhiteToMove);
+public List<string> MoveHistoryFormatted
+{
+		get
+		{
+			int moveNumber = 1;
+			List<string> formattedMoves = [];
+			string curr = "";
+			foreach (var move in MoveHistory)
+			{
+				if (moveNumber % 2 == 1)
+				{
+					formattedMoves.Add(curr);
+					curr = "";
+					curr += $"{moveNumber / 2 + 1}. ";
+				}
+				curr += move.AlgebraicNotation;
+				curr += " ";
+				moveNumber++;
+			}
+		return formattedMoves;
+    }
+}
+    internal bool IsInCheck => MoveHelper.IsAttackedBy(GetKing(WhiteToMove).Position, this, !WhiteToMove);
 	internal bool IsChecking => MoveHelper.IsAttackedBy(GetKing(!WhiteToMove).Position, this, WhiteToMove);
 	internal bool IsMate => IsInCheck && GetValidMoves().Count == 0;
 	internal bool IsDraw => MoveHelper.CalculateDraw(this);

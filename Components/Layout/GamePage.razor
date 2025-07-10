@@ -14,13 +14,18 @@
     @if (gameSession != null)
     {
         <MudStack Spacing="3" AlignItems="AlignItems.Center">
-            <ChessBoard Board="Board" OnSquareSelected="@(async (tuple) => await HandleSquareSelected(tuple))" InvertView="InvertView" />
             <MudPaper>
             <MudText Typo="Typo.h4" Align="Align.Center"> Turn: @(Board.WhiteToMove ? "White" : "Black") </MudText>
-            <MudText Typo="Typo.subtitle2">Session ID: @SessionId</MudText>
+            <ChessBoard Board="Board" OnSquareSelected="@(async (tuple) => await HandleSquareSelected(tuple))" InvertView="InvertView" />
+            <MudText Typo="Typo.body1" Align="Align.Center">
+                Move history: @foreach (var move in Board.MoveHistoryFormatted)
+                {
+                    <MudText>@move</MudText>
+                }
+            </MudText>
             </MudPaper>
+            <MudButton OnClick="ToStart"> Go to home </MudButton>
         </MudStack>            
-        <MudButton OnClick="ToStart"> Go to Home </MudButton>
         
     }
     else
@@ -32,10 +37,8 @@
             <MudText Typo="Typo.body1" Align="Align.Center" >
                 Invalid or expired game session. Please start a new game.
             </MudText>
-            <MudButton OnClick="ToStart">
-                Go to Home
-            </MudButton>
         </MudPaper>
+        <MudButton OnClick="ToStart"> Go to home </MudButton>
     }
 </MudContainer>
 

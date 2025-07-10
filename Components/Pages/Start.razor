@@ -6,27 +6,27 @@
 
 <MudContainer MaxWidth="MaxWidth.Medium">
     <MudPaper Class="pa-8" Elevation="3">
-        <MudText Typo="Typo.h3" Align="Align.Center" >
+        <MudText Typo="Typo.h3" Align="Align.Center" Class="mb-6">
             Welcome to WebChess!
-        </MudText>
-        
-        <MudText Typo="Typo.body1" Align="Align.Center"  Color="Color.Secondary">
-            Choose your game mode and start playing!
         </MudText>
 
         <MudGrid Justify="Justify.Center" Spacing="6">
+            <MudItem>
                 <MudButton 
                     Size="Size.Large" 
                     OnClick="NewLocalGame"
                     Class="game-mode-button">
                     <MudText Typo="Typo.button">Play Locally</MudText>
                 </MudButton>
+            </MudItem>
+            <MudItem>
                 <MudButton 
                     Size="Size.Large" 
                     OnClick="NewBotGame"
                     Class="game-mode-button">
                     <MudText Typo="Typo.button">Play vs Computer</MudText>
                 </MudButton>
+            </MudItem>
         </MudGrid>
     </MudPaper>
 </MudContainer>
