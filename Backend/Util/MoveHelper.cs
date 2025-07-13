@@ -6,19 +6,20 @@ namespace Backend.Util;
 
 internal static class MoveHelper
 {
-	internal static Move? TryCreatingMove(Board board, string move)
+	internal static bool TryCreatingMove(out Move move, Board board, string text)
 	{
-		var start = new Vector2(move[0] - 'a', move[1] - '1');
-		var end = new Vector2(move[2] - 'a', move[3] - '1');
+		move = Move.Empty;
+		var start = new Vector2(text[0] - 'a', text[1] - '1');
+		var end = new Vector2(text[2] - 'a', text[3] - '1');
 		Type? promotion = null;
-		if (move.Length == 5)
+		if (text.Length == 5)
 		{
-			var typeName = $"Chess.Backend.Core.Engine.Pieces.{(move[4] == 'q' ? "Queen" : move[4] == 'r' ? "Rook" : move[4] == 'b' ? "Bishop" : "Knight")}";
+			var typeName = $"Chess.Backend.Core.Engine.Pieces.{(text[4] == 'q' ? "Queen" : text[4] == 'r' ? "Rook" : text[4] == 'b' ? "Bishop" : "Knight")}";
 			promotion = Type.GetType(typeName, throwOnError: true);
 		}
 		var piece = board.GetPieceAt(start);
-		var moveObj = piece?.TryCreatingMove(end, board, promotionType: promotion);
-		return moveObj;
+		if (piece is null) return false;
+		return piece.TryCreatingMove(out move, end, board, promotionType: promotion);
 	}
 	internal static bool CheckPath(Vector2 start, Vector2 end, Board board)
 	{
@@ -43,7 +44,7 @@ internal static class MoveHelper
 		foreach (var piece in piecesCopy)
 		{
 			if (piece.IsWhite != white) continue;
-			if (piece.TryCreatingMove(pos, board, verifyCheck, setMoveFlags: false) is not null) return true;
+			if (piece.TryCreatingMove(out var _, pos, board, verifyCheck, setMoveFlags: false)) return true;
 		}
 		return false;
 	}
@@ -89,21 +90,12 @@ internal static class MoveHelper
 		if (piece is not Pawn) return false;
 		return piece.IsWhite && target.Y == 7 || !piece.IsWhite && target.Y == 0;
 	}
-	internal static bool IsCheck(Vector2 position, Vector2 target, Board board)
+	internal static (bool check, bool mate) IsCheckOrMate(Vector2 position, Vector2 target, Board board)
 	{
 		// Move constructor SHOULD NOT be called manually, but there is no simple other way to do this
 		var tempMove = new Move(position, target, board.GetPieceAt(position)!);
 		board.ExecuteMove(tempMove, false);
-		bool ret = board.IsInCheck;
-		board.UndoMove();
-		return ret;
-	}
-	internal static bool IsMate(Vector2 position, Vector2 target, Board board)
-	{
-		// Move constructor SHOULD NOT be called manually, but there is no simple other way to do this
-		var tempMove = new Move(position, target, board.GetPieceAt(position)!);
-		board.ExecuteMove(tempMove, false);
-		bool ret = board.IsMate;
+		var ret = (board.IsInCheck, board.IsMate);
 		board.UndoMove();
 		return ret;
 	}

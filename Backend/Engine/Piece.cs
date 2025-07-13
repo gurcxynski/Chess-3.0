@@ -10,29 +10,31 @@ public abstract class Piece(Vector2 position, bool isWhite = true)
 	internal bool HasMoved { get; set; } = false;
 	internal bool IsCaptured { get; set; } = false;
 	protected virtual bool CanJumpOver { get; } = false;
-	internal void Move(Vector2 position)
+	internal void MoveTo(Vector2 position)
 	{
 		Position = position;
 	}
-	internal Move? TryCreatingMove(int col, int row, Board board, bool verifyCheck = true, Type? promotionType = null, bool setMoveFlags = true) => TryCreatingMove(new (col, row), board, verifyCheck, promotionType, setMoveFlags);
-	internal Move? TryCreatingMove(Vector2 target, Board board, bool verifyCheck = true, Type? promotionType = null, bool setMoveFlags = true)
+	internal bool TryCreatingMove(out Move move, int col, int row, Board board, bool verifyCheck = true, Type? promotionType = null, bool setMoveFlags = true) => TryCreatingMove(out move, new (col, row), board, verifyCheck, promotionType, setMoveFlags);
+	internal bool TryCreatingMove(out Move move, Vector2 target, Board board, bool verifyCheck = true, Type? promotionType = null, bool setMoveFlags = true)
 	{
-		if (target == Position) return null;
-		if (IsCaptured) return null;
-		if (!CheckBasicMovement(target - Position, board)) return null;
-		if (!CanJumpOver && !MoveHelper.CheckPath(Position, target, board)) return null;
-		if (!MoveHelper.CheckDestination(Position, target, board)) return null;
+		move = Move.Empty;
+		if (target == Position) return false;
+		if (IsCaptured) return false;
+		if (!CheckBasicMovement(target - Position, board)) return false;
+		if (!CanJumpOver && !MoveHelper.CheckPath(Position, target, board)) return false;
+		if (!MoveHelper.CheckDestination(Position, target, board)) return false;
 		Piece? capturedPiece = MoveHelper.IsEnPassant(Position, target, board) ? MoveHelper.GetPieceCapturedByEnPassant(target, board) : board.GetPieceAt(target);
-		Move move = new(Position, target, this,
+		var (check, mate) = MoveHelper.IsCheckOrMate(Position, target, board);
+		move = new(Position, target, this,
 			capturedPiece: capturedPiece,
 			firstMove: !HasMoved,
 			castles: MoveHelper.IsCastles(Position, target, board),
 			promotion: MoveHelper.IsPromotion(this, target),
 			promotiontype: promotionType,
-			isCheck: setMoveFlags && MoveHelper.IsCheck(Position, target, board),
-			isMate: setMoveFlags && MoveHelper.IsMate(Position, target, board));
-		if (verifyCheck && MoveHelper.WillBeChecked(move, board)) return null;
-		return move;
+			isCheck: setMoveFlags && check,
+			isMate: setMoveFlags && mate);
+		if (verifyCheck && MoveHelper.WillBeChecked(move, board)) return false;
+		return true;
 	}
 	protected abstract bool CheckBasicMovement(Vector2 direction, Board board);
 	public override string ToString()

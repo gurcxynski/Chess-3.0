@@ -23,8 +23,7 @@
 		InvertView = !PlayerIsWhite;
 		api.OnMoveDataReceived += async (sender, e) =>
 		{
-			var move = Backend.Util.MoveHelper.TryCreatingMove(gamePageRef!.Board, System.Text.Encoding.UTF8.GetString(e.Item1, 0, e.Item2));
-			if (move is null) return;
+			if (!Backend.Util.MoveHelper.TryCreatingMove(out var move, gamePageRef!.Board, System.Text.Encoding.UTF8.GetString(e.Item1, 0, e.Item2))) return;
 			gamePageRef!.Board.ExecuteMove(move);
 			await InvokeAsync(StateHasChanged);
 		};
@@ -46,8 +45,7 @@
 			gamePageRef!.Selected = clicked;
 			return Task.CompletedTask;
 		}
-		Move? move = gamePageRef!.Selected.TryCreatingMove(col, row, board);
-		if (move is null) return Task.CompletedTask;
+		if (!gamePageRef!.Selected.TryCreatingMove(out var move, col, row, board)) return Task.CompletedTask;
 
 		board.ExecuteMove(move);
 		api.SendFen(board.ToString());

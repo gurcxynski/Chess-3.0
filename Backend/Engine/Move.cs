@@ -1,3 +1,4 @@
+using Backend.Engine.Pieces;
 using Backend.Util;
 using System.Numerics;
 
@@ -5,6 +6,7 @@ namespace Backend.Engine;
 
 public class Move(Vector2 start, Vector2 end, Piece movedPiece, Piece? capturedPiece = null, bool castles = false, bool promotion = false, Type? promotiontype = null, bool firstMove = false, bool isCheck = false, bool isMate = false)
 {
+	internal static Move Empty => new(Vector2.Zero, Vector2.Zero, new Pawn(Vector2.Zero));
 	internal Vector2 Start { get; private init; } = start;
 	internal Vector2 End { get; private init; } = end;
 	internal Piece MovedPiece { get; private init; } = movedPiece;

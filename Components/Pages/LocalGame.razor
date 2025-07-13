@@ -27,8 +27,7 @@
             return Task.CompletedTask;
         }
         
-        Move? move = gamePageRef!.Selected.TryCreatingMove(col, row, board);
-        if (move is null) {
+        if (!gamePageRef!.Selected.TryCreatingMove(out var move, col, row, board)) {
             Console.WriteLine("Invalid move");
             return Task.CompletedTask;
         }

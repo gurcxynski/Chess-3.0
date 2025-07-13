@@ -54,7 +54,7 @@ public class Board
 	internal void ExecuteMove(Move move, bool isReal = true)
 	{
 		if (move.IsCapture) move.CapturedPiece!.IsCaptured = true;
-		move.MovedPiece.Move(move.End);
+		move.MovedPiece.MoveTo(move.End);
 		if (isReal) move.MovedPiece.HasMoved = true;
 		if (isReal && move.IsPromotion) PromotePawn(move.MovedPiece, move.PromotionPieceType!);
 		WhiteToMove = !WhiteToMove;
@@ -66,12 +66,12 @@ public class Board
 		if (move.End.X == 2)
 		{
 			Piece rook = GetPieceAt(new(0, move.Start.Y))!;
-			rook.Move(new(3, move.Start.Y));
+			rook.MoveTo(new(3, move.Start.Y));
 		}
 		else if (move.End.X == 6)
 		{
 			Piece rook = GetPieceAt(new(7, move.Start.Y))!;
-			rook.Move(new(5, move.Start.Y));
+			rook.MoveTo(new(5, move.Start.Y));
 		}
 	}
 
@@ -79,7 +79,7 @@ public class Board
 	{
 		if (MoveCount == 0) return;
 		Move move = moveStack.Pop();
-		move.MovedPiece.Move(move.Start);
+		move.MovedPiece.MoveTo(move.Start);
 		WhiteToMove = !WhiteToMove;
 		if (move.IsCapture) move.CapturedPiece!.IsCaptured = false;
 		if (move.IsFirstMoveOfPiece) move.MovedPiece.HasMoved = false;
@@ -87,12 +87,12 @@ public class Board
 		if (move.End.X == 2)
 		{
 			Piece rook = GetPieceAt(new(3, move.Start.Y))!;
-			rook.Move(new(0, move.Start.Y));
+			rook.MoveTo(new(0, move.Start.Y));
 		}
 		if (move.End.X == 6)
 		{
 			Piece rook = GetPieceAt(new(5, move.Start.Y))!;
-			rook.Move(new(7, move.Start.Y));
+			rook.MoveTo(new(7, move.Start.Y));
 		}
 	}
 	private List<Move> GetValidMoves()
@@ -107,8 +107,7 @@ public class Board
 				{
 					Vector2 pos = new(x, y);
 					if (pos == piece.Position) continue;
-					Move? move = piece.TryCreatingMove(pos, this, setMoveFlags: false);
-					if (move is not null) validMoves.Add(move);
+					if (piece.TryCreatingMove(out var move, pos, this, setMoveFlags: false)) validMoves.Add(move);
 				}
 			}
 		}
