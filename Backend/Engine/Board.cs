@@ -47,7 +47,7 @@ public class Board
 
 	internal Piece? GetPieceAt(Vector2 pos) => Pieces.Find(piece => piece.Position == pos && !piece.IsCaptured);
 	internal Piece? GetPieceAt(int x, int y) => GetPieceAt(new Vector2(x, y));
-	internal List<Piece> GetAll(Type type) => Pieces.Where(piece => piece.GetType() == type).ToList();
+	internal List<Piece> GetAll(Type type) => [.. Pieces.Where(piece => piece.GetType() == type)];
 	internal Piece GetKing(bool isWhite) => isWhite ? whiteKing : blackKing;
 	internal Move? LastMove => moveStack.Count > 0 ? moveStack.Peek() : null;
 
@@ -107,7 +107,7 @@ public class Board
 				{
 					Vector2 pos = new(x, y);
 					if (pos == piece.Position) continue;
-					Move? move = piece.TryCreatingMove(pos, this);
+					Move? move = piece.TryCreatingMove(pos, this, setMoveFlags: false);
 					if (move is not null) validMoves.Add(move);
 				}
 			}
@@ -166,28 +166,24 @@ public class Board
 		return fen.ToString();
 	}
 
-public List<string> MoveHistoryFormatted
-{
-		get
-		{
-			int moveNumber = 1;
-			List<string> formattedMoves = [];
-			string curr = "";
-			foreach (var move in MoveHistory)
+	public string AlgrebraicMoveHistory
+	{
+			get
 			{
-				if (moveNumber % 2 == 1)
+				int moveNumber = 0;
+				StringBuilder formattedMoves = new();
+				foreach (Move move in MoveHistory)
 				{
-					formattedMoves.Add(curr);
-					curr = "";
-					curr += $"{moveNumber / 2 + 1}. ";
+					if (move.OfWhite)
+					{
+						moveNumber++;
+						formattedMoves.Append(moveNumber + ". ");
+					}
+					formattedMoves.Append(move.AlgebraicNotation).Append(' ');
 				}
-				curr += move.AlgebraicNotation;
-				curr += " ";
-				moveNumber++;
-			}
-		return formattedMoves;
-    }
-}
+				return formattedMoves.ToString();
+	    }
+	}
     internal bool IsInCheck => MoveHelper.IsAttackedBy(GetKing(WhiteToMove).Position, this, !WhiteToMove);
 	internal bool IsChecking => MoveHelper.IsAttackedBy(GetKing(!WhiteToMove).Position, this, WhiteToMove);
 	internal bool IsMate => IsInCheck && GetValidMoves().Count == 0;

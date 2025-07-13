@@ -43,7 +43,7 @@ internal static class MoveHelper
 		foreach (var piece in piecesCopy)
 		{
 			if (piece.IsWhite != white) continue;
-			if (piece.TryCreatingMove(pos, board, verifyCheck) is not null) return true;
+			if (piece.TryCreatingMove(pos, board, verifyCheck, setMoveFlags: false) is not null) return true;
 		}
 		return false;
 	}
@@ -83,14 +83,28 @@ internal static class MoveHelper
 	{
 		return board.GetPieceAt(position) is King && Math.Abs(position.X - target.X) == 2;
 	}
-	internal static string TypeToString<T>(bool white) where T : Piece
-	{
-		return (white ? "w" : "b") + typeof(T).Name.Split('.')[^1];
-	}
 
 	internal static bool IsPromotion(Piece piece, Vector2 target)
 	{
 		if (piece is not Pawn) return false;
 		return piece.IsWhite && target.Y == 7 || !piece.IsWhite && target.Y == 0;
+	}
+	internal static bool IsCheck(Vector2 position, Vector2 target, Board board)
+	{
+		// Move constructor SHOULD NOT be called manually, but there is no simple other way to do this
+		var tempMove = new Move(position, target, board.GetPieceAt(position)!);
+		board.ExecuteMove(tempMove, false);
+		bool ret = board.IsInCheck;
+		board.UndoMove();
+		return ret;
+	}
+	internal static bool IsMate(Vector2 position, Vector2 target, Board board)
+	{
+		// Move constructor SHOULD NOT be called manually, but there is no simple other way to do this
+		var tempMove = new Move(position, target, board.GetPieceAt(position)!);
+		board.ExecuteMove(tempMove, false);
+		bool ret = board.IsMate;
+		board.UndoMove();
+		return ret;
 	}
 }

@@ -18,10 +18,7 @@
             <MudText Typo="Typo.h4" Align="Align.Center"> Turn: @(Board.WhiteToMove ? "White" : "Black") </MudText>
             <ChessBoard Board="Board" OnSquareSelected="@(async (tuple) => await HandleSquareSelected(tuple))" InvertView="InvertView" />
             <MudText Typo="Typo.body1" Align="Align.Center">
-                Move history: @foreach (var move in Board.MoveHistoryFormatted)
-                {
-                    <MudText>@move</MudText>
-                }
+                Move history: @Board.AlgrebraicMoveHistory
             </MudText>
             </MudPaper>
             <MudButton OnClick="ToStart"> Go to home </MudButton>

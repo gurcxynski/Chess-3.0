@@ -14,8 +14,8 @@ public abstract class Piece(Vector2 position, bool isWhite = true)
 	{
 		Position = position;
 	}
-	internal Move? TryCreatingMove(int col, int row, Board board, bool verifyCheck = true, Type? promotionType = null) => TryCreatingMove(new (col, row), board, verifyCheck, promotionType);
-	internal Move? TryCreatingMove(Vector2 target, Board board, bool verifyCheck = true, Type? promotionType = null)
+	internal Move? TryCreatingMove(int col, int row, Board board, bool verifyCheck = true, Type? promotionType = null, bool setMoveFlags = true) => TryCreatingMove(new (col, row), board, verifyCheck, promotionType, setMoveFlags);
+	internal Move? TryCreatingMove(Vector2 target, Board board, bool verifyCheck = true, Type? promotionType = null, bool setMoveFlags = true)
 	{
 		if (target == Position) return null;
 		if (IsCaptured) return null;
@@ -23,10 +23,14 @@ public abstract class Piece(Vector2 position, bool isWhite = true)
 		if (!CanJumpOver && !MoveHelper.CheckPath(Position, target, board)) return null;
 		if (!MoveHelper.CheckDestination(Position, target, board)) return null;
 		Piece? capturedPiece = MoveHelper.IsEnPassant(Position, target, board) ? MoveHelper.GetPieceCapturedByEnPassant(target, board) : board.GetPieceAt(target);
-		Move move = new(Position, target, this, capturedPiece, firstMove: !HasMoved, castles: MoveHelper.IsCastles(Position, target, board), promotion: MoveHelper.IsPromotion(this, target))
-		{
-			PromotionPieceType = promotionType
-		};
+		Move move = new(Position, target, this,
+			capturedPiece: capturedPiece,
+			firstMove: !HasMoved,
+			castles: MoveHelper.IsCastles(Position, target, board),
+			promotion: MoveHelper.IsPromotion(this, target),
+			promotiontype: promotionType,
+			isCheck: setMoveFlags && MoveHelper.IsCheck(Position, target, board),
+			isMate: setMoveFlags && MoveHelper.IsMate(Position, target, board));
 		if (verifyCheck && MoveHelper.WillBeChecked(move, board)) return null;
 		return move;
 	}
